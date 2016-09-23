@@ -1,0 +1,30 @@
+{
+  "name": "dev3map",
+  "version": "0.0.1",
+  "description": "Worldmap for the Devoted 3.0 Minecraft server",
+  "author": "Gjum",
+  "license": "MIT",
+  "homepage": "https://github.com/Gjum/dev3map#readme",
+  "bugs": {
+    "url": "https://github.com/Gjum/dev3map/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gjum/dev3map.git"
+  },
+  "dependencies": {
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "babelify": "^7.3.0",
+    "leaflet": "^1.0.0-rc.3",
+    "react": "^15.3.1",
+    "react-bootstrap": "^0.30.3",
+    "react-dom": "^15.3.1",
+    "react-leaflet": "^1.0.0-beta.3",
+    "uglify-js": "^2.7.3"
+  },
+  "scripts": {
+    "postinstall": "browserify js/app.jsx -t [ babelify --presets [ es2015 react ] ] | uglifyjs -o bundle.js",
+    "watchify": "watchify js/app.jsx -o bundle.js -v -t [ babelify --presets [ es2015 react ] ]"
+  }
+}
