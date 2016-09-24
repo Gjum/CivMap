@@ -7,6 +7,7 @@ var Util = require('./util.js');
 
 const attribution = '<a href="https://dev3map.github.io">dev3map.github.io</a>';
 const tilesUrl = 'https://raw.githubusercontent.com/dev3map/tiles/master/world/';
+const claimsUrl = 'data/claims.json';
 
 var mcCRS = L.extend({}, L.CRS.Simple, {
   transformation: new L.Transformation(1, 0, 1, 0)
@@ -37,11 +38,14 @@ class McMap extends React.Component {
     this.state = {
       view: Util.hashToView(location.hash),
       cursorPos: L.latLng(0,0),
+      claims: [],
     };
   }
 
   componentWillMount() {
-    // TODO load json data into state here
+    Util.getJSON(claimsUrl, claims => {
+      this.setState({claims: claims});
+    });
   }
 
   onmoveend(o) {
@@ -84,6 +88,18 @@ class McMap extends React.Component {
         <CoordsDisplay cursor={this.state.cursorPos} />
 
         <RL.LayersControl position='topright'>
+
+          { this.state.claims.length <= 0 ? null :
+            <RL.LayersControl.Overlay name='claims' checked={true}>
+              <RL.LayerGroup>
+                { this.state.claims.map((claim, i) =>
+                  <RL.Polygon key={i} {...claim}>
+                    <RL.Popup><span>{claim.name}</span></RL.Popup>
+                  </RL.Polygon>
+                )}
+              </RL.LayerGroup>
+            </RL.LayersControl.Overlay>
+          }
 
           <RL.LayersControl.Overlay name='world border' checked={true}>
             <RL.Rectangle
