@@ -59,7 +59,7 @@ class McMap extends React.Component {
     var minZoom = -4;
     return (
       <RL.Map
-          className="map modal-container"
+          className="map"
           crs={mcCRS}
           maxBounds={tileBounds}
           center={Util.xz(this.state.view.x, this.state.view.z)}
