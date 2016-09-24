@@ -1,5 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var LE = require('leaflet-editable');
 var L = require('leaflet');
 var RL = require('react-leaflet');
 
@@ -30,6 +31,21 @@ class CoordsDisplay extends React.Component {
     return <div className='coords-display control-box leaflet-control leaflet-control-layers'>
       {'X ' + x + ' ' + z + ' Z'}</div>;
   }
+}
+
+function deepLatLngToArr(arr) {
+  if (Array.isArray(arr))
+    return arr.map(e => deepLatLngToArr(e));
+  var z = parseInt(arr.lat), x = parseInt(arr.lng);
+  if (z % 10 == 9) z += 1;
+  else if (z % 10 == -9) z -= 1;
+  if (x % 10 == 9) x += 1;
+  else if (x % 10 == -9) x -= 1;
+  return [z, x];
+}
+
+function printShape(latlngs) {
+  console.log(JSON.stringify(deepLatLngToArr(latlngs)));
 }
 
 class McMap extends React.Component {
@@ -72,6 +88,7 @@ class McMap extends React.Component {
           minZoom={minZoom}
           onmoveend={this.onmoveend.bind(this)}
           onmousemove={this.onmousemove.bind(this)}
+          editable={true}
           >
 
         <RL.TileLayer
@@ -96,7 +113,12 @@ class McMap extends React.Component {
                   <RL.Polygon key={i}
                       {...claim}
                       color='#fff'
-                      fillColor={claim.color}>
+                      fillColor={claim.color}
+                      onClick={e => {
+                        printShape(e.target._latlngs);
+                        e.target.toggleEdit();
+                      }}
+                      >
                     <RL.Popup><span>{claim.name}</span></RL.Popup>
                   </RL.Polygon>
                 )}
