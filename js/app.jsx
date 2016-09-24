@@ -93,7 +93,10 @@ class McMap extends React.Component {
             <RL.LayersControl.Overlay name='claims' checked={true}>
               <RL.LayerGroup>
                 { this.state.claims.map((claim, i) =>
-                  <RL.Polygon key={i} {...claim}>
+                  <RL.Polygon key={i}
+                      {...claim}
+                      color='#fff'
+                      fillColor={claim.color}>
                     <RL.Popup><span>{claim.name}</span></RL.Popup>
                   </RL.Polygon>
                 )}
