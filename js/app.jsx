@@ -1,5 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var LE = require('leaflet-editable');
 var L = require('leaflet');
 var RL = require('react-leaflet');
 
@@ -7,6 +8,7 @@ var Util = require('./util.js');
 
 const attribution = '<a href="https://dev3map.github.io">dev3map.github.io</a>';
 const tilesUrl = 'https://raw.githubusercontent.com/dev3map/tiles/master/world/';
+const claimsUrl = 'data/claims.json';
 
 var mcCRS = L.extend({}, L.CRS.Simple, {
   transformation: new L.Transformation(1, 0, 1, 0)
@@ -31,17 +33,42 @@ class CoordsDisplay extends React.Component {
   }
 }
 
+function EditablePolygonClaim(claim, key) {
+  var poly;
+  return <RL.Polygon key={key}
+        {...claim}
+        color='#fff'
+        fillColor={claim.color}
+        ref={r => {if (r) poly = r.leafletElement}}
+        >
+      <RL.Popup><span>
+        {claim.name}
+        <br />
+        <a onClick={e => {
+            if (poly) {
+              Util.printShape(claim.name, poly._latlngs);
+              poly.toggleEdit();
+            }
+          }}>
+          edit</a>
+      </span></RL.Popup>
+    </RL.Polygon>;
+}
+
 class McMap extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       view: Util.hashToView(location.hash),
       cursorPos: L.latLng(0,0),
+      claims: [],
     };
   }
 
   componentWillMount() {
-    // TODO load json data into state here
+    Util.getJSON(claimsUrl, claims => {
+      this.setState({claims: claims});
+    });
   }
 
   onmoveend(o) {
@@ -53,13 +80,40 @@ class McMap extends React.Component {
     this.setState({cursorPos: o.latlng});
   }
 
+  onMapRef(ref) {
+    if (ref && !this.map) {
+      var map = this.map = ref.leafletElement;
+
+      map.on('editable:drawing:click', (e) => Util.printShape("new shape", e.layer._latlngs));
+      map.on('editable:drawing:end', (e) => Util.printShape("new shape", e.layer._latlngs));
+
+      L.NewPolygonControl = L.Control.extend({
+        options: {
+          position: 'topleft'
+        },
+        onAdd: function (map) {
+          var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+          link = L.DomUtil.create('a', '', container);
+          link.href = '#';
+          link.title = 'Create a new polygon';
+          link.innerHTML = '▱';
+          L.DomEvent.on(link, 'click', L.DomEvent.stop)
+            .on(link, 'click', () => map.editTools.startPolygon());
+          return container;
+        }
+      });
+      map.addControl(new L.NewPolygonControl());
+    }
+  }
+
   render() {
     var tileBounds = L.latLngBounds([-5120, -5120], [5120, 5120]);
     var borderBounds = L.latLngBounds([-5000, -5000], [5000, 5000]);
     var minZoom = -4;
     return (
       <RL.Map
-          className="map modal-container"
+          className="map"
+          ref={this.onMapRef.bind(this)}
           crs={mcCRS}
           maxBounds={tileBounds}
           center={Util.xz(this.state.view.x, this.state.view.z)}
@@ -68,6 +122,7 @@ class McMap extends React.Component {
           minZoom={minZoom}
           onmoveend={this.onmoveend.bind(this)}
           onmousemove={this.onmousemove.bind(this)}
+          editable={true}
           >
 
         <RL.TileLayer
@@ -84,6 +139,14 @@ class McMap extends React.Component {
         <CoordsDisplay cursor={this.state.cursorPos} />
 
         <RL.LayersControl position='topright'>
+
+          { this.state.claims.length <= 0 ? null :
+            <RL.LayersControl.Overlay name='claims' checked={true}>
+              <RL.LayerGroup>
+                { this.state.claims.map(EditablePolygonClaim) }
+              </RL.LayerGroup>
+            </RL.LayersControl.Overlay>
+          }
 
           <RL.LayersControl.Overlay name='world border' checked={true}>
             <RL.Rectangle
