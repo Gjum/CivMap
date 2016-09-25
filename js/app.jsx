@@ -73,6 +73,32 @@ class McMap extends React.Component {
     this.setState({cursorPos: o.latlng});
   }
 
+  onMapRef(ref) {
+    if (ref && !this.map) {
+      var map = this.map = ref.leafletElement;
+
+      map.on('editable:drawing:click', (e) => printShape(e.layer._latlngs));
+      map.on('editable:drawing:end', (e) => printShape(e.layer._latlngs));
+
+      L.NewPolygonControl = L.Control.extend({
+        options: {
+          position: 'topleft'
+        },
+        onAdd: function (map) {
+          var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+          link = L.DomUtil.create('a', '', container);
+          link.href = '#';
+          link.title = 'Create a new polygon';
+          link.innerHTML = '▱';
+          L.DomEvent.on(link, 'click', L.DomEvent.stop)
+            .on(link, 'click', () => map.editTools.startPolygon());
+          return container;
+        }
+      });
+      map.addControl(new L.NewPolygonControl());
+    }
+  }
+
   render() {
     var tileBounds = L.latLngBounds([-5120, -5120], [5120, 5120]);
     var borderBounds = L.latLngBounds([-5000, -5000], [5000, 5000]);
@@ -80,6 +106,7 @@ class McMap extends React.Component {
     return (
       <RL.Map
           className="map"
+          ref={this.onMapRef.bind(this)}
           crs={mcCRS}
           maxBounds={tileBounds}
           center={Util.xz(this.state.view.x, this.state.view.z)}
