@@ -38,10 +38,22 @@ function hashToView(hash) {
   return {x: parseFloat(x), z: parseFloat(z), zoom: parseFloat(zoom)};
 }
 
+function deepLatLngToArr(o) {
+  if (Array.isArray(o))
+    return o.map(e => deepLatLngToArr(e));
+  return [Math.round(o.lat), Math.round(o.lng)];
+}
+
+function printShape(text, latlngs) {
+  console.log(text, JSON.stringify(deepLatLngToArr(latlngs)));
+}
+
 module.exports = {
   getJSON: getJSON,
   xz: xz,
   intCoords: intCoords,
   viewToHash: viewToHash,
   hashToView: hashToView,
+  deepLatLngToArr: deepLatLngToArr,
+  printShape: printShape,
 }

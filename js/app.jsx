@@ -33,19 +33,26 @@ class CoordsDisplay extends React.Component {
   }
 }
 
-function deepLatLngToArr(arr) {
-  if (Array.isArray(arr))
-    return arr.map(e => deepLatLngToArr(e));
-  var z = parseInt(arr.lat), x = parseInt(arr.lng);
-  if (z % 10 == 9) z += 1;
-  else if (z % 10 == -9) z -= 1;
-  if (x % 10 == 9) x += 1;
-  else if (x % 10 == -9) x -= 1;
-  return [z, x];
-}
-
-function printShape(latlngs) {
-  console.log(JSON.stringify(deepLatLngToArr(latlngs)));
+function EditablePolygonClaim(claim, key) {
+  var poly;
+  return <RL.Polygon key={key}
+        {...claim}
+        color='#fff'
+        fillColor={claim.color}
+        ref={r => {if (r) poly = r.leafletElement}}
+        >
+      <RL.Popup><span>
+        {claim.name}
+        <br />
+        <a onClick={e => {
+            if (poly) {
+              Util.printShape(claim.name, poly._latlngs);
+              poly.toggleEdit();
+            }
+          }}>
+          edit</a>
+      </span></RL.Popup>
+    </RL.Polygon>;
 }
 
 class McMap extends React.Component {
@@ -77,8 +84,8 @@ class McMap extends React.Component {
     if (ref && !this.map) {
       var map = this.map = ref.leafletElement;
 
-      map.on('editable:drawing:click', (e) => printShape(e.layer._latlngs));
-      map.on('editable:drawing:end', (e) => printShape(e.layer._latlngs));
+      map.on('editable:drawing:click', (e) => Util.printShape("new shape", e.layer._latlngs));
+      map.on('editable:drawing:end', (e) => Util.printShape("new shape", e.layer._latlngs));
 
       L.NewPolygonControl = L.Control.extend({
         options: {
@@ -136,19 +143,7 @@ class McMap extends React.Component {
           { this.state.claims.length <= 0 ? null :
             <RL.LayersControl.Overlay name='claims' checked={true}>
               <RL.LayerGroup>
-                { this.state.claims.map((claim, i) =>
-                  <RL.Polygon key={i}
-                      {...claim}
-                      color='#fff'
-                      fillColor={claim.color}
-                      onClick={e => {
-                        printShape(e.target._latlngs);
-                        e.target.toggleEdit();
-                      }}
-                      >
-                    <RL.Popup><span>{claim.name}</span></RL.Popup>
-                  </RL.Polygon>
-                )}
+                { this.state.claims.map(EditablePolygonClaim) }
               </RL.LayerGroup>
             </RL.LayersControl.Overlay>
           }
