@@ -7,4 +7,11 @@ import Main from './Main';
 // http://stackoverflow.com/a/34015469/988941
 injectTapEventPlugin();
 
-render(<Main />, document.getElementById('app'));
+render(
+  <Main
+    attribution='<a href="https://dev3map.github.io">dev3map.github.io</a>'
+    tilesUrl='https://raw.githubusercontent.com/dev3map/tiles/master/world/'
+    claimsUrl='https://raw.githubusercontent.com/dev3map/dev3map.github.io/master/data/claims.json'
+  />,
+  document.getElementById('app')
+);

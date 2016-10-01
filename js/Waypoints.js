@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import * as RL from 'react-leaflet';
 import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconUpload from 'material-ui/svg-icons/file/file-upload';
 
@@ -7,6 +8,8 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+
+import Util from './Util';
 
 function parseWaypoints(text) {
   // name, x, z, y, enabled, red, green, blue, suffix, world, dimensions
@@ -27,6 +30,24 @@ function parseWaypoints(text) {
       point.enabled = point.enabled == 'true';
       return point;
     });
+}
+
+export class WaypointsOverlay extends Component {
+  render() {
+    if (!this.props.waypoints || this.props.waypoints.length <= 0)
+      return null;
+    return <RL.LayerGroup>
+      { this.props.waypoints.map((w, key) =>
+        <RL.Marker key={key} position={Util.xz(w.x, w.z)} title={w.name}>
+          <RL.Popup><span>
+            {w.name}
+            <br />
+            {w.x} {w.y} {w.z}
+          </span></RL.Popup>
+        </RL.Marker>
+      )}
+    </RL.LayerGroup>;
+  }
 }
 
 export class WaypointsDialog extends Component {
@@ -65,6 +86,7 @@ export class WaypointsDialog extends Component {
       actions={actions}
       onRequestClose={this.props.onClose}
     >
+      Your waypoints are stored in <code>(.minecraft)/mods/VoxelMods/voxelMap/(server).points</code>
       <TextField fullWidth multiLine rows={2} rowsMax={10}
         hintText="Paste your waypoints here"
         value={this.state.value}
