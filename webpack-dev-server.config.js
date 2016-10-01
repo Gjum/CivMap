@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const buildPath = path.resolve(__dirname, 'build');
+const buildPath = path.resolve(__dirname, 'docs');
 const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const TransferWebpackPlugin = require('transfer-webpack-plugin');
 
@@ -9,11 +9,11 @@ const config = {
   entry: [
     'webpack/hot/dev-server',
     'webpack/hot/only-dev-server',
-    path.join(__dirname, '/src/js/app.js'),
+    path.join(__dirname, '/js/app.js'),
   ],
   // Server Configuration options
   devServer: {
-    contentBase: 'src/www', // Relative directory for base of server
+    contentBase: 'docs', // Relative directory for base of server
     devtool: 'eval',
     hot: true, // Live-reload
     inline: true,
@@ -23,17 +23,13 @@ const config = {
   devtool: 'eval',
   output: {
     path: buildPath, // Path of output file
-    filename: 'app.js',
+    filename: 'bundle.js',
   },
   plugins: [
     // Enables Hot Modules Replacement
     new webpack.HotModuleReplacementPlugin(),
     // Allows error warnings but does not stop compiling.
     new webpack.NoErrorsPlugin(),
-    // Moves files
-    new TransferWebpackPlugin([
-      {from: 'www'},
-    ], path.resolve(__dirname, 'src')),
   ],
   module: {
     loaders: [
