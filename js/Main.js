@@ -81,6 +81,7 @@ export default class Main extends Component {
       showBorder: true,
       showClaims: true,
       showWaypoints: true,
+      showTerrain: true,
       // map data
       mapView: Util.hashToView(location.hash), // read only! TODO feedback loop onmoveend <-> setState
       cursorPos: L.latLng(0,0),
@@ -203,6 +204,11 @@ export default class Main extends Component {
                 onToggle={() => this.setState({showClaims: !this.state.showClaims})}
               />
               <CustomToggle
+                label="Terrain"
+                toggled={this.state.showTerrain}
+                onToggle={() => this.setState({showTerrain: !this.state.showTerrain})}
+              />
+              <CustomToggle
                 label="Waypoints"
                 toggled={this.state.showWaypoints}
                 onToggle={() => this.setState({showWaypoints: !this.state.showWaypoints})}
@@ -276,6 +282,7 @@ export default class Main extends Component {
                 minZoom={minZoom}
                 maxNativeZoom={0}
                 continuousWorld={true}
+                opacity={this.state.showTerrain ? 1 : 0}
                 />
 
               <CoordsDisplay cursor={this.state.cursorPos} />

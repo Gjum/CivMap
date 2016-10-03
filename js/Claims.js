@@ -24,6 +24,7 @@ export class EditableClaim extends Component {
         positions={this.positions}
         color='#fff'
         fillColor={this.props.claim.color}
+        fillOpacity={0.8}
         ref={ref => {if (ref) {
           var poly = ref.leafletElement;
           if (this.props.isEditedClaim) {
