@@ -263,7 +263,6 @@ export default class Main extends Component {
               className="map"
               ref={ref => {if (ref) this.onMapCreated(ref.leafletElement)}}
               crs={mcCRS}
-              maxBounds={tileBounds}
               center={Util.xz(this.state.mapView.x, this.state.mapView.z)}
               zoom={this.state.mapView.zoom}
               maxZoom={5}
