@@ -1,17 +1,15 @@
-# CivMap
+# dev3map
 
-Worldmap for Civ-style Minecraft servers
-
+Worldmap for the Devoted 3.0 Minecraft server
 
 ## Installation
 
-After cloning the repository, install dependencies:
+After cloning the repository, install the dependencies:
 ```sh
-cd <project folder>/material-ui/examples/webpack-example
 npm install
 ```
 
-Now you can run your local server:
+Now you can run your local web server:
 ```sh
 npm start
 ```
