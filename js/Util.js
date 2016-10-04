@@ -47,13 +47,3 @@ export function deepLatLngToArr(o) {
     return o.map(e => deepLatLngToArr(e));
   return [Math.round(o.lat), Math.round(o.lng)];
 }
-
-export function triangle(center) {
-  var {lat: z, lng: x} = center;
-  var size = 100; // TODO from zoom
-  return [
-    [z-size, x+size],
-    [z     , x-size],
-    [z+size, x     ],
-  ];
-}

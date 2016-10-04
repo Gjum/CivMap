@@ -99,18 +99,6 @@ export default class Main extends Component {
   onMapCreated(map) {
     if (!this.map) {
       this.map = map;
-      this.map.on('editable:editing', e => this.updatePolyPositions(this.state.editedClaimId)(e));
-    }
-  }
-
-  updatePolyPositions(polyId) {
-    return e => {
-      window.setTimeout(() => {
-        var claim = this.state.claims[polyId];
-        var newPositions = Util.deepLatLngToArr(e.layer._latlngs);
-        claim.positions = newPositions;
-        this.setState({claims: this.state.claims});
-      }, 0);
     }
   }
 
@@ -183,8 +171,8 @@ export default class Main extends Component {
               onTouchTap={() => {
                 var claim = {
                   name: '',
-                  color: '#ffffff',
-                  positions: Util.triangle(this.map.getCenter()),
+                  color: '#000000',
+                  positions: [],
                 };
                 var claimId = this.state.claims.length;
                 this.state.claims.push(claim);
@@ -234,22 +222,21 @@ export default class Main extends Component {
               && this.state.editedClaimId >= 0
               && this.state.activeDrawer == 'claimEdit'}
           >
-            <MenuItem
-              primaryText='Back to menu'
-              leftIcon={<IconMenu />}
-              onTouchTap={() => {
-                this.setState({
-                  activeDrawer: 'main',
-                  editedClaimId: -1,
-                });
-              }}
-            />
             { this.state.editedClaimId < 0 ? null :
               <ClaimsDrawerContent
+                map={this.map}
                 claim={this.state.claims[this.state.editedClaimId]}
-                onUpdateClaim={(claim) => {
-                  this.state.claims[this.state.editedClaimId] = claim;
-                  this.setState({claims: this.state.claims});
+                onSave={claim => {
+                  var newClaims = this.state.claims.slice();
+                  newClaims[this.state.editedClaimId] = claim;
+                  this.setState({claims: newClaims});
+                }}
+                onClose={() => {
+                  // TODO delete created claim if empty
+                  this.setState({
+                    activeDrawer: 'main',
+                    editedClaimId: -1,
+                  });
                 }}
               />
             }
@@ -298,8 +285,8 @@ export default class Main extends Component {
                 <EditableClaim
                   key={claimId}
                   claim={claim}
-                  isEditedClaim={claimId == this.state.editedClaimId}
-                  onEditClicked={e => {
+                  opacity={claimId == this.state.editedClaimId ? 0 : .7}
+                  onEditClicked={() => {
                     this.setDrawerState(true);
                     this.setState({
                       activeDrawer: 'claimEdit',
