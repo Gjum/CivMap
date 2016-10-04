@@ -154,7 +154,7 @@ export default class Main extends Component {
             open={this.state.drawerOpen && this.state.activeDrawer == 'main'}
           >
             <div className='menu-inset'>
-              <AutoComplete fullWidth
+              <AutoComplete fullWidth openOnFocus
                 hintText="Find a claim, waypoint, ..."
                 filter={AutoComplete.fuzzyFilter}
                 dataSource={this.getSearchableData()}
@@ -287,6 +287,7 @@ export default class Main extends Component {
                   claim={claim}
                   opacity={claimId == this.state.editedClaimId ? 0 : .7}
                   onEditClicked={() => {
+                    // TODO cancel active editing
                     this.setDrawerState(true);
                     this.setState({
                       activeDrawer: 'claimEdit',
