@@ -69,7 +69,7 @@ export class ClaimsDrawerContent extends Component {
       color: '#ffffff',
       fillColor: claim.color,
       opacity: .5,
-      fillOpacity: .1,
+      fillOpacity: .3,
     });
 
     if (claim.positions.length == 0) {
@@ -94,7 +94,8 @@ export class ClaimsDrawerContent extends Component {
 
     this.poly.setLatLngs(claim.positions);
     this.poly.setStyle({fillColor: claim.color});
-    this.poly.editor.reset();
+    this.poly.disableEdit();
+    this.poly.enableEdit();
   }
 
   render() {
@@ -115,7 +116,10 @@ export class ClaimsDrawerContent extends Component {
       <MenuItem
         primaryText='Add another polygon'
         leftIcon={<IconAdd />}
-        onTouchTap={() => this.poly.editor.newShape()}
+        onTouchTap={() => {
+          this.poly.editor.commitDrawing();
+          this.poly.editor.newShape();
+        }}
       />
 
       <div className='menu-inset'>
@@ -136,10 +140,10 @@ export class ClaimsDrawerContent extends Component {
         </div>
       </div>
 
-      <Subheader>Result JSON</Subheader>
+      <Subheader>Claim JSON</Subheader>
 
       <div className='menu-inset'>
-        <TextField fullWidth multiLine rows={1} rowsMax={10}
+        <TextField fullWidth multiLine rows={1} rowsMax={999}
           hintText="Claim JSON"
           value={this.state.parseErrorText ? undefined : JSON.stringify(this.state.claim)}
           errorText={this.state.parseErrorText}
