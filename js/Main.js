@@ -78,7 +78,7 @@ export default class Main extends Component {
       activeDrawer: 'main',
       editedClaimId: -1,
       // map state
-      showBorder: true,
+      showBorder: false,
       showClaims: true,
       showWaypoints: true,
       showTerrain: true,
