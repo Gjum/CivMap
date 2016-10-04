@@ -9,7 +9,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
-import Util from './Util';
+import * as Util from './Util';
 
 function parseWaypoints(text) {
   // name, x, z, y, enabled, red, green, blue, suffix, world, dimensions
