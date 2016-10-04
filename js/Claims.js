@@ -55,7 +55,9 @@ export class ClaimsDrawerContent extends Component {
     this.poly.enableEdit();
 
     var updatePolyPositions = e => {
-      this.state.claim.positions = Util.deepLatLngToArr(this.poly.getLatLngs());
+      var p = Util.deepLatLngToArr(this.poly.getLatLngs());
+      if (p.length == 1 && p[0].length == 0) p = [];
+      this.state.claim.positions = p;
       this.setState({claim: this.state.claim});
     }
 
