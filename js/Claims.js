@@ -101,7 +101,7 @@ export class ClaimsDrawerContent extends Component {
   render() {
     return <div>
       <MenuItem
-        primaryText='Apply changes'
+        primaryText='Preview locally'
         leftIcon={<IconDone />}
         onTouchTap={() => {
           this.props.onSave(this.state.claim);
@@ -109,9 +109,15 @@ export class ClaimsDrawerContent extends Component {
         }}
       />
       <MenuItem
-        primaryText='Discard changes'
+        primaryText='Discard'
         leftIcon={<IconClose />}
         onTouchTap={this.props.onClose}
+      />
+      <MenuItem
+        primaryText='How to publish'
+        leftIcon={<IconHelp />}
+        href='https://github.com/dev3map/dev3map.github.io/wiki/Adding-and-editing-claims'
+        target='_blank'
       />
       <MenuItem
         primaryText='Add another polygon'
@@ -157,12 +163,6 @@ export class ClaimsDrawerContent extends Component {
           }}
         />
       </div>
-
-      <MenuItem
-        primaryText='Claims how-to'
-        leftIcon={<IconHelp />}
-        href='https://github.com/dev3map/dev3map.github.io/wiki/Adding-and-editing-claims'
-      />
     </div>;
   }
 }
