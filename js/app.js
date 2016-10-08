@@ -9,7 +9,7 @@ injectTapEventPlugin();
 
 render(
   <Main
-    attribution='<a href="https://dev3map.github.io">dev3map.github.io</a>'
+    attribution='<a href="https://github.com/dev3map/dev3map.github.io">dev3map.github.io</a>'
     tilesUrl='https://raw.githubusercontent.com/dev3map/tiles/master/world/'
     claimsUrl='claims.json'
   />,
