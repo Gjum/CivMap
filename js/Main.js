@@ -74,7 +74,7 @@ export default class Main extends Component {
     this.state = {
       // ui state
       wpDlgOpen: false,
-      drawerOpen: false,
+      drawerOpen: true,
       activeDrawer: 'main',
       editedClaimId: -1,
       // map state
