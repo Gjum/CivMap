@@ -39,8 +39,17 @@ var mcCRS = L.extend({}, L.CRS.Simple, {
 const muiTheme = getMuiTheme();
 
 class CoordsDisplay extends Component {
+  constructor(props, context) {
+    super(props, context);
+    this.state = {cursor: L.latLng([0,0])};
+  }
+
+  setCursor(cursor) {
+    this.setState({cursor: cursor});
+  }
+
   render() {
-    const [z, x] = Util.intCoords(this.props.cursor);
+    const [z, x] = Util.intCoords(this.state.cursor);
     return <div className='coords-display control-box leaflet-control leaflet-bar'>
       {'X ' + x + ' ' + z + ' Z'}</div>;
   }
@@ -255,7 +264,7 @@ export default class Main extends Component {
               maxZoom={5}
               minZoom={minZoom}
               onmoveend={e => history.replaceState({}, document.title, '#' + Util.viewToHash(e.target))}
-              onmousemove={e => this.setState({cursorPos: e.latlng})}
+              onmousemove={e => this.coordsDisplay && this.coordsDisplay.setCursor(e.latlng)}
               editable={true}
             >
 
@@ -271,7 +280,9 @@ export default class Main extends Component {
                 opacity={this.state.showTerrain ? 1 : 0}
                 />
 
-              <CoordsDisplay cursor={this.state.cursorPos} />
+              <CoordsDisplay
+                // updated directly through ref for performance reasons
+                ref={r => {if (r) this.coordsDisplay = r}} />
 
               { !this.state.showBorder ? null :
                 <RL.Rectangle
