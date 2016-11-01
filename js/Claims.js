@@ -18,9 +18,41 @@ export class EditableClaim extends Component {
     super(props);
   }
 
+  componentWillMount() {
+    this.recreateLabel(this.props.claim.positions);
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    this.recreateLabel(nextProps.claim.positions);
+  }
+
+  recreateLabel(coords) {
+    if (coords.length <= 0)
+      return; // no points in claim, no place for the label
+
+    // find first point array in arbitrarily nested array of arrays
+    // TODO scan all arrays recursively, show label per top region
+    // ehh, just manually provide label coords+width in data :P
+    while (Array.isArray(coords[0][0])) coords = coords[0];
+
+    var len = coords.length;
+    var zmin = coords.map(a => a[0]).reduce((a, b) => Math.min(a, b));
+    var zmax = coords.map(a => a[0]).reduce((a, b) => Math.max(a, b));
+    var xmin = coords.map(a => a[1]).reduce((a, b) => Math.min(a, b));
+    var xmax = coords.map(a => a[1]).reduce((a, b) => Math.max(a, b));
+    this.labelPos = [(zmax+zmin)/2, (xmax+xmin)/2];
+
+    this.label = L.divIcon({
+      className: 'claim-name',
+      html: this.props.claim.name,
+      iconSize: [200, 200],
+    });
+  }
+
   render() {
-    if (this.props.opacity <= 0)
+    if (this.props.opacity <= 0 || this.props.claim.positions.length <= 0)
       return null;
+
     return <RL.Polygon
         {...this.props.claim}
         color='#fff'
@@ -28,6 +60,7 @@ export class EditableClaim extends Component {
         opacity={this.props.opacity}
         fillOpacity={this.props.opacity}
         >
+      {this.label && <RL.Marker icon={this.label} position={this.labelPos} />}
       <RL.Popup><span>
         {this.props.claim.name}
         <br />

@@ -57,6 +57,18 @@ html, body, #app, .fullHeight, .map {
   color: black;
 }
 
+.claim-name {
+  text-shadow: black 0px 0px 5px;
+  pointer-events: none !important;
+  /* http://howtocenterincss.com/#contentType=text&container.width=200px&container.height=200px&horizontal=center&vertical=middle&browser.IE=none
+  setting fixed width/height is done by leaflet
+  */
+  display:flex;
+  text-align: center;
+  justify-content:center;
+  align-items:center;
+}
+
 .center-outer {
   display: table;
   position: absolute;
