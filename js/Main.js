@@ -7,11 +7,11 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 import IconArrFwd from 'material-ui/svg-icons/navigation/arrow-forward';
+import IconClaim from 'material-ui/svg-icons/social/public';
 import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconHelp from 'material-ui/svg-icons/action/help';
 import IconMenu from 'material-ui/svg-icons/navigation/menu';
 import IconPlace from 'material-ui/svg-icons/maps/place';
-import IconStars from 'material-ui/svg-icons/action/stars';
 
 import AppBar from 'material-ui/AppBar';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -30,7 +30,7 @@ import * as Util from './Util';
 import {WaypointsDialog, WaypointsOverlay} from './Waypoints';
 import {ClaimsDrawerContent, EditableClaim} from './Claims';
 
-L.Icon.Default.imagePath = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/';
+L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/';
 
 var mcCRS = L.extend({}, L.CRS.Simple, {
   transformation: new L.Transformation(1, 0, 1, 0)
@@ -101,7 +101,7 @@ export default class Main extends Component {
 
   componentWillMount() {
     Util.getJSON(this.props.claimsUrl, claims => {
-      this.setState({claims: this.state.claims.concat(claims)});
+      this.setState({claims: claims});
     });
   }
 
@@ -127,7 +127,7 @@ export default class Main extends Component {
     return this.state.claims.map(c => { return {
       text: c.name,
       value: <MenuItem
-        leftIcon={<IconStars />}
+        leftIcon={<IconClaim />}
         primaryText={c.name}
         onTouchTap={() => {
           // flip the vertical coordinates to circumvent https://github.com/Leaflet/Leaflet/issues/4886
@@ -144,9 +144,7 @@ export default class Main extends Component {
       value: <MenuItem
         leftIcon={<IconPlace />}
         primaryText={w.name}
-        onTouchTap={() => {
-          this.map.flyTo(Util.xz(w.x, w.z), 3);
-        }}
+        onTouchTap={() => this.map.flyTo(Util.xz(w.x, w.z), 3)}
       />,
     }}));
   }
@@ -176,7 +174,7 @@ export default class Main extends Component {
             />
             <MenuItem
               primaryText='Add a claim'
-              leftIcon={<IconStars />}
+              leftIcon={<IconClaim />}
               onTouchTap={() => {
                 var claim = {
                   name: '',
