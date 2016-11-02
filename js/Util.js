@@ -4,9 +4,17 @@ export function getJSON(url, onData, onErr) {
   request.onreadystatechange = function() {
     if (this.readyState === 4) {
       if (this.status >= 200 && this.status < 400) {
-        onData(JSON.parse(this.responseText));
+        try {
+          var json = JSON.parse(this.responseText);
+        } catch(e) {
+          if (onErr) onErr(e);
+          else console.error('Error converting json from', url, e);
+          return;
+        }
+        onData(json);
       } else {
-        onErr && onErr(this);
+        if (onErr) onErr(this);
+        else console.error('Error getting json from', url, this);
       }
     }
   };
