@@ -37,14 +37,31 @@ export class WaypointsOverlay extends Component {
     if (!this.props.waypoints || this.props.waypoints.length <= 0)
       return null;
     return <RL.LayerGroup>
-      { this.props.waypoints.map((w, key) =>
-        <RL.Marker key={key} position={[w.z+.5, w.x+.5]} title={w.name}>
-          <RL.Popup><span>
-            {w.name}
-            <br />
-            {w.x} {w.y} {w.z}
-          </span></RL.Popup>
-        </RL.Marker>
+      { this.props.waypoints.map(w =>
+        w.name.toLowerCase().includes("snitch") ?
+          <RL.Rectangle
+            key={'snitchRect'+w.name+w.x+w.y+w.z}
+            bounds={[[w.z-11, w.x-11], [w.z+12, w.x+12]]}
+            title={w.name}
+          >
+            <RL.Popup><span>
+              {w.name}
+              <br />
+              {w.x}, {w.y}, {w.z}
+            </span></RL.Popup>
+          </RL.Rectangle>
+        :
+          <RL.Marker
+            key={w.name+w.x+w.y+w.z}
+            position={[w.z+.5, w.x+.5]}
+            title={w.name}
+          >
+            <RL.Popup><span>
+              {w.name}
+              <br />
+              {w.x}, {w.y}, {w.z}
+            </span></RL.Popup>
+          </RL.Marker>
       )}
     </RL.LayerGroup>;
   }
@@ -86,8 +103,8 @@ export class WaypointsDialog extends Component {
       actions={actions}
       onRequestClose={this.props.onClose}
     >
-      <p>Your waypoints are stored in <code>(.minecraft)/mods/VoxelMods/voxelMap/(server).points</code></p>
       <p>Note that they do not leave your computer, only you can see them, and they are reset when you reload the page.</p>
+      <p>Your waypoints are stored in <code>(.minecraft location)\mods\VoxelMods\voxelMap\(server address).points</code></p>
       <TextField fullWidth multiLine rows={2} rowsMax={10}
         hintText="Paste your waypoints here"
         value={this.state.value}
