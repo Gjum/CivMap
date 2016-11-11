@@ -14,7 +14,7 @@ import * as Util from './Util';
 function parseWaypoints(text) {
   // name, x, z, y, enabled, red, green, blue, suffix, world, dimensions
   return text.split('\n')
-    .filter(line => line.includes('x:'))
+    .filter(line => line.includes(',x:'))
     .map(line => {
       var point = {};
       line.split(',').map(entry => {
@@ -38,7 +38,7 @@ export class WaypointsOverlay extends Component {
       return null;
     return <RL.LayerGroup>
       { this.props.waypoints.map((w, key) =>
-        <RL.Marker key={key} position={Util.xz(w.x, w.z)} title={w.name}>
+        <RL.Marker key={key} position={[w.z+.5, w.x+.5]} title={w.name}>
           <RL.Popup><span>
             {w.name}
             <br />
