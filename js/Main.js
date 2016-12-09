@@ -24,6 +24,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
+import Slider from 'material-ui/Slider';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
@@ -48,8 +49,9 @@ var defaultState = {
   editedClaimId: -1,
 
   // map state
+  claimOpacity: .1,
+  showClaimNames: false,
   showBorder: false,
-  showClaims: false,
   showWaypoints: true,
   basemap: 'blank',
 
@@ -199,11 +201,7 @@ export default class Main extends Component {
 
             <Subheader>Map controls</Subheader>
             <div className='menu-inset'>
-              <CustomToggle
-                label="Claims"
-                toggled={this.state.showClaims}
-                onToggle={() => this.setState({showClaims: !this.state.showClaims})}
-              />
+
               <CustomToggle
                 label="Waypoints"
                 toggled={this.state.showWaypoints}
@@ -225,6 +223,24 @@ export default class Main extends Component {
                 )}
                 <MenuItem value="blank" primaryText="blank" />
               </SelectField>
+            </div>
+
+            <Subheader>Claim controls</Subheader>
+            <div className='menu-inset'>
+              <Slider
+                defaultValue={this.state.claimOpacity}
+                value={this.state.claimOpacity}
+                onChange={(e, val) => {
+                  if (val < .05) val = 0;
+                  this.setState({claimOpacity: val});
+                }}
+                sliderStyle={{marginTop: 0, marginBottom: 16}}
+              />
+              <CustomToggle
+                label="Claim names"
+                toggled={this.state.showClaimNames}
+                onToggle={() => this.setState({showClaimNames: !this.state.showClaimNames})}
+              />
             </div>
 
             <Subheader>About</Subheader>
@@ -303,11 +319,12 @@ export default class Main extends Component {
                 />
               }
 
-              { this.state.showClaims && this.state.claims.map((claim, claimId) =>
+              { this.state.claimOpacity > 0 && this.state.claims.map((claim, claimId) =>
                 <EditableClaim
                   key={claimId}
                   claim={claim}
-                  opacity={claimId == this.state.editedClaimId ? 0 : .7}
+                  opacity={claimId == this.state.editedClaimId ? 0 : this.state.claimOpacity}
+                  showLabel={this.state.showClaimNames}
                   onEditClicked={() => {
                     // TODO cancel active editing
                     this.setDrawerState(true);

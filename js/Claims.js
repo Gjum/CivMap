@@ -19,16 +19,19 @@ export class EditableClaim extends Component {
   }
 
   componentWillMount() {
-    this.recreateLabel(this.props.claim.positions);
+    this.recreateLabel(this.props.claim.positions, !this.props.showLabel);
   }
 
   componentWillUpdate(nextProps, nextState) {
-    this.recreateLabel(nextProps.claim.positions);
+    this.recreateLabel(nextProps.claim.positions, !nextProps.showLabel);
   }
 
-  recreateLabel(coords) {
-    if (coords.length <= 0)
-      return; // no points in claim, no place for the label
+  recreateLabel(coords, hideLabel) {
+    if (hideLabel || coords.length <= 0) {
+      this.labelPos = null;
+      this.label = null;
+      return; // hide; or no points in claim, no place for the label
+    }
 
     // find first point array in arbitrarily nested array of arrays
     // TODO scan all arrays recursively, show label per top region
@@ -57,7 +60,7 @@ export class EditableClaim extends Component {
         {...this.props.claim}
         color='#fff'
         fillColor={this.props.claim.color}
-        opacity={this.props.opacity}
+        opacity={Math.min(this.props.opacity * 2, 1)}
         fillOpacity={this.props.opacity}
         >
       {this.label && <RL.Marker icon={this.label} position={this.labelPos} />}
