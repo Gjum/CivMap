@@ -39,6 +39,24 @@ var mcCRS = L.extend({}, L.CRS.Simple, {
 
 const muiTheme = getMuiTheme();
 
+var defaultState = {
+  // ui state
+  wpDlgOpen: false,
+  drawerOpen: true,
+  activeDrawer: 'main',
+  editedClaimId: -1,
+
+  // map state
+  showBorder: false,
+  showClaims: false,
+  showTerrain: true,
+  showWaypoints: true,
+
+  // map data
+  claims: [],
+  waypoints: [],
+};
+
 class CoordsDisplay extends Component {
   constructor(props, context) {
     super(props, context);
@@ -81,23 +99,9 @@ export default class Main extends Component {
   constructor(props, context) {
     super(props, context);
 
-    this.state = {
-      // ui state
-      wpDlgOpen: false,
-      drawerOpen: true,
-      activeDrawer: 'main',
-      editedClaimId: -1,
-      // map state
-      showBorder: false,
-      showClaims: true,
-      showWaypoints: true,
-      showTerrain: true,
-      // map data
-      mapView: Util.hashToView(location.hash), // read only! TODO feedback loop onmoveend <-> setState
-      cursorPos: L.latLng(0,0),
-      claims: [],
-      waypoints: [],
-    };
+    this.state = Util.updateJsonObject(defaultState, props.options || {});
+
+    this.mapView = Util.hashToView(location.hash);
   }
 
   componentWillMount() {
@@ -258,8 +262,8 @@ export default class Main extends Component {
               className="map"
               ref={ref => {if (ref) this.onMapCreated(ref.leafletElement)}}
               crs={mcCRS}
-              center={Util.xz(this.state.mapView.x, this.state.mapView.z)}
-              zoom={this.state.mapView.zoom}
+              center={[this.mapView.z, this.mapView.x]}
+              zoom={this.mapView.zoom}
               maxZoom={5}
               minZoom={minZoom}
               onmoveend={e => history.replaceState({}, document.title, '#' + Util.viewToHash(e.target))}
