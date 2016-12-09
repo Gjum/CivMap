@@ -152,7 +152,7 @@ export default class Main extends Component {
   render() {
     var tileBounds = Util.radiusToBounds(5120);
     var borderBounds = Util.radiusToBounds(5000);
-    var minZoom = -4;
+    var minZoom = -6;
 
     return <MuiThemeProvider muiTheme={muiTheme} className='fullHeight'>
         <div className='fullHeight'>
