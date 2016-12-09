@@ -10,8 +10,17 @@ injectTapEventPlugin();
 render(
   <Main
     attribution='<a href="https://github.com/dev3map/dev3map.github.io">dev3map.github.io</a>'
-    tilesUrl='https://raw.githubusercontent.com/dev3map/tiles/master/world/'
+    tilesUrl='https://raw.githubusercontent.com/dev3map/tiles/master/'
     claimsUrl='https://raw.githubusercontent.com/dev3map/data/master/claims.json'
+    basemaps={[
+      'world',
+      'night',
+      'simple',
+      'light',
+    ]}
+    options={{
+      basemap: 'world',
+    }}
   />,
   document.getElementById('app')
 );

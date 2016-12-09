@@ -23,6 +23,7 @@ import FlatButton from 'material-ui/FlatButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
@@ -49,8 +50,8 @@ var defaultState = {
   // map state
   showBorder: false,
   showClaims: false,
-  showTerrain: true,
   showWaypoints: true,
+  basemap: 'blank',
 
   // map data
   claims: [],
@@ -204,11 +205,6 @@ export default class Main extends Component {
                 onToggle={() => this.setState({showClaims: !this.state.showClaims})}
               />
               <CustomToggle
-                label="Terrain"
-                toggled={this.state.showTerrain}
-                onToggle={() => this.setState({showTerrain: !this.state.showTerrain})}
-              />
-              <CustomToggle
                 label="Waypoints"
                 toggled={this.state.showWaypoints}
                 onToggle={() => this.setState({showWaypoints: !this.state.showWaypoints})}
@@ -218,6 +214,17 @@ export default class Main extends Component {
                 toggled={this.state.showBorder}
                 onToggle={() => this.setState({showBorder: !this.state.showBorder})}
               />
+
+              <SelectField
+                floatingLabelText="Base map"
+                value={this.state.basemap}
+                onChange={(e, i, val) => this.setState({basemap: val})}
+                >
+                { this.props.basemaps.map(mapName =>
+                    <MenuItem key={mapName} value={mapName} primaryText={mapName} />
+                )}
+                <MenuItem value="blank" primaryText="blank" />
+              </SelectField>
             </div>
 
             <Subheader>About</Subheader>
@@ -269,19 +276,20 @@ export default class Main extends Component {
               onmoveend={e => history.replaceState({}, document.title, '#' + Util.viewToHash(e.target))}
               onmousemove={e => this.coordsDisplay && this.coordsDisplay.setCursor(e.latlng)}
               editable={true}
-            >
+              >
 
+              { this.state.basemap == "blank" ? null :
               <RL.TileLayer
                 attribution={this.props.attribution}
-                url={this.props.tilesUrl + 'z{z}/{x},{y}.png'}
+                url={this.props.tilesUrl + this.state.basemap + '/z{z}/{x},{y}.png'}
                 errorTileUrl={'img/no-tile.png'}
                 tileSize={256}
                 bounds={tileBounds}
                 minZoom={minZoom}
                 maxNativeZoom={0}
                 continuousWorld={true}
-                opacity={this.state.showTerrain ? 1 : 0}
                 />
+              }
 
               <CoordsDisplay
                 // updated directly through ref for performance reasons
