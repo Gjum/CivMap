@@ -324,9 +324,15 @@ export default class Main extends Component {
           <WaypointsDialog
             open={this.state.wpDlgOpen}
             onClose={() => this.setState({wpDlgOpen: false})}
-            onResult={waypoints => {
+            onReplace={waypoints => {
               this.setState({
                 waypoints: waypoints,
+                wpDlgOpen: false,
+              });
+            }}
+            onAdd={waypoints => {
+              this.setState({
+                waypoints: this.state.waypoints.concat(waypoints),
                 wpDlgOpen: false,
               });
             }}

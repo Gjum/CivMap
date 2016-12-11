@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import * as RL from 'react-leaflet';
+
+import IconAdd from 'material-ui/svg-icons/content/add-circle';
 import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconUpload from 'material-ui/svg-icons/file/file-upload';
 
@@ -73,7 +75,6 @@ export class WaypointsDialog extends Component {
 
     this.state = {
       waypointsText: '',
-      inProgress: false,
     };
   }
 
@@ -85,24 +86,31 @@ export class WaypointsDialog extends Component {
         onTouchTap={this.props.onClose}
       />,
       <RaisedButton primary
-        label="Import"
+        label="Replace"
         icon={<IconUpload />}
-        disabled={this.state.inProgress || !this.state.waypointsText}
+        disabled={!this.state.waypointsText}
         onTouchTap={() => {
-          this.setState({inProgress: true});
           const waypoints = parseWaypoints(this.state.waypointsText);
-          this.setState({inProgress: false});
-          this.props.onResult(waypoints);
+          this.props.onReplace(waypoints);
+        }}
+      />,
+      <RaisedButton primary
+        label="Add"
+        icon={<IconAdd />}
+        disabled={!this.state.waypointsText}
+        onTouchTap={() => {
+          const waypoints = parseWaypoints(this.state.waypointsText);
+          this.props.onAdd(waypoints);
         }}
       />,
     ];
 
     return <Dialog
-      open={this.props.open || this.state.inProgress}
+      open={this.props.open}
       title="Import waypoints"
       actions={actions}
       onRequestClose={this.props.onClose}
-    >
+      >
       <p>Note that they do not leave your computer, only you can see them, and they are reset when you reload the page.</p>
       <p>Your waypoints are stored in <code>(.minecraft location)\mods\VoxelMods\voxelMap\(server address).points</code></p>
       <TextField fullWidth multiLine rows={2} rowsMax={10}
@@ -110,13 +118,6 @@ export class WaypointsDialog extends Component {
         value={this.state.value}
         onChange={e => this.setState({waypointsText: e.target.value})}
       />
-      { !this.state.inProgress ? null :
-        <p>
-          <span style={{float: 'left', padding: 25}}>
-            Importing, please wait...</span>
-          <CircularProgress />
-        </p>
-      }
     </Dialog>
   }
 };
