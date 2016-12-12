@@ -12,6 +12,8 @@ const config = {
   output: {
     path: buildPath, // Path of output file
     filename: 'bundle.js', // Name of output file
+    libraryTarget: 'var',
+    library: 'CivMap',
   },
   plugins: [
     // Define production build to allow React to strip out unnecessary checks

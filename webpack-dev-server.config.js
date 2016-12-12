@@ -24,6 +24,8 @@ const config = {
   output: {
     path: buildPath, // Path of output file
     filename: 'bundle.js',
+    libraryTarget: 'var',
+    library: 'CivMap',
   },
   plugins: [
     // Enables Hot Modules Replacement
