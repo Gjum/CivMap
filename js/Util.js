@@ -55,3 +55,20 @@ export function deepLatLngToArr(o) {
     return o.map(e => deepLatLngToArr(e));
   return [Math.round(o.lat), Math.round(o.lng)];
 }
+
+export function updateJsonObject(oInto, oFrom) {
+  if (!oInto) return oFrom;
+  if (!oFrom) return oInto;
+  for (var key in oFrom) {
+    oInto[key] = oFrom[key];
+  }
+  return oInto;
+}
+
+export function mapObj(obj, fn) {
+  var results = [];
+  for (var key in obj) {
+    results.push(fn(obj[key], key));
+  }
+  return results;
+}
