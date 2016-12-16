@@ -12,6 +12,7 @@ import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconHelp from 'material-ui/svg-icons/action/help';
 import IconMenu from 'material-ui/svg-icons/navigation/menu';
 import IconPlace from 'material-ui/svg-icons/maps/place';
+import ImageTune from 'material-ui/svg-icons/image/tune';
 
 import AppBar from 'material-ui/AppBar';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -316,7 +317,7 @@ export default class Main extends Component {
             >
               { this.state.drawerOpen
                 ? <IconArrFwd />
-                : <IconMenu />
+                : <ImageTune />
               }
             </FloatingActionButton>
           </div>
