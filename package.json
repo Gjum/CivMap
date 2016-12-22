@@ -1,6 +1,6 @@
 {
   "name": "CivMap",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generic web map for Civ-style Minecraft servers",
   "repository": {
     "type": "git",
