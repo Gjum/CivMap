@@ -17,13 +17,12 @@ npm start
 ```
 Open the map on [localhost:3000](http://localhost:3000)
 
-For deployment, generate `docs/bundle.js`:
+### Creating a new release
+Update the version info in `package.json`,
+create a new tag, and push both to the repo.
+
+Then generate `bundle.js`:
 ```sh
 npm run build
 ```
-Now you can make your webserver serve the `docs` directory.
-
-> **Q:** Why is it called `docs` and not `static`?
->
-> **A:** This allows you to easily [host](https://github.com/blog/2228-simpler-github-pages-publishing)
-> this subdirectory as a web page on GitHub.
+and upload it as a "binary" to a [new release](https://github.com/Gjum/CivMap/releases/new).

@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const buildPath = path.resolve(__dirname, 'docs');
 const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const TransferWebpackPlugin = require('transfer-webpack-plugin');
 
@@ -10,7 +9,6 @@ const config = {
   devtool: 'source-map',
   // output config
   output: {
-    path: buildPath, // Path of output file
     filename: 'bundle.js', // Name of output file
     libraryTarget: 'var',
     library: 'CivMap',

@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const buildPath = path.resolve(__dirname, 'docs');
 const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const TransferWebpackPlugin = require('transfer-webpack-plugin');
 
@@ -13,7 +12,7 @@ const config = {
   ],
   // Server Configuration options
   devServer: {
-    contentBase: 'docs', // Relative directory for base of server
+    contentBase: 'web', // Relative directory for base of server
     devtool: 'eval',
     hot: true, // Live-reload
     inline: true,
@@ -22,8 +21,6 @@ const config = {
   },
   devtool: 'eval',
   output: {
-    path: buildPath, // Path of output file
-    filename: 'bundle.js',
     libraryTarget: 'var',
     library: 'CivMap',
   },
