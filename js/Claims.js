@@ -152,7 +152,7 @@ export class ClaimsDrawerContent extends Component {
       <MenuItem
         primaryText='How to publish'
         leftIcon={<IconHelp />}
-        href='https://github.com/dev3map/dev3map.github.io/wiki/Adding-and-editing-claims'
+        href={this.props.claimsPublishHelpUrl || 'https://github.com/dev3map/dev3map.github.io/wiki/Adding-and-editing-claims'}
         target='_blank'
       />
       <MenuItem

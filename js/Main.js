@@ -247,7 +247,7 @@ export default class Main extends Component {
             <MenuItem
               primaryText='Help'
               leftIcon={<IconHelp />}
-              href='https://github.com/dev3map/dev3map.github.io/wiki/'
+              href={this.props.helpUrl || 'https://github.com/Gjum/CivMap/wiki/'}
             />
 
           </Drawer>
@@ -260,6 +260,7 @@ export default class Main extends Component {
             { this.state.editedClaimId < 0 ? null :
               <ClaimsDrawerContent
                 map={this.map}
+                claimsPublishHelpUrl={this.props.claimsPublishHelpUrl}
                 claim={this.state.claims[this.state.editedClaimId]}
                 onSave={claim => {
                   var newClaims = this.state.claims.slice();
