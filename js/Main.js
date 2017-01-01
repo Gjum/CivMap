@@ -158,8 +158,7 @@ export default class Main extends Component {
   }
 
   render() {
-    var tileBounds = Util.radiusToBounds(5120);
-    var borderBounds = Util.radiusToBounds(5000);
+    var tileBounds = Util.radiusToBounds(this.props.borderCircleRadius || this.props.borderSquareRadius);
     var minZoom = -6;
 
     return <MuiThemeProvider muiTheme={muiTheme} className='fullHeight'>
@@ -312,12 +311,21 @@ export default class Main extends Component {
                 // updated directly through ref for performance reasons
                 ref={r => {if (r) this.coordsDisplay = r}} />
 
-              { !this.state.showBorder ? null :
+              { !this.state.showBorder ? null
+                : this.props.borderSquareRadius ?
                 <RL.Rectangle
-                  bounds={borderBounds}
+                  bounds={Util.radiusToBounds(this.props.borderSquareRadius)}
                   color='#ff8888'
                   fill={false}
                 />
+                : this.props.borderCircleRadius ?
+                <RL.Circle
+                  radius={this.props.borderCircleRadius}
+                  center={[0, 0]}
+                  color='#ff8888'
+                  fill={false}
+                />
+                : null // no border
               }
 
               { this.state.claimOpacity > 0 && this.state.claims.map((claim, claimId) =>
