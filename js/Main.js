@@ -299,7 +299,7 @@ export default class Main extends Component {
               <RL.TileLayer
                 attribution={this.props.attribution}
                 url={this.props.tilesUrl + this.state.basemap + '/z{z}/{x},{y}.png'}
-                errorTileUrl={'img/no-tile.png'}
+                errorTileUrl={'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
                 tileSize={256}
                 bounds={tileBounds}
                 minZoom={minZoom}
