@@ -24,11 +24,11 @@
   },
   "dependencies": {
     "leaflet": "^1.0.0",
-    "leaflet-editable": "^1.0.0-rc.2",
-    "material-ui": "^0.15.0",
+    "leaflet-editable": "^1.0.0",
+    "material-ui": "^0.16.6",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
-    "react-leaflet": "^1.0.0-rc.1",
-    "react-tap-event-plugin": "^1.0.0"
+    "react-leaflet": "^1.0.2",
+    "react-tap-event-plugin": "^2.0.1"
   }
 }
