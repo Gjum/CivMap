@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import * as RL from 'react-leaflet';
 import L from 'leaflet'
+import update from 'immutability-helper';
 
 import IconAdd from 'material-ui/svg-icons/content/add-circle';
 import IconClose from 'material-ui/svg-icons/navigation/close';
@@ -88,9 +89,9 @@ export class ClaimsOverlay extends Component {
           onEditClicked={() => {
             // TODO cancel active editing
             this.props.pluginApi.setSubStates({
-              drawerOpen: true,
-              activeDrawer: 'claimEdit',
-              'plugins.claims.editedClaimId': claimId,
+              drawerOpen: {$set: true},
+              activeDrawer: {$set: 'claimEdit'},
+              plugins: {claims: {editedClaimId: {$set: claimId}}},
             });
           }}
         />
@@ -172,9 +173,9 @@ export class ClaimsDrawerContent extends Component {
           var newClaims = ownState.claims.slice();
           newClaims[ownState.editedClaimId] = this.state.claim;
           this.props.pluginApi.setSubStates({
-            'plugins.claims.claims': newClaims,
-            activeDrawer: 'main',
-            editedClaimId: -1,
+            plugins: {claims: {claims: {$set: newClaims}}},
+            activeDrawer: {$set: 'main'},
+            editedClaimId: {$set: -1},
           });
         }}
       />
@@ -184,8 +185,8 @@ export class ClaimsDrawerContent extends Component {
         onTouchTap={() => {
           // TODO delete created claim if empty
           this.props.pluginApi.setSubStates({
-            activeDrawer: 'main',
-            editedClaimId: -1,
+            activeDrawer: {$set: 'main'},
+            editedClaimId: {$set: -1},
           });
         }}
       />

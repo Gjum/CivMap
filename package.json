@@ -23,6 +23,7 @@
     "webpack-dev-server": "^1.14.0"
   },
   "dependencies": {
+    "immutability-helper": "2.1.1",
     "leaflet": "^1.0.0",
     "leaflet-editable": "^1.0.0",
     "material-ui": "^0.16.6",

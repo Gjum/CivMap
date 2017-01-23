@@ -2,6 +2,7 @@ import * as L from'leaflet';
 import * as LE from'leaflet-editable';
 import * as RL from'react-leaflet';
 import React, {Component} from 'react';
+import update from 'immutability-helper';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -107,7 +108,10 @@ class PluginApi {
   constructor(component) {
     this._component = component;
     this.setState = component.setState.bind(component);
-    this.setSubStates = component.setSubStates.bind(component);
+  }
+
+  setSubStates(newState) {
+    return this.setState(update(this._component.state, newState));
   }
 }
 
@@ -126,7 +130,7 @@ export default class Main extends Component {
 
   componentWillMount() {
     Util.getJSON(this.props.claimsUrl, claims => {
-      this.setSubStates({'plugins.claims.claims': claims});
+      this.pluginApi.setSubStates({plugins: {claims: {claims: {$set: claims}}}});
     });
   }
 
@@ -145,26 +149,6 @@ export default class Main extends Component {
     if (!this.map) {
       this.map = map;
     }
-  }
-
-  /* Follows the dot.separated.paths through nested objects and sets the last key to val.
-    Example:
-    this.state = {nes: {ted: {data: 42}}}
-    setSubStates({'nes.ted.data': 123})
-    assert this.state == {nes: {ted: {data: 123}}}
-  */
-  setSubStates(newState) {
-    console.log('setting substates', newState);
-    for (var keyPath in newState) {
-      var keys = keyPath.split('.');
-      var finalKey = keys[keys.length - 1];
-      var targetObj = this.state;
-      // go down through the nesting to the object containing the last key
-      // note: not the object at the last key, but the one containing it, so we can update its value
-      keys.slice(0, -1).map(k => { targetObj = targetObj[k]; });
-      targetObj[finalKey] = newState[keyPath];
-    }
-    this.setState(this.state);
   }
 
   getSearchableData() {
@@ -225,10 +209,11 @@ export default class Main extends Component {
                   positions: [],
                 };
                 var claimId = this.state.plugins.claims.claims.length;
-                this.state.plugins.claims.claims.push(claim);
-                this.state.plugins.claims.editedClaimId = claimId;
-                this.state.activeDrawer = 'claimEdit';
-                this.setState(this.state);
+                this.pluginApi.setSubStates({
+                  plugins: {claims: {claims: {$push: claim}}},
+                  plugins: {claims: {editedClaimId: {$set: claimId}}},
+                  activeDrawer: {$set: 'claimEdit'},
+                });
               }}
             />
 
@@ -265,14 +250,14 @@ export default class Main extends Component {
                 value={this.state.plugins.claims.claimOpacity}
                 onChange={(e, val) => {
                   if (val < .05) val = 0;
-                  this.setSubStates({'plugins.claims.claimOpacity': val});
+                  this.pluginApi.setSubStates({plugins: {claims: {claimOpacity: {$set: val}}}});
                 }}
                 sliderStyle={{marginTop: 0, marginBottom: 16}}
               />
               <CustomToggle
                 label="Claim names"
                 toggled={this.state.plugins.claims.showClaimNames}
-                onToggle={() => this.setSubStates({'plugins.claims.showClaimNames': !this.state.plugins.claims.showClaimNames})}
+                onToggle={() => this.pluginApi.setSubStates({plugins: {claims: {showClaimNames: {$apply: x => !x}}}})}
               />
             </div>
 
