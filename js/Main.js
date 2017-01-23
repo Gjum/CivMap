@@ -31,7 +31,7 @@ import Toggle from 'material-ui/Toggle';
 
 import * as Util from './Util';
 import {WaypointsDialog, WaypointsOverlay} from './Waypoints';
-import {ClaimsDrawerContent, EditableClaim} from './Claims';
+import {ClaimsDrawerContent, ClaimsOverlay} from './Claims';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/';
 
@@ -46,18 +46,23 @@ var defaultState = {
   wpDlgOpen: false,
   drawerOpen: true,
   activeDrawer: 'main',
-  editedClaimId: -1,
 
   // map state
-  claimOpacity: .1,
-  showClaimNames: false,
   showBorder: false,
-  showWaypoints: true,
   basemap: 'blank',
 
-  // map data
-  claims: [],
-  waypoints: [],
+  plugins: {
+    claims: {
+      claims: [],
+      claimOpacity: .1,
+      showClaimNames: false,
+      editedClaimId: -1,
+    },
+    waypoints: {
+      waypoints: [],
+      showWaypoints: true,
+    },
+  },
 };
 
 class CoordsDisplay extends Component {
@@ -98,29 +103,34 @@ class CustomToggle extends Component {
   }
 }
 
+class PluginApi {
+  constructor(component) {
+    this._component = component;
+    this.setState = component.setState.bind(component);
+    this.setSubStates = component.setSubStates.bind(component);
+  }
+}
+
 export default class Main extends Component {
   constructor(props, context) {
     super(props, context);
 
-    this.state = Util.updateJsonObject(defaultState, props.options || {});
+    if (props.options) {
+      this.state = Util.updateJsonObject(defaultState, props.options);
+    }
 
     this.mapView = Util.hashToView(location.hash);
+
+    this.pluginApi = new PluginApi(this);
   }
 
   componentWillMount() {
     Util.getJSON(this.props.claimsUrl, claims => {
-      this.setState({claims: claims});
+      this.setSubStates({'plugins.claims.claims': claims});
     });
   }
 
-  onMapCreated(map) {
-    if (!this.map) {
-      this.map = map;
-    }
-  }
-
-  setDrawerState(open) {
-    this.setState({drawerOpen: open});
+  componentWillUpdate(nextProps, nextState) {
     if (this.map) {
       window.setTimeout(() => {
         this.map && this.map.invalidateSize(true); // animate
@@ -131,8 +141,34 @@ export default class Main extends Component {
     }
   }
 
+  onMapCreated(map) {
+    if (!this.map) {
+      this.map = map;
+    }
+  }
+
+  /* Follows the dot.separated.paths through nested objects and sets the last key to val.
+    Example:
+    this.state = {nes: {ted: {data: 42}}}
+    setSubStates({'nes.ted.data': 123})
+    assert this.state == {nes: {ted: {data: 123}}}
+  */
+  setSubStates(newState) {
+    console.log('setting substates', newState);
+    for (var keyPath in newState) {
+      var keys = keyPath.split('.');
+      var finalKey = keys[keys.length - 1];
+      var targetObj = this.state;
+      // go down through the nesting to the object containing the last key
+      // note: not the object at the last key, but the one containing it, so we can update its value
+      keys.slice(0, -1).map(k => { targetObj = targetObj[k]; });
+      targetObj[finalKey] = newState[keyPath];
+    }
+    this.setState(this.state);
+  }
+
   getSearchableData() {
-    return this.state.claims.map(c => { return {
+    return this.state.plugins.claims.claims.map(c => { return {
       text: c.name,
       value: <MenuItem
         leftIcon={<IconClaim />}
@@ -147,7 +183,7 @@ export default class Main extends Component {
           this.map.flyToBounds(bounds);
         }}
       />,
-    }}).concat(this.state.waypoints.map(w => { return {
+    }}).concat(this.state.plugins.waypoints.waypoints.map(w => { return {
       text: w.name,
       value: <MenuItem
         leftIcon={<IconPlace />}
@@ -188,13 +224,11 @@ export default class Main extends Component {
                   color: '#000000',
                   positions: [],
                 };
-                var claimId = this.state.claims.length;
-                this.state.claims.push(claim);
-                this.setState({
-                  activeDrawer: 'claimEdit',
-                  editedClaimId: claimId,
-                  claims: this.state.claims,
-                });
+                var claimId = this.state.plugins.claims.claims.length;
+                this.state.plugins.claims.claims.push(claim);
+                this.state.plugins.claims.editedClaimId = claimId;
+                this.state.activeDrawer = 'claimEdit';
+                this.setState(this.state);
               }}
             />
 
@@ -227,18 +261,18 @@ export default class Main extends Component {
             <Subheader>Claim controls</Subheader>
             <div className='menu-inset'>
               <Slider
-                defaultValue={this.state.claimOpacity}
-                value={this.state.claimOpacity}
+                defaultValue={this.state.plugins.claims.claimOpacity}
+                value={this.state.plugins.claims.claimOpacity}
                 onChange={(e, val) => {
                   if (val < .05) val = 0;
-                  this.setState({claimOpacity: val});
+                  this.setSubStates({'plugins.claims.claimOpacity': val});
                 }}
                 sliderStyle={{marginTop: 0, marginBottom: 16}}
               />
               <CustomToggle
                 label="Claim names"
-                toggled={this.state.showClaimNames}
-                onToggle={() => this.setState({showClaimNames: !this.state.showClaimNames})}
+                toggled={this.state.plugins.claims.showClaimNames}
+                onToggle={() => this.setSubStates({'plugins.claims.showClaimNames': !this.state.plugins.claims.showClaimNames})}
               />
             </div>
 
@@ -253,26 +287,16 @@ export default class Main extends Component {
 
           <Drawer openSecondary
             open={this.state.drawerOpen
-              && this.state.editedClaimId >= 0
-              && this.state.activeDrawer == 'claimEdit'}
+              && this.state.activeDrawer == 'claimEdit'
+              && this.state.plugins.claims.editedClaimId >= 0
+            }
           >
-            { this.state.editedClaimId < 0 ? null :
+            { this.state.plugins.claims.editedClaimId < 0 ? null :
               <ClaimsDrawerContent
+                pluginApi={this.pluginApi}
+                pluginState={this.state.plugins.claims}
                 map={this.map}
                 claimsPublishHelpUrl={this.props.claimsPublishHelpUrl}
-                claim={this.state.claims[this.state.editedClaimId]}
-                onSave={claim => {
-                  var newClaims = this.state.claims.slice();
-                  newClaims[this.state.editedClaimId] = claim;
-                  this.setState({claims: newClaims});
-                }}
-                onClose={() => {
-                  // TODO delete created claim if empty
-                  this.setState({
-                    activeDrawer: 'main',
-                    editedClaimId: -1,
-                  });
-                }}
               />
             }
           </Drawer>
@@ -328,30 +352,18 @@ export default class Main extends Component {
                 : null // no border
               }
 
-              { this.state.claimOpacity > 0 && this.state.claims.map((claim, claimId) =>
-                <EditableClaim
-                  key={claimId}
-                  claim={claim}
-                  opacity={claimId == this.state.editedClaimId ? 0 : this.state.claimOpacity}
-                  showLabel={this.state.showClaimNames}
-                  onEditClicked={() => {
-                    // TODO cancel active editing
-                    this.setDrawerState(true);
-                    this.setState({
-                      activeDrawer: 'claimEdit',
-                      editedClaimId: claimId,
-                    });
-                  }}
+              <ClaimsOverlay
+                pluginState={this.state.plugins.claims}
+                pluginApi={this.pluginApi}
                 />
-              )}
 
-              <WaypointsOverlay waypoints={this.state.showWaypoints && this.state.waypoints} />
+              <WaypointsOverlay waypoints={this.state.plugins.waypoints.showWaypoints && this.state.plugins.waypoints.waypoints} />
 
             </RL.Map>
 
             <FloatingActionButton mini
               className='mainMenuButton'
-              onTouchTap={() => this.setDrawerState(!this.state.drawerOpen)}
+              onTouchTap={() => this.setState({drawerOpen: !this.state.drawerOpen})}
             >
               { this.state.drawerOpen
                 ? <IconArrFwd />

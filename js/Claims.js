@@ -73,13 +73,40 @@ export class EditableClaim extends Component {
   }
 }
 
+export class ClaimsOverlay extends Component {
+  render() {
+    var state = this.props.pluginState;
+    if (!state.claims || state.claims.length <= 0)
+      return null;
+    return <RL.LayerGroup>
+      { state.claims.map((claim, claimId) =>
+        <EditableClaim
+          key={claimId}
+          claim={claim}
+          opacity={claimId == state.editedClaimId ? 0 : state.claimOpacity}
+          showLabel={state.showClaimNames}
+          onEditClicked={() => {
+            // TODO cancel active editing
+            this.props.pluginApi.setSubStates({
+              drawerOpen: true,
+              activeDrawer: 'claimEdit',
+              'plugins.claims.editedClaimId': claimId,
+            });
+          }}
+        />
+      )}
+    </RL.LayerGroup>;
+  }
+}
+
 export class ClaimsDrawerContent extends Component {
   constructor(props) {
     super(props);
 
+    var origClaim = props.pluginState.claims[props.pluginState.editedClaimId];
     var claim = {}; // copy or we would modify global state
-    for (var key in props.claim) {
-      claim[key] = props.claim[key];
+    for (var key in origClaim) {
+      claim[key] = origClaim[key];
     }
     this.state = {
       claim: claim,
@@ -140,14 +167,27 @@ export class ClaimsDrawerContent extends Component {
         primaryText='Preview locally'
         leftIcon={<IconDone />}
         onTouchTap={() => {
-          this.props.onSave(this.state.claim);
-          this.props.onClose();
+          // TODO delete created claim if empty
+          var ownState = this.props.pluginState;
+          var newClaims = ownState.claims.slice();
+          newClaims[ownState.editedClaimId] = this.state.claim;
+          this.props.pluginApi.setSubStates({
+            'plugins.claims.claims': newClaims,
+            activeDrawer: 'main',
+            editedClaimId: -1,
+          });
         }}
       />
       <MenuItem
         primaryText='Discard'
         leftIcon={<IconClose />}
-        onTouchTap={this.props.onClose}
+        onTouchTap={() => {
+          // TODO delete created claim if empty
+          this.props.pluginApi.setSubStates({
+            activeDrawer: 'main',
+            editedClaimId: -1,
+          });
+        }}
       />
       <MenuItem
         primaryText='How to publish'
