@@ -108,10 +108,7 @@ class PluginApi {
   constructor(component) {
     this._component = component;
     this.setState = component.setState.bind(component);
-  }
-
-  setSubStates(newState) {
-    return this.setState(update(this._component.state, newState));
+    this.setSubStates = component.setSubStates.bind(component);
   }
 }
 
@@ -130,7 +127,7 @@ export default class Main extends Component {
 
   componentWillMount() {
     Util.getJSON(this.props.claimsUrl, claims => {
-      this.pluginApi.setSubStates({plugins: {claims: {claims: {$set: claims}}}});
+      this.setSubStates({plugins: {claims: {claims: {$set: claims}}}});
     });
   }
 
@@ -143,6 +140,10 @@ export default class Main extends Component {
         this.map && this.map.invalidateSize(true); // animate
       }, 500);
     }
+  }
+
+  setSubStates(newState) {
+    return this.setState(update(this.state, newState));
   }
 
   onMapCreated(map) {
@@ -209,7 +210,7 @@ export default class Main extends Component {
                   positions: [],
                 };
                 var claimId = this.state.plugins.claims.claims.length;
-                this.pluginApi.setSubStates({
+                this.setSubStates({
                   plugins: {claims: {claims: {$push: claim}}},
                   plugins: {claims: {editedClaimId: {$set: claimId}}},
                   activeDrawer: {$set: 'claimEdit'},
@@ -250,14 +251,14 @@ export default class Main extends Component {
                 value={this.state.plugins.claims.claimOpacity}
                 onChange={(e, val) => {
                   if (val < .05) val = 0;
-                  this.pluginApi.setSubStates({plugins: {claims: {claimOpacity: {$set: val}}}});
+                  this.setSubStates({plugins: {claims: {claimOpacity: {$set: val}}}});
                 }}
                 sliderStyle={{marginTop: 0, marginBottom: 16}}
               />
               <CustomToggle
                 label="Claim names"
                 toggled={this.state.plugins.claims.showClaimNames}
-                onToggle={() => this.pluginApi.setSubStates({plugins: {claims: {showClaimNames: {$apply: x => !x}}}})}
+                onToggle={() => this.setSubStates({plugins: {claims: {showClaimNames: {$apply: x => !x}}}})}
               />
             </div>
 
