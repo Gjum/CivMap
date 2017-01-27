@@ -36,10 +36,13 @@ function parseWaypoints(text) {
 
 export class WaypointsOverlay extends Component {
   render() {
-    if (!this.props.waypoints || this.props.waypoints.length <= 0)
+    var pluginState = this.props.pluginState;
+    if (!pluginState.showWaypoints
+        || !pluginState.waypoints
+        || pluginState.waypoints.length <= 0)
       return null;
     return <RL.LayerGroup>
-      { this.props.waypoints.map(w =>
+      { pluginState.waypoints.map(w =>
         w.name.toLowerCase().includes("snitch") ?
           <RL.Rectangle
             key={'snitchRect'+w.name+w.x+w.y+w.z}
@@ -78,12 +81,36 @@ export class WaypointsDialog extends Component {
     };
   }
 
+  onClose() {
+    this.props.pluginApi.setSubStates({
+      plugins: {waypoints: {wpDlgOpen: {$set: false}}},
+    });
+  }
+
+  onReplace (waypoints) {
+    this.props.pluginApi.setSubStates({
+      plugins: {waypoints: {
+        waypoints: {$set: waypoints},
+        wpDlgOpen: {$set: false},
+      }},
+    });
+  }
+
+  onAdd (waypoints) {
+    this.props.pluginApi.setSubStates({
+      plugins: {waypoints: {
+        waypoints: {$apply: w => w.concat(waypoints)},
+        wpDlgOpen: {$set: false},
+      }},
+    });
+  }
+
   render() {
     const actions = [
       <FlatButton primary
         label="Close"
         icon={<IconClose />}
-        onTouchTap={this.props.onClose}
+        onTouchTap={() => this.onClose()}
       />,
       <RaisedButton primary
         label="Replace"
@@ -91,7 +118,7 @@ export class WaypointsDialog extends Component {
         disabled={!this.state.waypointsText}
         onTouchTap={() => {
           const waypoints = parseWaypoints(this.state.waypointsText);
-          this.props.onReplace(waypoints);
+          this.onReplace(waypoints);
         }}
       />,
       <RaisedButton primary
@@ -100,16 +127,16 @@ export class WaypointsDialog extends Component {
         disabled={!this.state.waypointsText}
         onTouchTap={() => {
           const waypoints = parseWaypoints(this.state.waypointsText);
-          this.props.onAdd(waypoints);
+          this.onAdd(waypoints);
         }}
       />,
     ];
 
     return <Dialog
-      open={this.props.open}
+      open={this.props.pluginState.wpDlgOpen}
       title="Import waypoints"
       actions={actions}
-      onRequestClose={this.props.onClose}
+      onRequestClose={() => this.onClose()}
       >
       <p>Note that they do not leave your computer, only you can see them, and they are reset when you reload the page.</p>
       <p>Your waypoints are stored in <code>(.minecraft location)\mods\VoxelMods\voxelMap\(server address).points</code></p>

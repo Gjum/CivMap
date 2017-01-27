@@ -44,7 +44,6 @@ const muiTheme = getMuiTheme();
 
 var defaultState = {
   // ui state
-  wpDlgOpen: false,
   drawerOpen: true,
   activeDrawer: 'main',
 
@@ -62,6 +61,7 @@ var defaultState = {
     waypoints: {
       waypoints: [],
       showWaypoints: true,
+      wpDlgOpen: false,
     },
   },
 };
@@ -198,7 +198,9 @@ export default class Main extends Component {
             <MenuItem
               primaryText='Import your waypoints'
               leftIcon={<IconPlace />}
-              onTouchTap={() => this.setState({wpDlgOpen: true})}
+              onTouchTap={() => this.setSubStates({
+                plugins: {waypoints: {wpDlgOpen: {$set: true}}},
+              })}
             />
             <MenuItem
               primaryText='Add a claim'
@@ -223,8 +225,8 @@ export default class Main extends Component {
 
               <CustomToggle
                 label="Waypoints"
-                toggled={this.state.showWaypoints}
-                onToggle={() => this.setState({showWaypoints: !this.state.showWaypoints})}
+                toggled={this.state.plugins.waypoints.showWaypoints}
+                onToggle={() => this.setSubStates({plugins: {waypoints: {showWaypoints: {$apply: x => !x}}}})}
               />
               <CustomToggle
                 label="World border"
@@ -343,7 +345,7 @@ export default class Main extends Component {
                 pluginApi={this.pluginApi}
                 />
 
-              <WaypointsOverlay waypoints={this.state.plugins.waypoints.showWaypoints && this.state.plugins.waypoints.waypoints} />
+              <WaypointsOverlay pluginState={this.state.plugins.waypoints} />
 
             </RL.Map>
 
@@ -359,21 +361,9 @@ export default class Main extends Component {
           </div>
 
           <WaypointsDialog
-            open={this.state.wpDlgOpen}
-            onClose={() => this.setState({wpDlgOpen: false})}
-            onReplace={waypoints => {
-              this.setState({
-                waypoints: waypoints,
-                wpDlgOpen: false,
-              });
-            }}
-            onAdd={waypoints => {
-              this.setState({
-                waypoints: this.state.waypoints.concat(waypoints),
-                wpDlgOpen: false,
-              });
-            }}
-          />
+            pluginApi={this.pluginApi}
+            pluginState={this.state.plugins.waypoints}
+            />
 
         </div>
       </MuiThemeProvider>;
