@@ -8,6 +8,7 @@ import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconDone from 'material-ui/svg-icons/navigation/check';
 import IconHelp from 'material-ui/svg-icons/action/help';
 
+import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
@@ -97,6 +98,23 @@ export class ClaimsOverlay extends Component {
         />
       )}
     </RL.LayerGroup>;
+  }
+}
+
+export class ClaimsDrawer extends Component {
+  render() {
+    return <Drawer
+      openSecondary
+      open={this.props.open
+        && this.props.pluginState.editedClaimId >= 0
+      }
+      >
+      {this.props.pluginState.editedClaimId < 0 ? null :
+        <ClaimsDrawerContent
+          {...this.props}
+          />
+      }
+    </Drawer>;
   }
 }
 

@@ -32,7 +32,7 @@ import Toggle from 'material-ui/Toggle';
 
 import * as Util from './Util';
 import {WaypointsDialog, WaypointsOverlay} from './Waypoints';
-import {ClaimsDrawerContent, ClaimsOverlay} from './Claims';
+import {ClaimsDrawer, ClaimsOverlay} from './Claims';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/';
 
@@ -213,8 +213,10 @@ export default class Main extends Component {
                 };
                 var claimId = this.state.plugins.claims.claims.length;
                 this.setSubStates({
-                  plugins: {claims: {claims: {$push: claim}}},
-                  plugins: {claims: {editedClaimId: {$set: claimId}}},
+                  plugins: {claims: {
+                    claims: {$push: [claim]},
+                    editedClaimId: {$set: claimId},
+                  }},
                   activeDrawer: {$set: 'claimEdit'},
                 });
               }}
@@ -273,21 +275,13 @@ export default class Main extends Component {
 
           </Drawer>
 
-          <Drawer openSecondary
-            open={this.state.drawerOpen
-              && this.state.activeDrawer == 'claimEdit'
-              && this.state.plugins.claims.editedClaimId >= 0
-            }
-          >
-            { this.state.plugins.claims.editedClaimId < 0 ? null :
-              <ClaimsDrawerContent
-                pluginApi={this.pluginApi}
-                pluginState={this.state.plugins.claims}
-                map={this.map}
-                claimsPublishHelpUrl={this.props.claimsPublishHelpUrl}
-              />
-            }
-          </Drawer>
+          <ClaimsDrawer
+            open={this.state.drawerOpen && this.state.activeDrawer == 'claimEdit'}
+            pluginApi={this.pluginApi}
+            pluginState={this.state.plugins.claims}
+            map={this.map}
+            claimsPublishHelpUrl={this.props.claimsPublishHelpUrl}
+          />
 
           <div className={'mapContainer ' +
               (this.state.drawerOpen ? 'drawerOpen' : 'drawerClosed')}
