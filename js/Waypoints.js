@@ -48,6 +48,7 @@ export class WaypointsOverlay extends Component {
             key={'snitchRect'+w.name+w.x+w.y+w.z}
             bounds={[[w.z-11, w.x-11], [w.z+12, w.x+12]]}
             title={w.name}
+            color="#ff8888"
           >
             <RL.Popup><span>
               {w.name}
@@ -55,7 +56,34 @@ export class WaypointsOverlay extends Component {
               {w.x}, {w.y}, {w.z}
             </span></RL.Popup>
           </RL.Rectangle>
-        :
+        : w.name.toLowerCase().includes("citybastion") ?
+            <RL.Rectangle
+              key={'cityBastionRect'+w.name+w.x+w.y+w.z}
+              bounds={[[w.z-20, w.x-20], [w.z+21, w.x+21]]}
+              title={w.name}
+              color="#ffff88"
+            >
+              <RL.Popup><span>
+                {w.name}
+                <br />
+                {w.x}, {w.y}, {w.z}
+              </span></RL.Popup>
+            </RL.Rectangle>
+        : w.name.toLowerCase().includes("claimsbastion") ?
+            <RL.Circle
+              key={'claimsBastionCircle'+w.name+w.x+w.y+w.z}
+              radius={100}
+              center={[w.z, w.x]}
+              title={w.name}
+              color="#88ffff"
+            >
+              <RL.Popup><span>
+                {w.name}
+                <br />
+                {w.x}, {w.y}, {w.z}
+              </span></RL.Popup>
+            </RL.Circle>
+          : // regular waypoint
           <RL.Marker
             key={w.name+w.x+w.y+w.z}
             position={[w.z+.5, w.x+.5]}
