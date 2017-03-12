@@ -1,3 +1,4 @@
+import * as _ from'lodash';
 import * as L from'leaflet';
 import * as LE from'leaflet-editable';
 import * as RL from'react-leaflet';
@@ -116,8 +117,9 @@ export default class Main extends Component {
   constructor(props, context) {
     super(props, context);
 
+    this.state = defaultState;
     if (props.options) {
-      this.state = Util.updateJsonObject(defaultState, props.options);
+      this.state = _.merge(this.state, props.options);
     }
 
     this.mapView = Util.hashToView(location.hash);
