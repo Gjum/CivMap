@@ -148,3 +148,14 @@ export class WaypointsDialog extends Component {
     </Dialog>
   }
 };
+
+export var WaypointsPluginInfo = {
+  name: "waypoints",
+  overlay: WaypointsOverlay,
+  dialog: WaypointsDialog,
+  state: {
+    waypoints: [],
+    showWaypoints: true,
+    wpDlgOpen: false,
+  },
+};

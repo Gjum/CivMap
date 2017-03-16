@@ -32,8 +32,8 @@ import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
 
 import * as Util from './Util';
-import {WaypointsDialog, WaypointsOverlay} from './Waypoints';
-import {ClaimsDrawer, ClaimsOverlay} from './Claims';
+import {WaypointsPluginInfo} from './Waypoints';
+import {ClaimsDrawer, ClaimsPluginInfo} from './Claims';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/';
 
@@ -52,20 +52,14 @@ var defaultState = {
   showBorder: false,
   basemap: 'blank',
 
-  plugins: {
-    claims: {
-      claims: [],
-      claimOpacity: .1,
-      showClaimNames: false,
-      editedClaimId: -1,
-    },
-    waypoints: {
-      waypoints: [],
-      showWaypoints: true,
-      wpDlgOpen: false,
-    },
-  },
+  plugins: {},
+  installedPlugins: [],
 };
+
+var defaultPlugins = [
+  ClaimsPluginInfo,
+  WaypointsPluginInfo,
+];
 
 class CoordsDisplay extends Component {
   constructor(props, context) {
@@ -121,6 +115,15 @@ export default class Main extends Component {
     if (props.options) {
       this.state = _.merge(this.state, props.options);
     }
+
+    if (this.state.installedPlugins.length <= 0) {
+      this.state.installedPlugins = defaultPlugins;
+    }
+
+    // install default plugin state
+    this.state.installedPlugins.map(pluginInfo => {
+      this.state.plugins[pluginInfo.name] = pluginInfo.state;
+    });
 
     this.mapView = Util.hashToView(location.hash);
 
@@ -336,12 +339,15 @@ export default class Main extends Component {
                 : null // no border
               }
 
-              <ClaimsOverlay
-                pluginState={this.state.plugins.claims}
-                pluginApi={this.pluginApi}
-                />
-
-              <WaypointsOverlay pluginState={this.state.plugins.waypoints} />
+              {
+                this.state.installedPlugins.filter(p => p.overlay).map((pluginInfo, key) =>
+                  <pluginInfo.overlay
+                    key={key}
+                    pluginState={this.state.plugins[pluginInfo.name]}
+                    pluginApi={this.pluginApi}
+                    />
+                )
+              }
 
             </RL.Map>
 
@@ -356,10 +362,15 @@ export default class Main extends Component {
             </FloatingActionButton>
           </div>
 
-          <WaypointsDialog
-            pluginApi={this.pluginApi}
-            pluginState={this.state.plugins.waypoints}
-            />
+          {
+            this.state.installedPlugins.filter(p => p.dialog).map((pluginInfo, key) =>
+              <pluginInfo.dialog
+                key={key}
+                pluginState={this.state.plugins[pluginInfo.name]}
+                pluginApi={this.pluginApi}
+                />
+            )
+          }
 
         </div>
       </MuiThemeProvider>;

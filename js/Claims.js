@@ -276,3 +276,14 @@ export class ClaimsDrawerContent extends Component {
     </div>;
   }
 }
+
+export var ClaimsPluginInfo = {
+  name: "claims",
+  overlay: ClaimsOverlay,
+  state: {
+    claims: [],
+    claimOpacity: .1,
+    showClaimNames: false,
+    editedClaimId: -1,
+  },
+};
