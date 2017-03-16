@@ -122,15 +122,24 @@ export class ClaimsDrawerContent extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      claim: this.setupClaim(props),
+      parseErrorText: null,
+    }
+
+    if (this.state.claim.positions.length == 0) {
+      this.poly.editor.newShape();
+    }
+  }
+
+  setupClaim(props) {
+    if (this.poly) this.poly.remove();
+
     var origClaim = props.pluginState.claims[props.pluginState.editedClaimId];
     var claim = {}; // copy or we would modify global state
     for (var key in origClaim) {
       claim[key] = origClaim[key];
     }
-    this.state = {
-      claim: claim,
-      parseErrorText: null,
-    };
 
     this.poly = L.polygon(claim.positions);
     this.poly.addTo(props.map);
@@ -154,8 +163,12 @@ export class ClaimsDrawerContent extends Component {
       fillOpacity: .3,
     });
 
-    if (claim.positions.length == 0) {
-      this.poly.editor.newShape();
+    return claim;
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.pluginState.editedClaimId != this.props.pluginState.editedClaimId) {
+      this.setState({claim: this.setupClaim(nextProps)});
     }
   }
 
