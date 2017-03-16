@@ -191,9 +191,11 @@ export class ClaimsDrawerContent extends Component {
           var newClaims = ownState.claims.slice();
           newClaims[ownState.editedClaimId] = this.state.claim;
           this.props.pluginApi.setSubStates({
-            plugins: {claims: {claims: {$set: newClaims}}},
-            activeDrawer: {$set: 'main'},
-            editedClaimId: {$set: -1},
+            plugins: {claims: {
+              claims: {$set: newClaims},
+              editedClaimId: {$set: -1}
+            }},
+            activeDrawer: {$set: 'main'}
           });
         }}
       />
@@ -203,8 +205,8 @@ export class ClaimsDrawerContent extends Component {
         onTouchTap={() => {
           // TODO delete created claim if empty
           this.props.pluginApi.setSubStates({
-            activeDrawer: {$set: 'main'},
-            editedClaimId: {$set: -1},
+            plugins: {claims: {editedClaimId: {$set: -1}}},
+            activeDrawer: {$set: 'main'}
           });
         }}
       />
