@@ -78,25 +78,12 @@ class CoordsDisplay extends Component {
   }
 }
 
-class Centered extends Component {
-  render() {
-    return (
-      <div className='center-outer'>
-      <div className='center-middle'>
-      <div className='center-inner'>
-        {this.props.children}
-      </div></div></div>);
-  }
-}
-
-class CustomToggle extends Component {
-  render() {
-    return <Toggle
-      labelPosition="right"
-      labelStyle={{marginLeft: 10}}
-      {...this.props}
-    />;
-  }
+function CustomToggle(props) {
+  return <Toggle
+    labelPosition="right"
+    labelStyle={{marginLeft: 10}}
+    {...props}
+  />;
 }
 
 class PluginApi {
