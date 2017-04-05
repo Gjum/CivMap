@@ -99,11 +99,10 @@ export default class Main extends Component {
     super(props, context);
 
     this.state = defaultState;
-    if (props.options) {
-      this.state = _.merge(this.state, props.options);
-    }
 
-    if (this.state.installedPlugins.length <= 0) {
+    if (props.options && props.options.installedPlugins) {
+      this.state.installedPlugins = props.options.installedPlugins;
+    } else {
       this.state.installedPlugins = defaultPlugins;
     }
 
@@ -111,6 +110,10 @@ export default class Main extends Component {
     this.state.installedPlugins.map(pluginInfo => {
       this.state.plugins[pluginInfo.name] = pluginInfo.state;
     });
+
+    if (props.options) {
+      this.state = _.merge(this.state, props.options);
+    }
 
     this.mapView = Util.hashToView(location.hash);
 
