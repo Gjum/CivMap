@@ -13,9 +13,12 @@ exports.Main = Main;
 exports.ClaimsPlugin = ClaimsPluginInfo;
 exports.WaypointsPlugin = WaypointsPluginInfo;
 
-export function start(config) {
+export function start(config, onRef) {
   render(
-    <Main {...config} />,
+    <Main
+      ref={r => r && onRef && onRef(r)}
+      {...config}
+      />,
     document.getElementById('app')
   );
 }
