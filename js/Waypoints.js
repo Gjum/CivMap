@@ -3,11 +3,13 @@ import * as RL from 'react-leaflet';
 
 import IconAdd from 'material-ui/svg-icons/content/add-circle';
 import IconClose from 'material-ui/svg-icons/navigation/close';
+import IconPlace from 'material-ui/svg-icons/maps/place';
 import IconUpload from 'material-ui/svg-icons/file/file-upload';
 
 import CircularProgress from 'material-ui/CircularProgress';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
@@ -177,8 +179,21 @@ export class WaypointsDialog extends Component {
   }
 };
 
+function getSearchableData(pluginApi, pluginState) {
+  return pluginState.waypoints.map(w => { return {
+      text: w.name,
+      value: <MenuItem
+        leftIcon={<IconPlace />}
+        primaryText={w.name}
+        onTouchTap={() => pluginApi.map.flyTo(Util.xz(w.x, w.z), 3)}
+      />,
+    }
+  });
+}
+
 export var WaypointsPluginInfo = {
   name: "waypoints",
+  getSearchableData: getSearchableData,
   overlay: WaypointsOverlay,
   dialog: WaypointsDialog,
   state: {

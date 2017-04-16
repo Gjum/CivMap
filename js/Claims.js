@@ -4,6 +4,7 @@ import L from 'leaflet'
 import update from 'immutability-helper';
 
 import IconAdd from 'material-ui/svg-icons/content/add-circle';
+import IconClaim from 'material-ui/svg-icons/social/public';
 import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconDone from 'material-ui/svg-icons/navigation/check';
 import IconHelp from 'material-ui/svg-icons/action/help';
@@ -277,8 +278,30 @@ export class ClaimsDrawerContent extends Component {
   }
 }
 
+function getSearchableData(pluginApi, pluginState) {
+  return pluginState.claims.map(c => {
+    return {
+      text: c.name,
+      value: <MenuItem
+        leftIcon={<IconClaim />}
+        primaryText={c.name}
+        onTouchTap={() => {
+          // flip the vertical coordinates to circumvent https://github.com/Leaflet/Leaflet/issues/4886
+          var bounds = L.latLngBounds(c.positions);
+          var s = bounds._northEast.lat;
+          var n = bounds._southWest.lat;
+          bounds._northEast.lat = n;
+          bounds._southWest.lat = s;
+          pluginApi.map.flyToBounds(bounds);
+        }}
+      />,
+    }
+  });
+}
+
 export var ClaimsPluginInfo = {
   name: "claims",
+  getSearchableData: getSearchableData,
   overlay: ClaimsOverlay,
   state: {
     claims: [],

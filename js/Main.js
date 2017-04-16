@@ -91,6 +91,7 @@ class PluginApi {
     this._component = component;
     this.setState = component.setState.bind(component);
     this.setSubStates = component.setSubStates.bind(component);
+    this.map = null; // set later when instantiated
   }
 }
 
@@ -144,33 +145,16 @@ export default class Main extends Component {
   onMapCreated(map) {
     if (!this.map) {
       this.map = map;
+      this.pluginApi.map = map;
     }
   }
 
   getSearchableData() {
-    return this.state.plugins.claims.claims.map(c => { return {
-      text: c.name,
-      value: <MenuItem
-        leftIcon={<IconClaim />}
-        primaryText={c.name}
-        onTouchTap={() => {
-          // flip the vertical coordinates to circumvent https://github.com/Leaflet/Leaflet/issues/4886
-          var bounds = L.latLngBounds(c.positions);
-          var s = bounds._northEast.lat;
-          var n = bounds._southWest.lat;
-          bounds._northEast.lat = n;
-          bounds._southWest.lat = s;
-          this.map.flyToBounds(bounds);
-        }}
-      />,
-    }}).concat(this.state.plugins.waypoints.waypoints.map(w => { return {
-      text: w.name,
-      value: <MenuItem
-        leftIcon={<IconPlace />}
-        primaryText={w.name}
-        onTouchTap={() => this.map.flyTo(Util.xz(w.x, w.z), 3)}
-      />,
-    }}));
+    return Array.prototype.concat.apply([],
+      this.state.installedPlugins.filter(p => p.getSearchableData).map((pluginInfo) =>
+        pluginInfo.getSearchableData(this.pluginApi, this.state.plugins[pluginInfo.name])
+      )
+    );
   }
 
   render() {
