@@ -1,7 +1,7 @@
 import React from 'react';
 import {render} from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import Main from './Main';
+import {Main} from './Main';
 import {WaypointsPluginInfo} from './Waypoints';
 import {ClaimsPluginInfo} from './Claims';
 

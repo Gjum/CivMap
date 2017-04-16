@@ -29,11 +29,13 @@ import SelectField from 'material-ui/SelectField';
 import Slider from 'material-ui/Slider';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
-import Toggle from 'material-ui/Toggle';
 
+import {ClaimsDrawer, ClaimsPluginInfo} from './Claims';
+import CoordsDisplay from './CoordsDisplay';
+import CustomToggle from './CustomToggle';
+import {PluginApi} from './PluginApi';
 import * as Util from './Util';
 import {WaypointsPluginInfo} from './Waypoints';
-import {ClaimsDrawer, ClaimsPluginInfo} from './Claims';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/';
 
@@ -56,48 +58,14 @@ var defaultState = {
   installedPlugins: [],
 };
 
-var defaultPlugins = [
+export var defaultPlugins = [
   ClaimsPluginInfo,
   WaypointsPluginInfo,
 ];
 
-class CoordsDisplay extends Component {
-  constructor(props, context) {
-    super(props, context);
-    this.state = {cursor: L.latLng([0,0])};
-  }
-
-  setCursor(cursor) {
-    this.setState({cursor: cursor});
-  }
-
-  render() {
-    const [z, x] = Util.intCoords(this.state.cursor);
-    return <div className='coords-display control-box leaflet-control leaflet-bar'>
-      {'X ' + x + ' ' + z + ' Z'}</div>;
-  }
-}
-
-function CustomToggle(props) {
-  return <Toggle
-    labelPosition="right"
-    labelStyle={{marginLeft: 10}}
-    {...props}
-  />;
-}
-
-class PluginApi {
-  constructor(component) {
-    this._component = component;
-    this.setState = component.setState.bind(component);
-    this.setSubStates = component.setSubStates.bind(component);
-    this.map = null; // set later when instantiated
-  }
-}
-
-export default class Main extends Component {
-  constructor(props, context) {
-    super(props, context);
+export class Main extends Component {
+  constructor(props) {
+    super(props);
 
     this.state = defaultState;
 
