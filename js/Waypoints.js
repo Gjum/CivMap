@@ -170,7 +170,7 @@ export class WaypointsDialog extends Component {
       >
       <p>Note that they do not leave your computer, only you can see them, and they are reset when you reload the page.</p>
       <p>Your waypoints are stored in <code>(.minecraft location)\mods\VoxelMods\voxelMap\(server address).points</code></p>
-      <TextField fullWidth multiLine rows={2} rowsMax={10}
+      <TextField autoFocus fullWidth multiLine rows={2} rowsMax={10}
         hintText="Paste your waypoints here"
         value={this.state.value}
         onChange={e => this.setState({waypointsText: e.target.value})}
