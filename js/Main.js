@@ -201,7 +201,6 @@ export class Main extends Component {
                 defaultValue={this.state.plugins.claims.claimOpacity}
                 value={this.state.plugins.claims.claimOpacity}
                 onChange={(e, val) => {
-                  if (val < .05) val = 0;
                   this.setSubStates({plugins: {claims: {claimOpacity: {$set: val}}}});
                 }}
                 sliderStyle={{marginTop: 0, marginBottom: 16}}

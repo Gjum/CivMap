@@ -83,7 +83,7 @@ export class ClaimsOverlay extends Component {
       return null;
     return <RL.LayerGroup>
       { state.claims.map((claim, claimId) =>
-        <EditableClaim
+        state.claimOpacity < .05 ? null : <EditableClaim
           key={claimId}
           claim={claim}
           opacity={claimId == state.editedClaimId ? 0 : state.claimOpacity}
