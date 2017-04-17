@@ -105,7 +105,7 @@ export class ClaimsDrawer extends Component {
   render() {
     return <Drawer
       openSecondary
-      open={this.props.pluginApi._component.state.drawerOpen
+      open={this.props.isDrawerOpen
         && this.props.pluginState.editedClaimId >= 0
       }
       >

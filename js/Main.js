@@ -298,6 +298,7 @@ export class Main extends Component {
                 key={key}
                 pluginState={this.state.plugins[pluginInfo.name]}
                 pluginApi={this.pluginApi}
+                isDrawerOpen={this.state.drawerOpen}
                 />
             )
           }
