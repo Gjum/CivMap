@@ -87,11 +87,10 @@ export class Main extends Component {
     this.mapView = Util.hashToView(location.hash);
 
     this.pluginApi = new PluginApi(this);
-  }
 
-  componentWillMount() {
-    Util.getJSON(this.props.claimsUrl, claims => {
-      this.setSubStates({plugins: {claims: {claims: {$set: claims}}}});
+    // initialize plugins (download json etc.)
+    this.state.installedPlugins.filter(p => p.init).map(pluginInfo => {
+      pluginInfo.init(this.pluginApi, this.state.plugins[pluginInfo.name]);
     });
   }
 
@@ -226,7 +225,7 @@ export class Main extends Component {
             pluginApi={this.pluginApi}
             pluginState={this.state.plugins.claims}
             map={this.map}
-            claimsPublishHelpUrl={this.props.claimsPublishHelpUrl}
+            claimsPublishHelpUrl={this.state.plugins.claims.publishHelpUrl}
           />
 
           <div className={'mapContainer ' +

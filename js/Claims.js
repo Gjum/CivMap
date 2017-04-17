@@ -278,6 +278,16 @@ export class ClaimsDrawerContent extends Component {
   }
 }
 
+function init(pluginApi, pluginState) {
+  if (!pluginState.jsonUrl) {
+    console.error("[ClaimsPlugin] No jsonUrl specified");
+    return;
+  }
+  Util.getJSON(pluginState.jsonUrl, claims => {
+    pluginApi.setSubStates({plugins: {claims: {claims: {$set: claims}}}});
+  });
+}
+
 function getSearchableData(pluginApi, pluginState) {
   return pluginState.claims.map(c => {
     return {
@@ -301,9 +311,11 @@ function getSearchableData(pluginApi, pluginState) {
 
 export var ClaimsPluginInfo = {
   name: "claims",
+  init: init,
   getSearchableData: getSearchableData,
   overlay: ClaimsOverlay,
   state: {
+    jsonUrl: null,
     claims: [],
     claimOpacity: .1,
     showClaimNames: false,
