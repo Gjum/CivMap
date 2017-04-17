@@ -181,6 +181,8 @@ export class Main extends Component {
               />
 
               <SelectField
+                style={{width: 220}}
+                autoWidth
                 floatingLabelText="Base map"
                 value={this.state.basemap}
                 onChange={(e, i, val) => this.setState({basemap: val})}
