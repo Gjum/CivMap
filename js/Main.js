@@ -30,7 +30,7 @@ import Slider from 'material-ui/Slider';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
 
-import {ClaimsDrawer, ClaimsPluginInfo} from './Claims';
+import {ClaimsPluginInfo} from './Claims';
 import CoordsDisplay from './CoordsDisplay';
 import CustomToggle from './CustomToggle';
 import {PluginApi} from './PluginApi';
@@ -48,7 +48,6 @@ const muiTheme = getMuiTheme();
 var defaultState = {
   // ui state
   drawerOpen: true,
-  activeDrawer: 'main',
 
   // map state
   showBorder: false,
@@ -132,7 +131,7 @@ export class Main extends Component {
         <div className='fullHeight'>
 
           <Drawer openSecondary
-            open={this.state.drawerOpen && this.state.activeDrawer == 'main'}
+            open={this.state.drawerOpen}
           >
             <div className='menu-inset'>
               <AutoComplete fullWidth openOnFocus
@@ -163,7 +162,6 @@ export class Main extends Component {
                     claims: {$push: [claim]},
                     editedClaimId: {$set: claimId},
                   }},
-                  activeDrawer: {$set: 'claimEdit'},
                 });
               }}
             />
@@ -219,14 +217,6 @@ export class Main extends Component {
             />
 
           </Drawer>
-
-          <ClaimsDrawer
-            open={this.state.drawerOpen && this.state.activeDrawer == 'claimEdit'}
-            pluginApi={this.pluginApi}
-            pluginState={this.state.plugins.claims}
-            map={this.map}
-            claimsPublishHelpUrl={this.state.plugins.claims.publishHelpUrl}
-          />
 
           <div className={'mapContainer ' +
               (this.state.drawerOpen ? 'drawerOpen' : 'drawerClosed')}
@@ -303,8 +293,8 @@ export class Main extends Component {
           </div>
 
           {
-            this.state.installedPlugins.filter(p => p.dialog).map((pluginInfo, key) =>
-              <pluginInfo.dialog
+            this.state.installedPlugins.filter(p => p.gui).map((pluginInfo, key) =>
+              <pluginInfo.gui
                 key={key}
                 pluginState={this.state.plugins[pluginInfo.name]}
                 pluginApi={this.pluginApi}

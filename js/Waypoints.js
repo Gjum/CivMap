@@ -195,7 +195,7 @@ export var WaypointsPluginInfo = {
   name: "waypoints",
   getSearchableData: getSearchableData,
   overlay: WaypointsOverlay,
-  dialog: WaypointsDialog,
+  gui: WaypointsDialog,
   state: {
     waypoints: [],
     showWaypoints: true,

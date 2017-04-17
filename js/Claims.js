@@ -92,7 +92,6 @@ export class ClaimsOverlay extends Component {
             // TODO cancel active editing
             this.props.pluginApi.setSubStates({
               drawerOpen: {$set: true},
-              activeDrawer: {$set: 'claimEdit'},
               plugins: {claims: {editedClaimId: {$set: claimId}}},
             });
           }}
@@ -106,7 +105,7 @@ export class ClaimsDrawer extends Component {
   render() {
     return <Drawer
       openSecondary
-      open={this.props.open
+      open={this.props.pluginApi._component.state.drawerOpen
         && this.props.pluginState.editedClaimId >= 0
       }
       >
@@ -143,7 +142,7 @@ export class ClaimsDrawerContent extends Component {
     }
 
     this.poly = L.polygon(claim.positions);
-    this.poly.addTo(props.map);
+    this.poly.addTo(props.pluginApi.map);
     this.poly.enableEdit();
 
     var updatePolyPositions = e => {
@@ -209,7 +208,6 @@ export class ClaimsDrawerContent extends Component {
               claims: {$set: newClaims},
               editedClaimId: {$set: -1}
             }},
-            activeDrawer: {$set: 'main'}
           });
         }}
       />
@@ -220,14 +218,13 @@ export class ClaimsDrawerContent extends Component {
           // TODO delete created claim if empty
           this.props.pluginApi.setSubStates({
             plugins: {claims: {editedClaimId: {$set: -1}}},
-            activeDrawer: {$set: 'main'}
           });
         }}
       />
       <MenuItem
         primaryText='How to publish'
         leftIcon={<IconHelp />}
-        href={this.props.claimsPublishHelpUrl || 'https://github.com/dev3map/dev3map.github.io/wiki/Adding-and-editing-claims'}
+        href={this.props.pluginState.publishHelpUrl || 'https://github.com/dev3map/dev3map.github.io/wiki/Adding-and-editing-claims'}
         target='_blank'
       />
       <MenuItem
@@ -314,6 +311,7 @@ export var ClaimsPluginInfo = {
   init: init,
   getSearchableData: getSearchableData,
   overlay: ClaimsOverlay,
+  gui: ClaimsDrawer,
   state: {
     jsonUrl: null,
     claims: [],
