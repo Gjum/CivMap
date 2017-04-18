@@ -10,7 +10,6 @@ import CircularProgress from 'material-ui/CircularProgress';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
-import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
 import * as Util from './Util';
@@ -137,12 +136,12 @@ export class WaypointsDialog extends Component {
 
   render() {
     const actions = [
-      <FlatButton primary
+      <FlatButton default
         label="Close"
         icon={<IconClose />}
         onTouchTap={() => this.onClose()}
       />,
-      <RaisedButton primary
+      <FlatButton primary
         label="Replace"
         icon={<IconUpload />}
         disabled={!this.state.waypointsText}
@@ -151,7 +150,7 @@ export class WaypointsDialog extends Component {
           this.onReplace(waypoints);
         }}
       />,
-      <RaisedButton primary
+      <FlatButton primary
         label="Add"
         icon={<IconAdd />}
         disabled={!this.state.waypointsText}
