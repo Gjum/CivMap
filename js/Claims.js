@@ -257,7 +257,7 @@ export class ClaimsDrawerContent extends Component {
       <Subheader>Claim JSON</Subheader>
 
       <div className='menu-inset'>
-        <TextField fullWidth multiLine rows={1} rowsMax={999}
+        <TextField fullWidth multiLine
           hintText="Claim JSON"
           value={this.state.parseErrorText ? undefined : JSON.stringify(this.state.claim)}
           errorText={this.state.parseErrorText}
