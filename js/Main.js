@@ -1,6 +1,5 @@
 import * as _ from'lodash';
 import * as L from'leaflet';
-import * as LE from'leaflet-editable';
 import * as RL from'react-leaflet';
 import React, {Component} from 'react';
 import update from 'immutability-helper';
@@ -37,7 +36,7 @@ import {PluginApi} from './PluginApi';
 import * as Util from './Util';
 import {WaypointsPluginInfo} from './Waypoints';
 
-L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/';
+L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/images/';
 
 var mcCRS = L.extend({}, L.CRS.Simple, {
   transformation: new L.Transformation(1, 0, 1, 0)
