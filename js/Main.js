@@ -25,11 +25,11 @@ import FlatButton from 'material-ui/FlatButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import SelectField from 'material-ui/SelectField';
 import Slider from 'material-ui/Slider';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
 
+import BasemapSelector from './BasemapSelector';
 import {ClaimsPluginInfo} from './Claims';
 import CoordsDisplay from './CoordsDisplay';
 import CustomToggle from './CustomToggle';
@@ -180,18 +180,11 @@ export class Main extends Component {
                 onToggle={() => this.setState({showBorder: !this.state.showBorder})}
               />
 
-              <SelectField
-                style={{width: 220}}
-                autoWidth
-                floatingLabelText="Base map"
-                value={this.state.basemap}
+              <BasemapSelector
+                selected={this.state.basemap}
                 onChange={(e, i, val) => this.setState({basemap: val})}
-                >
-                { this.props.basemaps.map(mapName =>
-                    <MenuItem key={mapName} value={mapName} primaryText={mapName} />
-                )}
-                <MenuItem value="blank" primaryText="blank" />
-              </SelectField>
+                basemaps={this.props.basemaps}
+              />
             </div>
 
             <Subheader>Claim controls</Subheader>
