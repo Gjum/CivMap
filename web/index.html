@@ -37,25 +37,36 @@
   <script type="text/javascript">
     CivMap.start({
       attribution: 'CivMap SNAPSHOT',
-      helpUrl: 'https://github.com/dev3map/dev3map.github.io/wiki/',
-      tilesUrl: 'https://raw.githubusercontent.com/dev3map/tiles/master/',
-      borderSquareRadius: 5000,
+      tilesUrl: 'https://raw.githubusercontent.com/civexmap/tiles/master/',
+      borderSquareRadius: 4000,
       basemaps: [
         'terrain',
         'night',
         'simple',
+        'height',
+        'biome',
         'light',
       ],
       options: {
         basemap: 'terrain',
         installedPlugins: [
-          CivMap.ClaimsPlugin,
           CivMap.WaypointsPlugin,
+          CivMap.FeaturesPlugin,
         ],
         plugins: {
-          claims: {
-            jsonUrl: 'https://raw.githubusercontent.com/dev3map/data/master/claims.json',
-            publishHelpUrl: 'https://github.com/dev3map/dev3map.github.io/wiki/Adding-and-editing-claims',
+          features: {
+            featureGroup: {
+              geometry: "group",
+              name: "Claims Maps",
+              features: [
+                {
+                  geometry: "image",
+                  name: "Jecowa transparent",
+                  url: "https://www.mediafire.com/convkey/7bcf/d539122c3ohp7bxag.jpg",
+                  bounds: [[-4096, -4096], [4096, 4096]],
+                },
+              ],
+            },
           },
         },
       },

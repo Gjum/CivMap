@@ -146,24 +146,6 @@ export class Main extends Component {
                 plugins: {waypoints: {wpDlgOpen: {$set: true}}},
               })}
             />
-            <MenuItem
-              primaryText='Add a claim'
-              leftIcon={<IconClaim />}
-              onTouchTap={() => {
-                var claim = {
-                  name: '',
-                  color: '#000000',
-                  positions: [],
-                };
-                var claimId = this.state.plugins.claims.claims.length;
-                this.setSubStates({
-                  plugins: {claims: {
-                    claims: {$push: [claim]},
-                    editedClaimId: {$set: claimId},
-                  }},
-                });
-              }}
-            />
 
             <Subheader>Map controls</Subheader>
             <div className='menu-inset'>
@@ -186,20 +168,16 @@ export class Main extends Component {
               />
             </div>
 
-            <Subheader>Claim controls</Subheader>
+            <Subheader>Features controls</Subheader>
             <div className='menu-inset'>
               <Slider
-                defaultValue={this.state.plugins.claims.claimOpacity}
-                value={this.state.plugins.claims.claimOpacity}
+                label="Opacity"
+                defaultValue={this.state.plugins.features.globalOpacity}
+                value={this.state.plugins.features.globalOpacity}
                 onChange={(e, val) => {
-                  this.setSubStates({plugins: {claims: {claimOpacity: {$set: val}}}});
+                  this.setSubStates({plugins: {features: {globalOpacity: {$set: val}}}});
                 }}
                 sliderStyle={{marginTop: 0, marginBottom: 16}}
-              />
-              <CustomToggle
-                label="Claim names"
-                toggled={this.state.plugins.claims.showClaimNames}
-                onToggle={() => this.setSubStates({plugins: {claims: {showClaimNames: {$apply: x => !x}}}})}
               />
             </div>
 
@@ -226,7 +204,6 @@ export class Main extends Component {
               minZoom={minZoom}
               onmoveend={e => history.replaceState({}, document.title, '#' + Util.viewToHash(e.target))}
               onmousemove={e => this.coordsDisplay && this.coordsDisplay.setCursor(e.latlng)}
-              editable={true}
               >
 
               { this.state.basemap == "blank" ? null :
