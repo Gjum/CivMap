@@ -4,6 +4,7 @@ import L from 'leaflet'
 import update from 'immutability-helper';
 
 import * as Util from './Util';
+import ImageOverlay from './ImageOverlay';
 
 function renderFeature(props, feature, key) {
   if (feature.geometry == "group")
@@ -19,7 +20,7 @@ function FeatureGroup(props) {
 }
 
 function FeatureImage(props) {
-  return <RL.ImageOverlay
+  return <ImageOverlay
     url={props.image.url}
     bounds={props.image.bounds}
     opacity={props.pluginState.globalOpacity}
