@@ -133,20 +133,13 @@ export class Main extends Component {
           >
             <div className='menu-inset'>
               <AutoComplete fullWidth openOnFocus
-                hintText="Find a claim, waypoint, ..."
+                hintText="Search"
                 filter={AutoComplete.fuzzyFilter}
                 dataSource={this.getSearchableData()}
               />
             </div>
 
-            <Subheader>Map controls</Subheader>
             <div className='menu-inset'>
-              <CustomToggle
-                label="World border"
-                toggled={this.state.showBorder}
-                onToggle={() => this.setState({showBorder: !this.state.showBorder})}
-              />
-
               <BasemapSelector
                 selected={this.state.basemap}
                 onChange={(e, i, val) => this.setState({basemap: val})}
@@ -163,6 +156,14 @@ export class Main extends Component {
                   />
               )
             }
+
+            <div className='menu-inset'>
+              <CustomToggle
+                label="Show world border"
+                toggled={this.state.showBorder}
+                onToggle={() => this.setState({showBorder: !this.state.showBorder})}
+              />
+            </div>
 
             <Subheader>About</Subheader>
             <MenuItem
