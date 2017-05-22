@@ -39,6 +39,34 @@ html, body, #app, .fullHeight, .map {
   margin: 0px 16px;
 }
 
+.basemap-selector {
+  margin: 0px 8px;
+}
+
+.basemap-selector-item {
+  width: 33%;
+  float: left;
+  cursor: pointer;
+}
+
+.basemap-selector-item-inner:hover {
+  background-color: #88bcd4;
+}
+
+.basemap-selector-current {
+  background-color: #00bcd4;
+}
+
+.basemap-selector-item-inner {
+  transition: background-color 500ms;
+  padding: 8px;
+}
+
+.basemap-selector-item img {
+  display: block;
+  width: 100%;
+}
+
 .leaflet-container {
   background: none;
 }

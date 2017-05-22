@@ -3,16 +3,17 @@ import MenuItem from 'material-ui/MenuItem';
 import SelectField from 'material-ui/SelectField';
 
 export default function BasemapSelector(props) {
-  return <SelectField
-    style={{width: 220}}
-    autoWidth
-    floatingLabelText="Base map"
-    value={props.selected}
-    onChange={props.onChange}
-    >
+  return <div className='basemap-selector' >
     { props.basemaps.map(mapName =>
-      <MenuItem key={mapName} value={mapName} primaryText={mapName} />
+      <div key={mapName}
+        className='basemap-selector-item'
+        onClick={() => props.onBasemapSelect(mapName)}
+        >
+        <div className={'basemap-selector-item-inner' + (mapName == props.selected ? ' basemap-selector-current' : '')} >
+          <img src={props.tilesUrl + mapName + '/z-2/0,0.png'} />
+          {mapName}
+        </div>
+      </div>
     )}
-    <MenuItem value="blank" primaryText="blank" />
-  </SelectField>;
+  </div>;
 }

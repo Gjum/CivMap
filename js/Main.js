@@ -139,13 +139,12 @@ export class Main extends Component {
               />
             </div>
 
-            <div className='menu-inset'>
-              <BasemapSelector
-                selected={this.state.basemap}
-                onChange={(e, i, val) => this.setState({basemap: val})}
-                basemaps={this.props.basemaps}
-              />
-            </div>
+            <BasemapSelector
+              selected={this.state.basemap}
+              onBasemapSelect={val => this.setState({basemap: val})}
+              basemaps={this.props.basemaps}
+              tilesUrl={this.props.tilesUrl}
+            />
 
             {
               this.state.installedPlugins.filter(p => p.menu).map((pluginInfo, key) =>
