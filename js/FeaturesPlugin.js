@@ -6,20 +6,20 @@ import update from 'immutability-helper';
 import * as Util from './Util';
 import ImageOverlay from './ImageOverlay';
 
-function renderFeature(props, feature, key) {
+function renderFeatureOverlay(props, feature, key) {
   if (feature.geometry == "group")
-    return <FeatureGroup group={feature} key={key} {...props} />;
+    return <FeatureOverlayGroup group={feature} key={key} {...props} />;
   if (feature.geometry == "image")
-    return <FeatureImage image={feature} key={key} {...props} />;
+    return <FeatureOverlayImage image={feature} key={key} {...props} />;
 }
 
-function FeatureGroup(props) {
+function FeatureOverlayGroup(props) {
   return <RL.LayerGroup>
-    { props.group.features.map((f, key) => renderFeature(props, f, key)) }
+    { props.group.features.map((f, key) => renderFeatureOverlay(props, f, key)) }
   </RL.LayerGroup>;
 }
 
-function FeatureImage(props) {
+function FeatureOverlayImage(props) {
   return <ImageOverlay
     url={props.image.url}
     bounds={props.image.bounds}
@@ -29,10 +29,10 @@ function FeatureImage(props) {
 
 class FeaturesOverlay extends Component {
   render() {
-    var state = this.props.pluginState;
-    if (!state.featureGroup)
+    var featureGroup = this.props.pluginState.featureGroup;
+    if (!featureGroup)
       return null;
-    return renderFeature(this.props, state.featureGroup);
+    return renderFeatureOverlay(this.props, featureGroup);
   }
 }
 
