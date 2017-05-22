@@ -12,6 +12,7 @@ import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
 
+import CustomToggle from './CustomToggle';
 import * as Util from './Util';
 
 function parseWaypoints(text) {
@@ -178,6 +179,25 @@ export class WaypointsDialog extends Component {
   }
 };
 
+function WaypointsMenu(props) {
+  return <div>
+    <MenuItem
+      primaryText='Import your waypoints'
+      leftIcon={<IconPlace />}
+      onTouchTap={() => props.pluginApi.setSubStates({
+        plugins: {waypoints: {wpDlgOpen: {$set: true}}},
+      })}
+    />
+    <div className='menu-inset'>
+      <CustomToggle
+        label="Show Waypoints"
+        toggled={props.pluginState.showWaypoints}
+        onToggle={() => props.pluginApi.setSubStates({plugins: {waypoints: {showWaypoints: {$apply: x => !x}}}})}
+      />
+    </div>
+  </div>;
+}
+
 function getSearchableData(pluginApi, pluginState) {
   return pluginState.waypoints.map(w => { return {
       text: w.name,
@@ -195,6 +215,7 @@ export var WaypointsPluginInfo = {
   getSearchableData: getSearchableData,
   overlay: WaypointsOverlay,
   gui: WaypointsDialog,
+  menu: WaypointsMenu,
   state: {
     waypoints: [],
     showWaypoints: true,

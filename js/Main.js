@@ -138,22 +138,9 @@ export class Main extends Component {
                 dataSource={this.getSearchableData()}
               />
             </div>
-            <MenuItem
-              primaryText='Import your waypoints'
-              leftIcon={<IconPlace />}
-              onTouchTap={() => this.setSubStates({
-                plugins: {waypoints: {wpDlgOpen: {$set: true}}},
-              })}
-            />
 
             <Subheader>Map controls</Subheader>
             <div className='menu-inset'>
-
-              <CustomToggle
-                label="Waypoints"
-                toggled={this.state.plugins.waypoints.showWaypoints}
-                onToggle={() => this.setSubStates({plugins: {waypoints: {showWaypoints: {$apply: x => !x}}}})}
-              />
               <CustomToggle
                 label="World border"
                 toggled={this.state.showBorder}
