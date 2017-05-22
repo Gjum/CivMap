@@ -35,6 +35,21 @@
   </script>
   <script src="bundle.js"></script>
   <script type="text/javascript">
+    var defaultFeatureGroup = {
+      type: "group",
+      properties: { name: "Claims Maps", },
+      features: [
+        {
+          type: "image",
+          properties: { name: "Jecowa transparent", },
+          geometry: {
+            type: "image",
+            url: "https://www.mediafire.com/convkey/7bcf/d539122c3ohp7bxag.jpg",
+            bounds: [[-4096, -4096], [4096, 4096]],
+          },
+        },
+      ],
+    };
     CivMap.start({
       attribution: 'CivMap SNAPSHOT',
       tilesUrl: 'https://raw.githubusercontent.com/civexmap/tiles/master/',
@@ -55,18 +70,7 @@
         ],
         plugins: {
           features: {
-            featureGroup: {
-              geometry: "group",
-              name: "Claims Maps",
-              features: [
-                {
-                  geometry: "image",
-                  name: "Jecowa transparent",
-                  url: "https://www.mediafire.com/convkey/7bcf/d539122c3ohp7bxag.jpg",
-                  bounds: [[-4096, -4096], [4096, 4096]],
-                },
-              ],
-            },
+            featureGroup: defaultFeatureGroup,
           },
         },
       },

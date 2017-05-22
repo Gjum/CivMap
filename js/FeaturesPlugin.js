@@ -9,66 +9,73 @@ import Subheader from 'material-ui/Subheader';
 import * as Util from './Util';
 import ImageOverlay from './ImageOverlay';
 
-function renderFeatureOverlay(props, feature, key) {
-  if (feature.geometry == "group")
-    return <FeatureOverlayGroup group={feature} key={key} {...props} />;
-  if (feature.geometry == "image")
-    return <FeatureOverlayImage image={feature} key={key} {...props} />;
+function renderFeatureOverlay(commonProps, feature, key) {
+  if (feature.type == "group")
+    return <FeatureOverlayGroup group={feature} key={key} commonProps={commonProps} />;
+  if (feature.geometry.type == "image")
+    return <FeatureOverlayImage image={feature} key={key} commonProps={commonProps} />;
+  console.error("[FeaturesOverlay] Unknown feature geometry type", feature);
 }
 
 function FeatureOverlayGroup(props) {
+  let {group, commonProps} = props;
   return <RL.LayerGroup>
-    { props.group.features.map((f, key) => renderFeatureOverlay(props, f, key)) }
+    { group.features.map((f, key) => renderFeatureOverlay(commonProps, f, key)) }
   </RL.LayerGroup>;
 }
 
 function FeatureOverlayImage(props) {
+  let {image, commonProps} = props;
   return <ImageOverlay
-    url={props.image.url}
-    bounds={props.image.bounds}
-    opacity={props.pluginState.globalOpacity}
+    opacity={commonProps.pluginState.globalOpacity}
+    {...image.geometry}
   />;
 }
 
 class FeaturesOverlay extends Component {
   render() {
-    var featureGroup = this.props.pluginState.featureGroup;
+    let {pluginState: {featureGroup}} = this.props;
     if (!featureGroup)
       return null;
     return renderFeatureOverlay(this.props, featureGroup);
   }
 }
 
-function renderFeatureMenu(props, feature, key) {
-  if (feature.geometry == "group")
-    return <FeatureMenuGroup group={feature} key={key} {...props} />;
-  if (feature.geometry == "image")
-    return <FeatureMenuImage image={feature} key={key} {...props} />;
+function renderFeatureMenu(commonProps, feature, key) {
+  if (feature.type == "group")
+    return <FeatureMenuGroup group={feature} key={key} commonProps={commonProps} />;
+  else
+    return <FeatureMenuFeature feature={feature} key={key} commonProps={commonProps} />;
 }
 
 function FeatureMenuGroup(props) {
+  let {group: {properties, features}, commonProps} = props;
   return <div>
-    {props.group.name}:
+    {properties && properties.name || "(unnamed)"}
     <div style={{paddingLeft: '1em'}}>
-      {props.group.features.map((f, key) => renderFeatureMenu(props, f, key))}
+      {features.map((f, key) => renderFeatureMenu(commonProps, f, key))}
     </div>
   </div>;
 }
 
-function FeatureMenuImage(props) {
+function FeatureMenuFeature(props) {
+  let {feature: {properties, geometry}} = props;
   return <div>
-    {props.image.name}
+    {properties && properties.name || "(unnamed)"}
+    <span style={{float: 'right', color: 'gray'}}>
+      {geometry.type}
+    </span>
   </div>;
 }
 
 class FeaturesMenu extends Component {
   render() {
-    var pluginState = this.props.pluginState;
+    let {pluginState: {featureGroup, globalOpacity}} = this.props;
     return <div>
       <Subheader>Overlay opacity</Subheader>
       <div className='menu-inset'>
         <Slider
-          value={pluginState.globalOpacity}
+          value={globalOpacity}
           onChange={(e, val) => {
             this.props.pluginApi.setSubStates({plugins: {features: {globalOpacity: {$set: val}}}});
           }}
@@ -80,7 +87,7 @@ class FeaturesMenu extends Component {
         className='menu-inset'
         style={{marginBottom: 16}}
         >
-        { pluginState.featureGroup && renderFeatureMenu(this.props, pluginState.featureGroup) }
+        { featureGroup && renderFeatureMenu(this.props, featureGroup) }
       </div>
     </div>;
   }
@@ -103,7 +110,7 @@ export var FeaturesPluginInfo = {
   menu: FeaturesMenu,
   state: {
     jsonUrl: null,
-    featureGroup: {},
+    featureGroup: {features: []},
     editedFeatureId: -1,
     globalOpacity: 1,
   },
