@@ -6,16 +6,16 @@ import {WaypointsPluginInfo} from './Waypoints';
 import {ClaimsPluginInfo} from './Claims';
 import {FeaturesPluginInfo} from './FeaturesPlugin';
 
-// Needed for onTouchTap
-// http://stackoverflow.com/a/34015469/988941
-injectTapEventPlugin();
-
 exports.Main = Main;
 exports.ClaimsPlugin = ClaimsPluginInfo;
 exports.WaypointsPlugin = WaypointsPluginInfo;
 exports.FeaturesPlugin = FeaturesPluginInfo;
 
 export function start(config, onRef) {
+  // Needed for onTouchTap
+  // http://stackoverflow.com/a/34015469/988941
+  injectTapEventPlugin();
+
   render(
     <Main
       ref={r => r && onRef && onRef(r)}
