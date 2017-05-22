@@ -24,7 +24,6 @@ import FlatButton from 'material-ui/FlatButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import Slider from 'material-ui/Slider';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
 
@@ -168,18 +167,15 @@ export class Main extends Component {
               />
             </div>
 
-            <Subheader>Features controls</Subheader>
-            <div className='menu-inset'>
-              <Slider
-                label="Opacity"
-                defaultValue={this.state.plugins.features.globalOpacity}
-                value={this.state.plugins.features.globalOpacity}
-                onChange={(e, val) => {
-                  this.setSubStates({plugins: {features: {globalOpacity: {$set: val}}}});
-                }}
-                sliderStyle={{marginTop: 0, marginBottom: 16}}
-              />
-            </div>
+            {
+              this.state.installedPlugins.filter(p => p.menu).map((pluginInfo, key) =>
+                <pluginInfo.menu
+                  key={key}
+                  pluginState={this.state.plugins[pluginInfo.name]}
+                  pluginApi={this.pluginApi}
+                  />
+              )
+            }
 
             <Subheader>About</Subheader>
             <MenuItem
