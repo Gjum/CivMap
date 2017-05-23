@@ -98,10 +98,10 @@ function FeatureMenuGroup(props) {
 
 function FeatureMenuFeature(props) {
   let {feature: {properties, geometry}} = props;
-  return <div>
+  return <div style={{clear: 'both'}}>
     {properties && properties.name || "(unnamed)"}
     <span style={{float: 'right', color: 'gray'}}>
-      {geometry.type}
+      {props.feature.type || '('+geometry.type+')'}
     </span>
   </div>;
 }
