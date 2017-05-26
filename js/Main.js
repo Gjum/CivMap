@@ -11,6 +11,7 @@ import IconArrFwd from 'material-ui/svg-icons/navigation/arrow-forward';
 import IconClaim from 'material-ui/svg-icons/social/public';
 import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconHelp from 'material-ui/svg-icons/action/help';
+import IconLink from 'material-ui/svg-icons/content/link';
 import IconMenu from 'material-ui/svg-icons/navigation/menu';
 import IconPlace from 'material-ui/svg-icons/maps/place';
 import ImageTune from 'material-ui/svg-icons/image/tune';
@@ -172,6 +173,12 @@ export class Main extends Component {
               />
             </div>
 
+            <MenuItem
+              primaryText='Link to current view'
+              leftIcon={<IconLink />}
+              onTouchTap={() => history.replaceState({}, document.title, viewToHash(this.map, this.state, this.viewDefaults))}
+            />
+
             <Subheader>About</Subheader>
             <MenuItem
               primaryText='Help'
@@ -193,7 +200,6 @@ export class Main extends Component {
               zoom={minZoom}
               maxZoom={5}
               minZoom={minZoom}
-              onmoveend={e => history.replaceState({}, document.title, viewToHash(e.target, this.state, this.viewDefaults))}
               onmousemove={e => this.coordsDisplay && this.coordsDisplay.setCursor(e.latlng)}
               >
 
