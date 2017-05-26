@@ -1,17 +1,26 @@
 import {intCoords, radiusToBounds, xz} from './Util';
 
-export function viewToHash(leaf, appState) {
+export function viewToHash(leaf, appState, defaults) {
+  var hash = '';
+
+  if (appState.basemap != defaults.basemap)
+    hash += '#t=' + appState.basemap;
+
   let boundsObj = leaf.getBounds();
+  let [x, z] = intCoords(boundsObj.getCenter());
   let [e, n] = intCoords(boundsObj.getNorthEast());
   let [w, s] = intCoords(boundsObj.getSouthWest());
-  return '#b=' + [w, n, e, s].join(',')
-    + '#t=' + appState.basemap;
+  let radius = parseInt(Math.min(Math.abs(e - w), Math.abs(s - n)) / 2);
+  if (radius < defaults.radius)
+    hash += '#c=' + x + ',' + z + ',r' + radius;
+
+  return hash || '#';
 }
 
-export function hashToView(hash, appProps, appState) {
+export function hashToView(hash, defaults) {
   var view = {
-    bounds: radiusToBounds(appProps.borderCircleRadius || appProps.borderSquareRadius),
-    basemap: appState.basemap,
+    bounds: radiusToBounds(defaults.radius),
+    basemap: defaults.basemap,
   };
   if (!hash) return view;
 
@@ -33,6 +42,12 @@ export function hashToView(hash, appProps, appState) {
     if (key == 'b') {
       let [w, n, e, s] = vals.split(',', 4).map(parseFloat);
       view.bounds = [xz(w, n), xz(e, s)];
+    }
+    else if (key == 'c') {
+      let [x, z, r] = vals.split(/,r?/, 3).map(parseFloat);
+      if (!r) view.marker = true;
+      r = r || 10;
+      view.bounds = [xz(x - r, z - r), xz(x + r, z + r)];
     }
     else if (key == 't') view.basemap = vals;
   });

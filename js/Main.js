@@ -82,7 +82,12 @@ export class Main extends Component {
       this.state = _.merge(this.state, props.options);
     }
 
-    this.mapView = hashToView(location.hash, this.props, this.state);
+    this.viewDefaults = {
+      radius: props.borderCircleRadius || props.borderSquareRadius,
+      basemap: this.state.basemap,
+    };
+
+    this.mapView = hashToView(location.hash, this.viewDefaults);
     this.state.basemap = this.mapView.basemap;
 
     this.pluginApi = new PluginApi(this);
@@ -188,7 +193,7 @@ export class Main extends Component {
               zoom={minZoom}
               maxZoom={5}
               minZoom={minZoom}
-              onmoveend={e => history.replaceState({}, document.title, viewToHash(e.target, this.state))}
+              onmoveend={e => history.replaceState({}, document.title, viewToHash(e.target, this.state, this.viewDefaults))}
               onmousemove={e => this.coordsDisplay && this.coordsDisplay.setCursor(e.latlng)}
               >
 
