@@ -33,6 +33,7 @@ import CoordsDisplay from './CoordsDisplay';
 import CustomToggle from './CustomToggle';
 import {PluginApi} from './PluginApi';
 import * as Util from './Util';
+import {hashToView, viewToHash} from './Url';
 import {WaypointsPluginInfo} from './Waypoints';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/images/';
@@ -81,7 +82,8 @@ export class Main extends Component {
       this.state = _.merge(this.state, props.options);
     }
 
-    this.mapView = Util.hashToView(location.hash);
+    this.mapView = hashToView(location.hash, this.props, this.state);
+    this.state.basemap = this.mapView.basemap;
 
     this.pluginApi = new PluginApi(this);
 
@@ -110,6 +112,7 @@ export class Main extends Component {
     if (!this.map) {
       this.map = map;
       this.pluginApi.map = map;
+      map.fitBounds(this.mapView.bounds);
     }
   }
 
@@ -181,11 +184,11 @@ export class Main extends Component {
               className="map"
               ref={ref => {if (ref) this.onMapCreated(ref.leafletElement)}}
               crs={mcCRS}
-              center={[this.mapView.z, this.mapView.x]}
-              zoom={this.mapView.zoom}
+              center={[0, 0]}
+              zoom={minZoom}
               maxZoom={5}
               minZoom={minZoom}
-              onmoveend={e => history.replaceState({}, document.title, '#' + Util.viewToHash(e.target))}
+              onmoveend={e => history.replaceState({}, document.title, viewToHash(e.target, this.state))}
               onmousemove={e => this.coordsDisplay && this.coordsDisplay.setCursor(e.latlng)}
               >
 

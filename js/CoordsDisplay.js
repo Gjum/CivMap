@@ -1,6 +1,6 @@
 import * as L from'leaflet';
 import React, {Component} from 'react';
-import * as Util from './Util';
+import {intCoords} from './Util';
 
 export default class CoordsDisplay extends Component {
   constructor(props, context) {
@@ -13,7 +13,7 @@ export default class CoordsDisplay extends Component {
   }
 
   render() {
-    const [z, x] = Util.intCoords(this.state.cursor);
+    const [x, z] = intCoords(this.state.cursor);
     return <div className='coords-display control-box leaflet-control leaflet-bar'>
       {'X ' + x + ' ' + z + ' Z'}</div>;
   }
