@@ -60,6 +60,7 @@ html, body, #app, .fullHeight, .map {
 .basemap-selector-item-inner {
   transition: background-color 500ms;
   padding: 8px;
+  text-align: center;
 }
 
 .basemap-selector-item img {
