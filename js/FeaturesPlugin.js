@@ -10,25 +10,63 @@ import * as Util from './Util';
 import ImageOverlay from './ImageOverlay';
 
 function renderFeatureOverlay(commonProps, feature, key) {
-  if (feature.type == "group")
+  if (feature.features)
     return <FeatureOverlayGroup group={feature} key={key} commonProps={commonProps} />;
+
   if (feature.geometry.type == "image")
     return <FeatureOverlayImage image={feature} key={key} commonProps={commonProps} />;
+  if (feature.geometry.type == "line")
+    return <FeatureOverlayLine line={feature} key={key} commonProps={commonProps} />;
+  if (feature.geometry.type == "polygon")
+    return <FeatureOverlayPolygon polygon={feature} key={key} commonProps={commonProps} />;
+  if (feature.geometry.type == "circle")
+    return <FeatureOverlayCircle circle={feature} key={key} commonProps={commonProps} />;
+
   console.error("[FeaturesOverlay] Unknown feature geometry type", feature);
 }
 
 function FeatureOverlayGroup(props) {
-  let {group, commonProps} = props;
+  let {group: {features}, commonProps} = props;
   return <RL.LayerGroup>
-    { group.features.map((f, key) => renderFeatureOverlay(commonProps, f, key)) }
+    { features.map((f, key) => renderFeatureOverlay(commonProps, f, key)) }
   </RL.LayerGroup>;
 }
 
 function FeatureOverlayImage(props) {
-  let {image, commonProps} = props;
+  let {image: {geometry, style}, commonProps: {pluginState: {globalOpacity}}} = props;
   return <ImageOverlay
-    opacity={commonProps.pluginState.globalOpacity}
-    {...image.geometry}
+    opacity={globalOpacity}
+    {...geometry}
+    {...style}
+  />;
+}
+
+function FeatureOverlayLine(props) {
+  let {line: {geometry, style}, commonProps: {pluginState: {globalOpacity}}} = props;
+  return <RL.Polyline
+    opacity={globalOpacity}
+    {...geometry}
+    {...style}
+  />;
+}
+
+function FeatureOverlayPolygon(props) {
+  let {polygon: {geometry, style}, commonProps: {pluginState: {globalOpacity}}} = props;
+  return <RL.Polygon
+    opacity={globalOpacity}
+    fillOpacity={geometry.filled ? globalOpacity : 0}
+    {...geometry}
+    {...style}
+  />;
+}
+
+function FeatureOverlayCircle(props) {
+  let {circle: {geometry, style}, commonProps: {pluginState: {globalOpacity}}} = props;
+  return <RL.Circle
+    opacity={globalOpacity}
+    fillOpacity={geometry.filled ? globalOpacity : 0}
+    {...geometry}
+    {...style}
   />;
 }
 
@@ -42,7 +80,7 @@ class FeaturesOverlay extends Component {
 }
 
 function renderFeatureMenu(commonProps, feature, key) {
-  if (feature.type == "group")
+  if (feature.features)
     return <FeatureMenuGroup group={feature} key={key} commonProps={commonProps} />;
   else
     return <FeatureMenuFeature feature={feature} key={key} commonProps={commonProps} />;

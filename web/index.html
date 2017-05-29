@@ -36,16 +36,39 @@
   <script src="bundle.js"></script>
   <script type="text/javascript">
     var defaultFeatureGroup = {
-      type: "group",
       properties: { name: "Claims Maps", },
       features: [
         {
-          type: "image",
           properties: { name: "Jecowa transparent", },
           geometry: {
             type: "image",
             url: "https://www.mediafire.com/convkey/7bcf/d539122c3ohp7bxag.jpg",
             bounds: [[-4096, -4096], [4096, 4096]],
+          },
+        },
+        {
+          geometry: {
+            type: "circle",
+            center: [200, -300],
+            radius: 100,
+          },
+        },
+        {
+          geometry: {
+            type: "line",
+            positions: [
+              [200, -300],
+              [300, -300],
+              [200, -400],
+            ],
+          },
+        },
+        {
+          type: "claim",
+          properties: { name: "Fenriss", },
+          geometry: {
+            type: "polygon",
+            positions: [[[252,162],[266,192],[280,242],[288,298],[286,378],[6,688],[-14,686],[-96,654],[-180,628],[-216,598],[-228,540],[-324,434],[-326,404],[-302,382],[-288,352],[-320,352],[-342,360],[-378,326],[-418,286],[-422,242],[-404,220],[-376,214],[-340,188],[-300,170],[-290,132],[-264,128],[-238,146],[-128,102],[-50,140],[36,152],[60,134],[96,158],[166,144]],[[-406,64],[-304,110],[-324,174],[-362,184],[-398,170],[-472,100],[-444,70],[-424,62]]],
           },
         },
       ],
@@ -70,6 +93,7 @@
         ],
         plugins: {
           features: {
+            globalOpacity: .5,
             featureGroup: defaultFeatureGroup,
           },
         },
