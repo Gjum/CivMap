@@ -1,0 +1,48 @@
+{
+  "name": "civmap",
+  "version": "0.3.0",
+  "description": "Generic web map for Civ-style Minecraft servers",
+  "author": "Gjum",
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/Gjum/CivMap#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gjum/CivMap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Gjum/CivMap/issues"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --hot --inline --progress --colors",
+    "build": "webpack --config webpack-production.config.js --progress --colors"
+  },
+  "private": true,
+  "devDependencies": {
+    "babel-core": "^6.3.26",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-react-transform": "^2.0.0",
+    "babel-plugin-syntax-class-properties": "^6.3.13",
+    "babel-plugin-syntax-decorators": "^6.3.13",
+    "babel-plugin-syntax-object-rest-spread": "^6.3.13",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "file-loader": "^0.8.5",
+    "html-webpack-plugin": "^2.7.2",
+    "react-hot-loader": "^1.3.0",
+    "transfer-webpack-plugin": "^0.1.4",
+    "webpack-dev-server": "^1.14.0",
+    "webpack": "^1.12.9"
+  },
+  "dependencies": {
+    "immutability-helper": "2.1.1",
+    "leaflet": "^1.1.0",
+    "material-ui": "^0.16.6",
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1",
+    "react-leaflet": "^1.4.1",
+    "react-redux": "^5.0.5",
+    "react-tap-event-plugin": "^2.0.1",
+    "redux": "^3.7.1"
+  }
+}
