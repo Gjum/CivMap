@@ -1,0 +1,54 @@
+html,
+body,
+#app-root,
+.civMapApp,
+.map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+div {
+  margin: 0;
+  padding: 0;
+}
+
+.civMapApp {
+  display: flex;
+  flex-direction: column;
+}
+
+.mapContainer {
+  flex: 1;
+}
+
+.appBarTitle {
+  flex: 1;
+}
+
+.fab-bottomright {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1010;
+}
+
+.basemap-selector-current {
+  background-color: #BBDEFB;
+}
+
+.leaflet-container {
+  background: none;
+}
+.leaflet-tile {
+  image-rendering: pixelated !important;
+  image-rendering: crisp-edges !important;
+  -moz-image-rendering: crisp-edges !important;
+}
+
+@media all and (max-width: 600px) {
+    .mainContent {
+        width:100%;
+    }
+}

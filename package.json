@@ -37,7 +37,8 @@
   "dependencies": {
     "immutability-helper": "2.1.1",
     "leaflet": "^1.1.0",
-    "material-ui": "^0.16.6",
+    "material-ui": "^1.0.0-beta.4",
+    "material-ui-icons": "^1.0.0-alpha.19",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
     "react-leaflet": "^1.4.1",
