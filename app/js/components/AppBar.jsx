@@ -25,23 +25,34 @@ const AppBar = ({
 }) => {
   const showMenuIcon = !shouldDrawerDock({ windowHeight, windowWidth });
   return (
-    <MuiAppBar position="static" className='appBar'>
+    <MuiAppBar position="static" className='appBar' color='default'>
       <Toolbar>
         {showMenuIcon &&
-          <IconButton color="inherit" onClick={setDrawerOpen}>
+          <IconButton
+            onClick={setDrawerOpen}
+          >
             <MenuIcon />
           </IconButton>
         }
-        <Typography type="title" color="inherit" className='appBarTitle'>
+        <Typography type="title" className='appBarTitle'>
           {basemapName} Map
         </Typography>
-        <IconButton color="inherit" onClick={openSearch}>
+        <IconButton
+          disabled
+          onClick={openSearch}
+        >
           <SearchIcon />
         </IconButton>
-        <IconButton color="inherit" onClick={openShare}>
+        <IconButton
+          disabled
+          onClick={openShare}
+        >
           <ShareIcon />
         </IconButton>
-        <IconButton color="inherit" onClick={openOverlayEditor}>
+        <IconButton
+          disabled
+          onClick={openOverlayEditor}
+        >
           <ModeEditIcon />
         </IconButton>
       </Toolbar>

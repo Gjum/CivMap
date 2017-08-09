@@ -13,6 +13,7 @@ const WaypointsMenuItem = ({
   const getClassName = mapId => mapId == basemap ? ' basemap-selector-current' : null;
   return (
     <ListItem button
+      disabled
       onClick={() => {
         openWaypointsEditor();
         setDrawerClosed();
@@ -21,7 +22,7 @@ const WaypointsMenuItem = ({
       <ListItemIcon><PersonPinCircleIcon /></ListItemIcon>
       <ListItemText
         primary='Import your Waypoints'
-        secondary='for your eyes only'
+        secondary='only visible to you'
       />
     </ListItem>
   );
