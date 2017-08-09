@@ -7,9 +7,8 @@ import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle';
 import { setDrawerClosed, openWaypointsEditor } from '../actions';
 
 const WaypointsMenuItem = ({
-  layer,
-  setDrawerClosed,
   openWaypointsEditor,
+  setDrawerClosed,
 }) => {
   const getClassName = mapId => mapId == basemap ? ' basemap-selector-current' : null;
   return (
@@ -28,13 +27,9 @@ const WaypointsMenuItem = ({
   );
 }
 
-const mapStateToProps = ({ overlay }) => {
-  return overlay.find(l => l.properties.isWaypointsLayer);
-};
-
 const mapDispatchToProps = {
   setDrawerClosed,
   openWaypointsEditor,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WaypointsMenuItem);
+export default connect(undefined, mapDispatchToProps)(WaypointsMenuItem);
