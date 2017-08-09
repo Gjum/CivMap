@@ -1,9 +1,9 @@
 
 import { appLoad } from '../actions';
-import store from '../store';
+import store, { defaultMapView } from '../store';
 
-export function loadDefaultAppState() {
-  const mapConfig = {
+export const defaultAppState = {
+  mapConfig: {
     basemapPreview: '/z-2/0,0.png',
     basemaps: {
       terrain: { name: 'Terrain', id: 'terrain', bgColor: '#000', isDefault: true },
@@ -13,28 +13,25 @@ export function loadDefaultAppState() {
     },
     borderApothem: 13000,
     tilesRoot: 'https://raw.githubusercontent.com/ccmap/tiles/master/',
-  };
+  },
 
-  const overlay = [
-    {
-      id: -1,
-      properties: { name: 'hi test', description: 'foo bar', opacity: .7 },
-      features: [
-        { id: -2, geometry: { type: 'circle', center: [-5000, -7000], radius: 1000 }, style: {}, properties: {} },
-      ],
-    },
-    {
-      id: -3,
-      properties: { name: 'My Waypoints', isWaypointsLayer: true },
-      features: [
-        { id: -4, geometry: { type: 'marker', position: [-5127, -6700] }, style: {}, properties: { name: 'Impasse' } },
-      ],
-    },
-  ];
+  mapView: {
+    ...defaultMapView,
+    basemapId: 'terrain',
+  },
 
-  const basemapId = Object.values(mapConfig.basemaps).find(b => b.isDefault).id;
+  overlay: [],
+};
 
-  store.dispatch(appLoad({ mapConfig, overlay, mapView: { basemapId } }));
+const defaultBasemap = Object.values(defaultAppState.mapConfig.basemaps).find(b => b.isDefault) || {};
+defaultAppState.mapView.basemapId = defaultBasemap.id;
+defaultAppState.mapView.targetView = {
+  x: 0, z: 0,
+  radius: defaultAppState.mapConfig.borderApothem,
+};
+
+export function loadDefaultAppState() {
+  store.dispatch(appLoad(defaultAppState));
 }
 
 export function loadAppStateFromLocalStorage() {

@@ -1,6 +1,6 @@
 import { createStore, combineReducers } from 'redux';
 
-const defaultControlState = {
+export const defaultControlState = {
   drawerOpen: false,
   windowHeight: NaN,
   windowWidth: NaN,
@@ -19,11 +19,11 @@ const control = (state = defaultControlState, action) => {
   }
 }
 
-const defaultMapConfig = {
+export const defaultMapConfig = {
   basemapPreview: '/z-2/0,0.png',
   basemaps: {},
-  borderApothem: 13000,
-  tilesRoot: 'https://raw.githubusercontent.com/ccmap/tiles/master/',
+  borderApothem: NaN,
+  tilesRoot: null,
 };
 
 const mapConfig = (state = defaultMapConfig, action) => {
@@ -35,7 +35,7 @@ const mapConfig = (state = defaultMapConfig, action) => {
   }
 }
 
-const defaultMapView = {
+export const defaultMapView = {
   basemapId: null,
   lastView: null,
   targetView: null,

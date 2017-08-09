@@ -13,6 +13,7 @@ import LeafBaseMap from './LeafBaseMap.jsx';
 import LeafMap from './LeafMap.jsx';
 import LeafOverlay from './LeafOverlay.jsx';
 import LocalStorageSync from './LocalStorageSync.jsx';
+import ViewResetMenuItem from './ViewResetMenuItem.jsx';
 import WaypointsMenuItem from './WaypointsMenuItem.jsx';
 
 const CivMapApp = () => (
@@ -25,6 +26,7 @@ const CivMapApp = () => (
         <Divider />
         <List>
           <WaypointsMenuItem />
+          <ViewResetMenuItem />
         </List>
       </div>
     </AppDrawer>
