@@ -42,8 +42,8 @@ div {
   z-index: 1010;
 }
 
-.basemap-selector-current {
-  background-color: #BBDEFB;
+.basemap-selector-current h3 {
+  font-weight: bold;
 }
 
 .leaflet-container {
