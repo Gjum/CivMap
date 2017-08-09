@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom';
 
 import AppRoot from './components/AppRoot.jsx';
 import { loadAppStateFromLocalStorage, loadDefaultAppState } from './utils/State.js';
+import { listenToWindowResize } from './utils/WindowSize';
 
 loadDefaultAppState();
 
@@ -11,6 +12,8 @@ if (customUrl) {
 } else {
   loadAppStateFromLocalStorage();
 }
+
+listenToWindowResize();
 
 ReactDOM.render(
   AppRoot,

@@ -11,32 +11,32 @@ import SearchIcon from 'material-ui-icons/Search';
 import ModeEditIcon from 'material-ui-icons/ModeEdit';
 
 import { setDrawerOpen, openOverlayEditor, openSearch } from '../actions';
+import { shouldDrawerDock } from '../utils/WindowSize.js';
 
 const AppBar = ({
   basemapName,
+  windowHeight,
+  windowWidth,
   setDrawerOpen,
   openOverlayEditor,
   openSearch,
 }) => {
+  const showMenuIcon = !shouldDrawerDock({ windowHeight, windowWidth });
   return (
     <MuiAppBar position="static" className='appBar'>
       <Toolbar>
-        <IconButton color="inherit"
-          onClick={setDrawerOpen}
-        >
-          <MenuIcon />
-        </IconButton>
+        {showMenuIcon &&
+          <IconButton color="inherit" onClick={setDrawerOpen}>
+            <MenuIcon />
+          </IconButton>
+        }
         <Typography type="title" color="inherit" className='appBarTitle'>
           {basemapName} Map
         </Typography>
-        <IconButton color="inherit"
-          onClick={openSearch}
-        >
+        <IconButton color="inherit" onClick={openSearch}>
           <SearchIcon />
         </IconButton>
-        <IconButton color="inherit"
-          onClick={openOverlayEditor}
-        >
+        <IconButton color="inherit" onClick={openOverlayEditor}>
           <ModeEditIcon />
         </IconButton>
       </Toolbar>
@@ -44,9 +44,12 @@ const AppBar = ({
   );
 };
 
-const mapStateToProps = ({ mapConfig, mapView }) => {
+const mapStateToProps = ({ control, mapConfig, mapView }) => {
+  const { windowHeight, windowWidth } = control;
   return {
     basemapName: mapConfig.basemaps[mapView.basemapId].name,
+    windowHeight,
+    windowWidth,
   };
 };
 

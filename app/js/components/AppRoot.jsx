@@ -7,8 +7,8 @@ import List from 'material-ui/List';
 import store from '../store';
 
 import AppBar from './AppBar.jsx';
+import AppDrawer from './AppDrawer.jsx';
 import BasemapSelectorList from './BasemapSelectorList.jsx';
-import Drawer from './Drawer.jsx';
 import FabOnViewMode from './FabOnViewMode.jsx';
 import LeafBaseMap from './LeafBaseMap.jsx';
 import LeafMap from './LeafMap.jsx';
@@ -20,22 +20,23 @@ const CivMapApp = () => (
   <div className='civMapApp'>
     <LocalStorageSync />
 
-    <Drawer>
-      <div>
+    <AppDrawer>
+      <div className='drawer-content'>
         <BasemapSelectorList />
         <Divider />
         <List>
           <WaypointsMenuItem />
         </List>
       </div>
-    </Drawer>
-    <FabOnViewMode />
-
-    <AppBar />
-    <LeafMap>
-      <LeafBaseMap />
-      <LeafOverlay />
-    </LeafMap>
+    </AppDrawer>
+    <div className="shiftedContainer">
+      <AppBar />
+      <FabOnViewMode />
+      <LeafMap>
+        <LeafBaseMap />
+        <LeafOverlay />
+      </LeafMap>
+    </div>
   </div>
 );
 

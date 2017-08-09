@@ -2,6 +2,8 @@ import { createStore, combineReducers } from 'redux';
 
 const defaultControlState = {
   drawerOpen: false,
+  windowHeight: NaN,
+  windowWidth: NaN,
 };
 
 const control = (state = defaultControlState, action) => {
@@ -10,6 +12,8 @@ const control = (state = defaultControlState, action) => {
       return { ...state, drawerOpen: true };
     case 'CLOSE_DRAWER':
       return { ...state, drawerOpen: false };
+    case 'TRACK_WINDOW_SIZE':
+      return { ...state, windowHeight: action.height, windowWidth: action.width };
     default:
       return state;
   }

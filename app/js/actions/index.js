@@ -105,6 +105,14 @@ export const trackMapView = (lastView) => {
   };
 };
 
+export const trackWindowSize = ({ height, width }) => {
+  return {
+    type: 'TRACK_WINDOW_SIZE',
+    height,
+    width,
+  };
+};
+
 export const updateCollection = (id, properties) => {
   return {
     type: 'UPDATE_COLLECTION',

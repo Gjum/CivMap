@@ -22,6 +22,7 @@ const LeafMap = ({
   children,
 }) => {
   const onRef = ref => {
+    if (ref) ref.leafletElement.invalidateSize(true);
     if (ref && targetView) {
       ref.leafletElement.fitBounds(circleToBounds(targetView));
       setTargetView(null);
@@ -51,10 +52,11 @@ const LeafMap = ({
 };
 
 
-const mapStateToProps = ({ mapConfig, mapView }, ownProps) => {
+const mapStateToProps = ({ control, mapConfig, mapView }, ownProps) => {
   return {
     mapBgColor: mapConfig.basemaps[mapView.basemapId].bgColor,
     targetView: mapView.targetView,
+    _windowWidth: control.windowWidth, // dummy, only to trigger a re-render
   };
 };
 
