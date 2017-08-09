@@ -38,9 +38,9 @@ export function loadDefaultAppState() {
 }
 
 export function loadAppStateFromLocalStorage() {
-  const stateJson = window.localStorage.getItem('civMapState');
-  if (!stateJson) return;
   try {
+    const stateJson = window.localStorage.getItem('civMapState');
+    if (!stateJson) return;
     const { mapView, overlay } = JSON.parse(stateJson);
 
     if (!mapView.basemapId) {
