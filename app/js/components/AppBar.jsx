@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { default as MuiAppBar } from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
+import ShareIcon from 'material-ui-icons/Share';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 
@@ -10,16 +11,17 @@ import MenuIcon from 'material-ui-icons/Menu';
 import SearchIcon from 'material-ui-icons/Search';
 import ModeEditIcon from 'material-ui-icons/ModeEdit';
 
-import { setDrawerOpen, openOverlayEditor, openSearch } from '../actions';
+import { openOverlayEditor, openSearch, openShare, setDrawerOpen } from '../actions';
 import { shouldDrawerDock } from '../utils/WindowSize.js';
 
 const AppBar = ({
   basemapName,
   windowHeight,
   windowWidth,
-  setDrawerOpen,
   openOverlayEditor,
   openSearch,
+  openShare,
+  setDrawerOpen,
 }) => {
   const showMenuIcon = !shouldDrawerDock({ windowHeight, windowWidth });
   return (
@@ -35,6 +37,9 @@ const AppBar = ({
         </Typography>
         <IconButton color="inherit" onClick={openSearch}>
           <SearchIcon />
+        </IconButton>
+        <IconButton color="inherit" onClick={openShare}>
+          <ShareIcon />
         </IconButton>
         <IconButton color="inherit" onClick={openOverlayEditor}>
           <ModeEditIcon />
@@ -54,9 +59,10 @@ const mapStateToProps = ({ control, mapConfig, mapView }) => {
 };
 
 const mapDispatchToProps = {
-  setDrawerOpen,
   openOverlayEditor,
   openSearch,
+  openShare,
+  setDrawerOpen,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppBar);

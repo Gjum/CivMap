@@ -9,7 +9,6 @@ import store from '../store';
 import AppBar from './AppBar.jsx';
 import AppDrawer from './AppDrawer.jsx';
 import BasemapSelectorList from './BasemapSelectorList.jsx';
-import FabOnViewMode from './FabOnViewMode.jsx';
 import LeafBaseMap from './LeafBaseMap.jsx';
 import LeafMap from './LeafMap.jsx';
 import LeafOverlay from './LeafOverlay.jsx';
@@ -31,7 +30,6 @@ const CivMapApp = () => (
     </AppDrawer>
     <div className="shiftedContainer">
       <AppBar />
-      <FabOnViewMode />
       <LeafMap>
         <LeafBaseMap />
         <LeafOverlay />
