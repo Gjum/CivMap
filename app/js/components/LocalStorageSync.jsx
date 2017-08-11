@@ -4,12 +4,10 @@ import { connect } from 'react-redux';
 let lastLocalStorageError = {};
 
 const LocalStorageSync = ({
-  mapView,
-  overlay,
+  appState,
 }) => {
-  const appStateJson = JSON.stringify({ mapView, overlay });
   try {
-    window.localStorage.setItem('civMapState', appStateJson);
+    window.localStorage.setItem('civMapState', JSON.stringify(appState));
   } catch (e) {
     if (lastLocalStorageError.code != e.code) {
       lastLocalStorageError = e;
@@ -20,7 +18,9 @@ const LocalStorageSync = ({
 };
 
 const mapStateToProps = ({ mapView, overlay }, ownProps) => {
-  return { mapView, overlay };
+  const { basemapId, lastView } = mapView;
+  mapView = { basemapId, lastView };
+  return { appState: { mapView, overlay } };
 };
 
 export default connect(mapStateToProps)(LocalStorageSync);
