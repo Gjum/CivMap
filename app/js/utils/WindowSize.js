@@ -2,7 +2,7 @@ import { trackWindowSize } from '../actions';
 import store from '../store';
 
 export function shouldDrawerDock({ windowHeight, windowWidth }) {
-  return windowWidth > 600 && windowWidth > windowHeight;
+  return windowWidth >= 600 && windowWidth > windowHeight;
 }
 
 export function listenToWindowResize() {
