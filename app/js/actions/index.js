@@ -1,5 +1,3 @@
-let nextId = 1;
-
 export const appLoad = (state) => {
   return {
     type: 'APP_LOAD',
@@ -10,7 +8,7 @@ export const appLoad = (state) => {
 export const addCollection = (properties) => {
   return {
     type: 'ADD_COLLECTION',
-    id: nextId++,
+    id: Date.now(),
     properties,
   };
 };
@@ -19,7 +17,7 @@ export const addFeature = (collectionId, { geometry, style, properties }) => {
   return {
     type: 'ADD_FEATURE',
     collectionId,
-    featureId: nextId++,
+    featureId: Date.now(),
     geometry,
     style,
     properties,
