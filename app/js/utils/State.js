@@ -7,7 +7,7 @@ export const defaultAppState = {
     basemapPreview: '/z-2/0,0.png',
     basemaps: {
       terrain: { name: 'Terrain', id: 'terrain', bgColor: '#000', isDefault: true },
-      biome: { name: 'Biome', id: 'biome', bgColor: '#ddd' },
+      biome: { name: 'Biome', id: 'biome', bgColor: '#000' },
       height: { name: 'Height', id: 'height', bgColor: '#888' },
       simple: { name: 'Simple', id: 'simple', bgColor: '#888' },
     },
