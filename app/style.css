@@ -28,7 +28,7 @@ div {
 .drawer-content {
   width: 264px; /* = 320 - 56 */
 }
-@media all and (orientation: landscape) and (min-width: 648px) { /* = 320 + 264 + 64 */
+@media all and (orientation: landscape) and (min-width: 600px) {
   .shiftedContainer {
     border-left: 264px solid white;
     box-sizing: border-box;
