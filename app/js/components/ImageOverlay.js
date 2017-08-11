@@ -1,3 +1,4 @@
+import * as L from 'leaflet';
 import * as RL from 'react-leaflet';
 
 export default class ImageOverlay extends RL.ImageOverlay {
