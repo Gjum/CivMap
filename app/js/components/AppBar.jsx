@@ -32,7 +32,7 @@ const AppBar = ({
   }
 
   return (
-    <MuiAppBar position="static" className='appBar' color='default'>
+    <MuiAppBar position="static" className='appbar' color='default'>
       <Toolbar>
         {showMenuIcon &&
           <IconButton
@@ -41,7 +41,7 @@ const AppBar = ({
             <MenuIcon />
           </IconButton>
         }
-        <Typography type="title" className='appBarTitle'>
+        <Typography type="title" className='appbar-title'>
           {title}
         </Typography>
         <IconButton

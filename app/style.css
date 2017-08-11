@@ -20,9 +20,13 @@ div {
   flex-direction: column;
 }
 
-.appBarTitle, .mapContainer {
+.appbar-title, .mapContainer {
   flex: 1;
   max-height: 100%;
+}
+
+.appbar-title {
+  text-align: center;
 }
 
 .drawer-content {
