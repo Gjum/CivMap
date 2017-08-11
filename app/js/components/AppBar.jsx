@@ -15,7 +15,8 @@ import { openOverlayEditor, openSearch, openShare, setDrawerOpen } from '../acti
 import { shouldDrawerDock } from '../utils/WindowSize.js';
 
 const AppBar = ({
-  basemapName,
+  lastView,
+  borderApothem,
   windowHeight,
   windowWidth,
   openOverlayEditor,
@@ -24,6 +25,12 @@ const AppBar = ({
   setDrawerOpen,
 }) => {
   const showMenuIcon = !shouldDrawerDock({ windowHeight, windowWidth });
+
+  let title = 'ccMap';
+  if (lastView && lastView.radius < borderApothem) {
+    title = `${lastView.x}, ${lastView.z}`;
+  }
+
   return (
     <MuiAppBar position="static" className='appBar' color='default'>
       <Toolbar>
@@ -35,7 +42,7 @@ const AppBar = ({
           </IconButton>
         }
         <Typography type="title" className='appBarTitle'>
-          {basemapName} Map
+          {title}
         </Typography>
         <IconButton
           disabled
@@ -63,7 +70,8 @@ const AppBar = ({
 const mapStateToProps = ({ control, mapConfig, mapView }) => {
   const { windowHeight, windowWidth } = control;
   return {
-    basemapName: mapConfig.basemaps[mapView.basemapId].name,
+    lastView: mapView.lastView,
+    borderApothem: mapConfig.borderApothem,
     windowHeight,
     windowWidth,
   };
