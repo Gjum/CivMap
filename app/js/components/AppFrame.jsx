@@ -8,7 +8,7 @@ import AppBar from './AppBar.jsx';
 import AppDrawer from './AppDrawer.jsx';
 import BasemapSelectorList from './BasemapSelectorList.jsx';
 import LayersMenuItem from './LayersMenuItem.jsx';
-import LeafMap from './LeafMap.jsx';
+import LeafMap from './leaflet/LeafMap.jsx';
 import ViewResetMenuItem from './ViewResetMenuItem.jsx';
 import WaypointsMenuItem from './WaypointsMenuItem.jsx';
 

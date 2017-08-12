@@ -6,8 +6,8 @@ import * as RL from 'react-leaflet';
 import LeafBaseMap from './LeafBaseMap.jsx';
 import LeafOverlay from './LeafOverlay.jsx';
 
-import { setTargetView, trackMapView } from '../actions';
-import { boundsToCircle, circleToBounds } from '../utils/Math.js';
+import { setTargetView, trackMapView } from '../../actions';
+import { boundsToCircle, circleToBounds } from '../../utils/Math.js';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
 
