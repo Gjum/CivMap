@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Divider from 'material-ui/Divider';
 import List from 'material-ui/List';
 
-import AppBar from './AppBar.jsx';
+import AppBarBrowse from './AppBarBrowse.jsx';
 import AppDrawer from './AppDrawer.jsx';
 import BasemapSelectorList from './BasemapSelectorList.jsx';
 import LayersMenuItem from './LayersMenuItem.jsx';
@@ -26,7 +26,7 @@ const BROWSE = () => (
       </div>
     </AppDrawer>
     <div className="shifted-container flex-container">
-      <AppBar />
+      <AppBarBrowse />
       <LeafMap />
     </div>
   </div>

@@ -14,7 +14,7 @@ import ModeEditIcon from 'material-ui-icons/ModeEdit';
 import { openOverlayEditor, openSearch, openShare, setDrawerOpen } from '../actions';
 import { shouldDrawerDock } from '../utils/WindowSize.js';
 
-const AppBar = ({
+const AppBarBrowse = ({
   lastView,
   borderApothem,
   windowHeight,
@@ -84,4 +84,4 @@ const mapDispatchToProps = {
   setDrawerOpen,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppBar);
+export default connect(mapStateToProps, mapDispatchToProps)(AppBarBrowse);
