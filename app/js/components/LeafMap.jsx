@@ -3,6 +3,9 @@ import { connect } from 'react-redux';
 import * as L from 'leaflet';
 import * as RL from 'react-leaflet';
 
+import LeafBaseMap from './LeafBaseMap.jsx';
+import LeafOverlay from './LeafOverlay.jsx';
+
 import { setTargetView, trackMapView } from '../actions';
 import { boundsToCircle, circleToBounds } from '../utils/Math.js';
 
@@ -19,7 +22,6 @@ const LeafMap = ({
   targetView,
   setTargetView,
   trackMapView,
-  children,
 }) => {
   const onRef = ref => {
     if (ref && targetView) {
@@ -44,7 +46,8 @@ const LeafMap = ({
         onmoveend={e => trackMapView(getEventView(e))}
         onzoomend={e => trackMapView(getEventView(e))}
       >
-        {children}
+        <LeafBaseMap />
+        <LeafOverlay />
       </RL.Map>
     </div>
   );
