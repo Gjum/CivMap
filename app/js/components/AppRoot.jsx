@@ -15,7 +15,7 @@ import ViewResetMenuItem from './ViewResetMenuItem.jsx';
 import WaypointsMenuItem from './WaypointsMenuItem.jsx';
 
 const CivMapApp = () => (
-  <div className='civMapApp'>
+  <div className='full'>
     <LocalStorageSync />
 
     <AppDrawer>
