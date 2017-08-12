@@ -2,7 +2,7 @@ html,
 body,
 #app-root,
 .full,
-.shiftedContainer,
+.flex-container,
 .map {
   width: 100%;
   height: 100%;
@@ -15,7 +15,7 @@ div {
   padding: 0;
 }
 
-.shiftedContainer {
+.flex-container {
   display: flex;
   flex-direction: column;
 }
@@ -33,7 +33,7 @@ div {
   width: 264px; /* = 320 - 56 */
 }
 @media all and (orientation: landscape) and (min-width: 600px) {
-  .shiftedContainer {
+  .shifted-container {
     border-left: 264px solid white;
     box-sizing: border-box;
   }
