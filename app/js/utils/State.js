@@ -36,9 +36,10 @@ export function loadDefaultAppState() {
 
 export function loadAppStateFromLocalStorage() {
   try {
-    const stateJson = window.localStorage.getItem('civMapState');
+    const stateJson = window.localStorage.getItem('civMap.state');
     if (!stateJson) return;
-    const { mapView, overlay } = JSON.parse(stateJson);
+
+    const { mapView } = JSON.parse(stateJson);
 
     if (!mapView.basemapId) {
       const defaultBasemap = Object.values(store.getState().mapConfig.basemaps).find(b => b.isDefault) || {};
@@ -49,7 +50,14 @@ export function loadAppStateFromLocalStorage() {
       mapView.targetView = mapView.lastView;
     }
 
-    store.dispatch(appLoad({ mapView, overlay }));
+    const appState = { mapView };
+
+    const overlayJson = window.localStorage.getItem('civMap.overlay');
+    if (overlayJson) {
+      appState.overlay = JSON.parse(overlayJson);
+    }
+
+    store.dispatch(appLoad(appState));
 
   } catch (e) {
     console.error('loading localStorage state failed', e);
