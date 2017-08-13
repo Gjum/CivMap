@@ -49,10 +49,12 @@ function FeatureOverlayLine(props) {
 
 function FeatureOverlayMarker(props) {
   let { marker: { geometry, style }, commonProps: { globalOpacity } } = props;
+  const [z, x] = geometry.position;
   return <RL.Marker
     opacity={globalOpacity}
     {...geometry}
     {...style}
+    position={[z + .5, x + .5]}
   />;
 }
 
