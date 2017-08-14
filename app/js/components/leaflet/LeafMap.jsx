@@ -25,7 +25,7 @@ const LeafMap = ({
 }) => {
   const onRef = ref => {
     if (ref && targetView) {
-      ref.leafletElement.fitBounds(circleToBounds(targetView));
+      ref.leafletElement.fitBounds(circleToBounds(targetView), {animate: false});
       setTargetView(null);
     }
   }
