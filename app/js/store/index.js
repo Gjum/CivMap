@@ -3,6 +3,7 @@ import { createStore, combineReducers } from 'redux';
 export const defaultControlState = {
   drawerOpen: false,
   appMode: 'BROWSE',
+  editId: null,
   windowHeight: NaN,
   windowWidth: NaN,
 };

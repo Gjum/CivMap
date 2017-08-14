@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as L from 'leaflet';
 import * as RL from 'react-leaflet';
+import 'leaflet-editable';
 
 import LeafBaseMap from './LeafBaseMap.jsx';
 import LeafOverlay from './LeafOverlay.jsx';
@@ -69,6 +70,7 @@ class LeafMap extends React.Component {
           zoomControl={false}
           onmoveend={this.onViewChange.bind(this)}
           onzoomend={this.onViewChange.bind(this)}
+          editable
         >
           <LeafBaseMap />
           <LeafOverlay />
