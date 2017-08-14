@@ -2,8 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as RL from 'react-leaflet';
 
-import ImageOverlay from './ImageOverlay.js'
-
 function renderFeatureOverlay(commonProps, feature, key) {
   if (feature.features)
     return <FeatureOverlayGroup group={feature} key={key} commonProps={commonProps} />;
@@ -31,7 +29,7 @@ function FeatureOverlayGroup(props) {
 
 function FeatureOverlayImage(props) {
   let { image: { geometry, style }, commonProps: { globalOpacity } } = props;
-  return <ImageOverlay
+  return <RL.ImageOverlay
     opacity={globalOpacity}
     {...geometry}
     {...style}
