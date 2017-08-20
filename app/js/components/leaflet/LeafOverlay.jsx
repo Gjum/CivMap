@@ -3,9 +3,6 @@ import { connect } from 'react-redux';
 import * as RL from 'react-leaflet';
 
 function renderFeatureOverlay(commonProps, feature, key) {
-  if (feature.features)
-    return <FeatureOverlayGroup group={feature} key={key} commonProps={commonProps} />;
-
   if (feature.geometry.type == "image")
     return <FeatureOverlayImage image={feature} key={key} commonProps={commonProps} />;
   if (feature.geometry.type == "line")
@@ -18,13 +15,6 @@ function renderFeatureOverlay(commonProps, feature, key) {
     return <FeatureOverlayCircle circle={feature} key={key} commonProps={commonProps} />;
 
   console.error("[FeaturesOverlay] Unknown feature geometry type", feature);
-}
-
-function FeatureOverlayGroup(props) {
-  let { group: { features }, commonProps } = props;
-  return <RL.FeatureGroup>
-    {features.map((f, key) => renderFeatureOverlay(commonProps, f, key))}
-  </RL.FeatureGroup>;
 }
 
 function FeatureOverlayImage(props) {
@@ -82,15 +72,16 @@ const LeafOverlay = ({ overlay }) => {
   const commonProps = {
     globalOpacity: 1,
   };
-  // TODO if creating for first time, use ref to center area of visble overlay
   return <RL.FeatureGroup>
-    {overlay.map((collection, key) => (
-      <FeatureOverlayGroup group={collection} key={key} commonProps={commonProps} />
+    {overlay.map(({ features, id }, layerKey) => (
+      <RL.FeatureGroup key={id || layerKey}>
+        {features.map((f, featureKey) => renderFeatureOverlay(commonProps, f, f.id || featureKey))}
+      </RL.FeatureGroup>
     ))}
   </RL.FeatureGroup>;
 }
 
-const mapStateToProps = ({ overlay }, ownProps) => {
+const mapStateToProps = ({ overlay }) => {
   return {
     overlay,
   };
