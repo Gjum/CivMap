@@ -89,13 +89,6 @@ export const setDrawerOpen = () => {
   return { type: 'OPEN_DRAWER' };
 };
 
-export const setTargetView = (targetView) => {
-  return {
-    type: 'SET_TARGET_VIEW',
-    targetView,
-  };
-};
-
 export const trackMapView = (lastView) => {
   return {
     type: 'TRACK_MAP_VIEW',

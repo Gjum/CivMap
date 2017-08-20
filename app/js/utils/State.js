@@ -25,7 +25,7 @@ export const defaultAppState = {
 
 const defaultBasemap = Object.values(defaultAppState.mapConfig.basemaps).find(b => b.isDefault) || {};
 defaultAppState.mapView.basemapId = defaultBasemap.id;
-defaultAppState.mapView.targetView = {
+defaultAppState.mapView.lastView = {
   x: 0, z: 0,
   radius: defaultAppState.mapConfig.borderApothem,
 };
@@ -44,10 +44,6 @@ export function loadAppStateFromLocalStorage() {
     if (!mapView.basemapId) {
       const defaultBasemap = Object.values(store.getState().mapConfig.basemaps).find(b => b.isDefault) || {};
       mapView.basemapId = defaultBasemap.id;
-    }
-
-    if (mapView.lastView) {
-      mapView.targetView = mapView.lastView;
     }
 
     const appState = { mapView };

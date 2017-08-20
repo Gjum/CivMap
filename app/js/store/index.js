@@ -39,7 +39,6 @@ const mapConfig = (state = defaultMapConfig, action) => {
 export const defaultMapView = {
   basemapId: null,
   lastView: null,
-  targetView: null,
 };
 
 const mapView = (state = defaultMapView, action) => {
@@ -48,8 +47,6 @@ const mapView = (state = defaultMapView, action) => {
       return { ...state, ...action.state.mapView };
     case 'SET_ACTIVE_BASEMAP':
       return { ...state, basemapId: action.basemapId };
-    case 'SET_TARGET_VIEW':
-      return { ...state, targetView: action.targetView };
     case 'TRACK_MAP_VIEW':
       return { ...state, lastView: action.lastView };
     default:
