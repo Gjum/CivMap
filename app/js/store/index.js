@@ -174,4 +174,4 @@ const civMapApp = combineReducers({
   transient,
 });
 
-export default createStore(civMapApp)
+export default createStore(civMapApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
