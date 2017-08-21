@@ -15,25 +15,43 @@ var mcCRS = L.extend({}, L.CRS.Simple, {
   transformation: new L.Transformation(1, 0, 1, 0)
 });
 
-const getEventView = e => boundsToCircle(e.target.getBounds());
-
 class LeafMap extends React.Component {
+  componentWillReceiveProps(newProps) {
+    const { lastView } = newProps;
+    if (lastView !== this.props.lastView) {
+      this.checkAndSetView();
+    }
+    if (lastView === this.waitingForView) {
+      this.waitingForView = null;
+    }
+  }
+
+  checkAndSetView() {
+    if (!this.map) return;
+    if (!this.props.lastView) return;
+    if (!this.waitingForView) {
+      this.map.fitBounds(circleToBounds(this.props.lastView), { animate: false });
+    }
+  }
+
+  onRef(ref) {
+    if (!ref) return;
+    const map = ref.leafletElement;
+    if (this.map == map) return;
+    this.map = map;
+    this.checkAndSetView();
+  }
+
+  onViewChange(e) {
+    const newView = boundsToCircle(e.target.getBounds());
+    this.waitingForView = newView;
+    this.props.trackMapView(newView);
+  }
+
   render() {
     const {
-      lastView,
       mapBgColor,
-      trackMapView,
     } = this.props;
-
-    const onRef = ref => {
-      if (!ref) return;
-      const map = ref.leafletElement;
-      if (this.map == map) return;
-      this.map = map;
-      if (lastView) {
-        this.map.fitBounds(circleToBounds(lastView), { animate: false });
-      }
-    }
 
     return (
       <div className="mapContainer"
@@ -41,7 +59,7 @@ class LeafMap extends React.Component {
       >
         <RL.Map
           className="map"
-          ref={onRef}
+          ref={this.onRef.bind(this)}
           crs={mcCRS}
           center={[0, 0]}
           zoom={-6}
@@ -49,8 +67,8 @@ class LeafMap extends React.Component {
           minZoom={-6}
           attributionControl={false}
           zoomControl={false}
-          onmoveend={e => trackMapView(getEventView(e))}
-          onzoomend={e => trackMapView(getEventView(e))}
+          onmoveend={this.onViewChange.bind(this)}
+          onzoomend={this.onViewChange.bind(this)}
         >
           <LeafBaseMap />
           <LeafOverlay />
