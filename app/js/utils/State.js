@@ -16,7 +16,7 @@ export const defaultAppState = {
   },
 
   mapView: {
-    ...defaultMapView,
+    lastView: { x: 0, z: 0, zoom: -6 },
     basemapId: 'terrain',
   },
 

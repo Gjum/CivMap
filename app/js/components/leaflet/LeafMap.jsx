@@ -19,18 +19,18 @@ class LeafMap extends React.Component {
   componentWillReceiveProps(newProps) {
     const { lastView } = newProps;
     if (lastView !== this.props.lastView) {
-      this.checkAndSetView();
+      this.checkAndSetView(lastView);
     }
     if (lastView === this.waitingForView) {
       this.waitingForView = null;
     }
   }
 
-  checkAndSetView() {
+  checkAndSetView(view) {
     if (!this.map) return;
-    if (!this.props.lastView) return;
+    if (!view) return;
     if (!this.waitingForView) {
-      this.map.fitBounds(circleToBounds(this.props.lastView), { animate: false });
+      this.map.fitBounds(circleToBounds(view), { animate: false });
     }
   }
 
@@ -39,7 +39,7 @@ class LeafMap extends React.Component {
     const map = ref.leafletElement;
     if (this.map == map) return;
     this.map = map;
-    this.checkAndSetView();
+    this.checkAndSetView(this.props.lastView);
   }
 
   onViewChange(e) {
