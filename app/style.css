@@ -56,5 +56,5 @@ div {
 .leaflet-tile {
   image-rendering: pixelated !important;
   image-rendering: crisp-edges !important;
-  -moz-image-rendering: crisp-edges !important;
+  image-rendering: -moz-crisp-edges !important;
 }
