@@ -25,7 +25,7 @@ const BROWSE = () => (
         </List>
       </div>
     </AppDrawer>
-    <div className="shifted-container flex-container">
+    <div className="container full-map">
       <AppBarBrowse />
       <LeafMap />
     </div>

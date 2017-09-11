@@ -4,21 +4,16 @@ import { connect } from 'react-redux';
 import Drawer from 'material-ui/Drawer';
 
 import { setDrawerClosed } from '../actions';
-import { shouldDrawerDock } from '../utils/WindowSize.js';
 
 const AppDrawer = ({
   drawerOpen,
-  windowHeight,
-  windowWidth,
   setDrawerClosed,
   children,
 }) => {
-  const drawerDocked = shouldDrawerDock({ windowHeight, windowWidth });
   return (
     <Drawer
       className="drawer"
-      docked={drawerDocked}
-      open={drawerOpen || drawerDocked}
+      open={drawerOpen}
       onRequestClose={setDrawerClosed}
     >
       {children}
@@ -26,8 +21,8 @@ const AppDrawer = ({
   );
 };
 
-const mapStateToProps = ({ control: { drawerOpen, windowHeight, windowWidth } }, ownProps) => {
-  return { drawerOpen, windowHeight, windowWidth };
+const mapStateToProps = ({ control: { drawerOpen } }, ownProps) => {
+  return { drawerOpen };
 };
 
 const mapDispatchToProps = {

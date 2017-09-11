@@ -12,19 +12,15 @@ import SearchIcon from 'material-ui-icons/Search';
 import ModeEditIcon from 'material-ui-icons/ModeEdit';
 
 import { openOverlayEditor, openSearch, openShare, setDrawerOpen } from '../actions';
-import { shouldDrawerDock } from '../utils/WindowSize.js';
 
 const AppBarBrowse = ({
   lastView,
   borderApothem,
-  windowHeight,
-  windowWidth,
   openOverlayEditor,
   openSearch,
   openShare,
   setDrawerOpen,
 }) => {
-  const showMenuIcon = !shouldDrawerDock({ windowHeight, windowWidth });
 
   let title = 'ccMap';
   if (lastView && lastView.radius < borderApothem) {
@@ -32,48 +28,43 @@ const AppBarBrowse = ({
   }
 
   return (
-    <MuiAppBar position="static" className='appbar' color='default'>
-      <Toolbar>
-        {showMenuIcon &&
-          <IconButton
-            onClick={setDrawerOpen}
-          >
-            <MenuIcon />
-          </IconButton>
-        }
-        <Typography type="title" className='appbar-title'>
-          {title}
-        </Typography>
-        <IconButton
-          disabled
-          onClick={openSearch}
-        >
-          <SearchIcon />
-        </IconButton>
-        <IconButton
-          disabled
-          onClick={openShare}
-        >
-          <ShareIcon />
-        </IconButton>
-        <IconButton
-          disabled
-          onClick={openOverlayEditor}
-        >
-          <ModeEditIcon />
-        </IconButton>
-      </Toolbar>
-    </MuiAppBar>
+    <div className='appbar custom-appbar'>
+      <IconButton
+        onClick={setDrawerOpen}
+      >
+        <MenuIcon />
+      </IconButton>
+
+      <div className='appbar-stretch'>
+        {title}
+      </div>
+
+      <IconButton
+        disabled
+        onClick={openSearch}
+      >
+        <SearchIcon />
+      </IconButton>
+      <IconButton
+        disabled
+        onClick={openShare}
+      >
+        <ShareIcon />
+      </IconButton>
+      <IconButton
+        disabled
+        onClick={openOverlayEditor}
+      >
+        <ModeEditIcon />
+      </IconButton>
+    </div>
   );
 };
 
-const mapStateToProps = ({ control, mapConfig, mapView }) => {
-  const { windowHeight, windowWidth } = control;
+const mapStateToProps = ({ mapConfig, mapView }) => {
   return {
     lastView: mapView.lastView,
     borderApothem: mapConfig.borderApothem,
-    windowHeight,
-    windowWidth,
   };
 };
 

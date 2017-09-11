@@ -2,7 +2,6 @@ html,
 body,
 #app-root,
 .full,
-.flex-container,
 .map {
   width: 100%;
   height: 100%;
@@ -15,28 +14,13 @@ div {
   padding: 0;
 }
 
-.flex-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.appbar-title, .mapContainer {
-  flex: 1;
-  max-height: 100%;
-}
-
-.appbar-title {
+.appbar-stretch {
   text-align: center;
+  flex: 1;
 }
 
 .drawer-content {
-  width: 264px; /* = 320 - 56 */
-}
-@media all and (orientation: landscape) and (min-width: 600px) {
-  .shifted-container {
-    border-left: 264px solid white;
-    box-sizing: border-box;
-  }
+  width: 284px;
 }
 
 .fab-bottomright {
@@ -57,4 +41,111 @@ div {
   image-rendering: pixelated !important;
   image-rendering: crisp-edges !important;
   image-rendering: -moz-crisp-edges !important;
+}
+
+.mainlist, .custom-appbar {
+  z-index: 1000;
+  box-shadow:
+    0px 0px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+/***** app layout *****/
+
+.container {
+  display: grid;
+  height: 100%;
+}
+
+.appbar {
+  grid-area: appbar;
+}
+
+.mainlist {
+  grid-area: mainlist;
+  overflow-y: auto;
+}
+
+.mapContainer {
+  grid-area: map;
+}
+
+.full-map .mainlist, .full-list .mapContainer {
+  display: none;
+}
+
+/* mobile */
+.container.split {
+  grid-template:
+      "appbar" auto
+      "map" 1fr
+      "mainlist" 284px;
+}
+.container.full-map {
+  grid-template:
+      "appbar" auto
+      "map" 1fr;
+}
+.container.full-list {
+  grid-template:
+      "appbar" auto
+      "mainlist" 1fr;
+}
+
+/* landscape on medium-size devices */
+@media all and (orientation: landscape) and (min-width: 600px) and (max-width: 719px) {
+  .container.split {
+      grid-template: "appbar map" auto
+      "mainlist map" 1fr
+      / 284px auto;
+  }
+  .container.full-map {
+      grid-template:
+          "appbar" auto
+          "map" 1fr;
+  }
+  .container.full-list {
+      grid-template:
+          "appbar" auto
+          "mainlist" 1fr;
+  }
+}
+
+/* large devices */
+@media all and (min-width: 720px) {
+  .container.split {
+      grid-template: "appbar map" auto
+      "mainlist map" 1fr
+      / 360px auto;
+  }
+}
+
+/***** custom appbar *****/
+
+.custom-appbar {
+  height: 48px; /* resizing is done through padding alone */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  z-index: 1001;
+}
+
+/* portrait under 600px height */
+.custom-appbar {
+  padding: 4px;
+}
+
+/* landscape on small/medium devices */
+@media all and (orientation: landscape) and (max-height: 599px) {
+  .custom-appbar {
+    padding: 0px;
+  }
+}
+
+/* large devices, or medium on portrait */
+@media all and (min-height: 600px) {
+  .custom-appbar {
+    padding: 8px;
+  }
 }
