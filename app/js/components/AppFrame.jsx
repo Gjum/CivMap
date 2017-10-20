@@ -12,19 +12,33 @@ import LeafMap from './leaflet/LeafMap.jsx';
 import ViewResetMenuItem from './ViewResetMenuItem.jsx';
 import WaypointsMenuItem from './WaypointsMenuItem.jsx';
 
+const drawer = () => (
+  <AppDrawer>
+    <div className='drawer-content'>
+      <BasemapSelectorList />
+      <Divider />
+      <List>
+        <WaypointsMenuItem />
+        <LayersMenuItem />
+        <ViewResetMenuItem />
+      </List>
+    </div>
+  </AppDrawer>
+)
+
+const defaultLayout = () => (
+  <div className='full'>
+    {drawer()}
+    <div className="container full-map">
+      <AppBarBrowse />
+      <LeafMap />
+    </div>
+  </div>
+);
+
 const BROWSE = () => (
   <div className='full'>
-    <AppDrawer>
-      <div className='drawer-content'>
-        <BasemapSelectorList />
-        <Divider />
-        <List>
-          <WaypointsMenuItem />
-          <LayersMenuItem />
-          <ViewResetMenuItem />
-        </List>
-      </div>
-    </AppDrawer>
+    {drawer()}
     <div className="container full-map">
       <AppBarBrowse />
       <LeafMap />
