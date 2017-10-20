@@ -7,7 +7,7 @@ import 'leaflet-editable';
 import LeafBaseMap from './LeafBaseMap.jsx';
 import LeafOverlay from './LeafOverlay.jsx';
 
-import { trackMapView } from '../../actions';
+import { trackMap, trackMapView } from '../../actions';
 import { boundsToCircle, circleToBounds } from '../../utils/Math.js';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
@@ -38,8 +38,9 @@ class LeafMap extends React.Component {
   onRef(ref) {
     if (!ref) return;
     const map = ref.leafletElement;
-    if (this.map == map) return;
+    if (this.map === map) return;
     this.map = map;
+    this.props.trackMap(map);
     this.checkAndSetView(this.props.lastView);
   }
 
@@ -89,6 +90,7 @@ const mapStateToProps = ({ control, mapConfig, mapView }, ownProps) => {
 };
 
 const mapDispatchToProps = {
+  trackMap,
   trackMapView,
 };
 

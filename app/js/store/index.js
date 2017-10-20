@@ -141,11 +141,25 @@ const overlay = (state = [], action) => {
   }
 }
 
+export const defaultTransient = {
+  map: null,
+};
+
+const transient = (state = defaultTransient, action) => {
+  switch (action.type) {
+    case 'TRACK_MAP':
+      return { ...state, map: action.map };
+    default:
+      return state;
+  }
+}
+
 const civMapApp = combineReducers({
   control,
   mapConfig,
   mapView,
   overlay,
+  transient,
 });
 
 export default createStore(civMapApp)

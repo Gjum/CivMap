@@ -89,6 +89,13 @@ export const setDrawerOpen = () => {
   return { type: 'OPEN_DRAWER' };
 };
 
+export const trackMap = (map) => {
+  return {
+    type: 'TRACK_MAP',
+    map,
+  };
+};
+
 export const trackMapView = (lastView) => {
   return {
     type: 'TRACK_MAP_VIEW',
