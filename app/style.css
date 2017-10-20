@@ -43,7 +43,8 @@ div {
   image-rendering: -moz-crisp-edges !important;
 }
 
-.mainlist, .custom-appbar {
+.mainlist,
+.custom-appbar {
   z-index: 1000;
   box-shadow:
     0px 0px 4px -1px rgba(0, 0, 0, 0.2),
@@ -71,7 +72,8 @@ div {
   grid-area: map;
 }
 
-.full-map .mainlist, .full-list .mapContainer {
+.full-map .mainlist,
+.full-list .mapContainer {
   display: none;
 }
 
