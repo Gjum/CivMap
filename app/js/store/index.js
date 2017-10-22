@@ -14,6 +14,10 @@ const control = (state = defaultControlState, action) => {
       return { ...state, drawerOpen: true };
     case 'CLOSE_DRAWER':
       return { ...state, drawerOpen: false };
+    case 'OPEN_BROWSE_MODE':
+      return { ...state, drawerOpen: false, appMode: 'BROWSE' };
+    case 'OPEN_OVERLAY_EDITOR':
+      return { ...state, drawerOpen: false, appMode: 'OVERLAY' };
     case 'TRACK_WINDOW_SIZE':
       return { ...state, windowHeight: action.height, windowWidth: action.width };
     default:
@@ -105,6 +109,12 @@ const collection = (state, action) => {
         ...state,
         properties: action.properties,
       };
+    case 'SET_LAYER_HIDDEN':
+      if (action.id != state.id) return state;
+      return {
+        ...state,
+        properties: { ...state.properties, hidden: action.hidden },
+      };
 
     case 'ADD_FEATURE':
       if (action.collectionId != state.id) return state;
@@ -130,6 +140,8 @@ const overlay = (state = [], action) => {
       return state.map(cState => collection(cState, action));
     case 'REMOVE_COLLECTION':
       return state.filter(cState => cState.id != action.id);
+    case 'SET_LAYER_HIDDEN':
+      return state.map(cState => collection(cState, action));
 
     case 'ADD_FEATURE':
     case 'UPDATE_FEATURE':

@@ -5,8 +5,10 @@ import Divider from 'material-ui/Divider';
 import List from 'material-ui/List';
 
 import AppBarBrowse from './AppBarBrowse.jsx';
+import AppBarOverlay from './AppBarOverlay.jsx';
 import AppDrawer from './AppDrawer.jsx';
 import BasemapSelectorList from './BasemapSelectorList.jsx';
+import LayersList from './LayersList.jsx';
 import LayersMenuItem from './LayersMenuItem.jsx';
 import LeafMap from './leaflet/LeafMap.jsx';
 import ViewResetMenuItem from './ViewResetMenuItem.jsx';
@@ -46,8 +48,22 @@ const BROWSE = () => (
   </div>
 );
 
+const OVERLAY = () => (
+  <div className='full'>
+    {drawer()}
+    <div className="container split">
+      <AppBarOverlay />
+      <LeafMap />
+      <div className="mainlist">
+        <LayersList />
+      </div>
+    </div>
+  </div>
+);
+
 const modes = {
   BROWSE,
+  OVERLAY,
 };
 
 const AppFrame = ({

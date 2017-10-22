@@ -89,6 +89,13 @@ function FeatureOverlayCircle(props) {
   />;
 }
 
+// RL.FeatureGroup has weird expectations about its children...
+function unlistify(list) {
+  if (!list || list.length > 1) return list
+  if (list.length < 1) return null
+  return list[0]
+}
+
 const LeafOverlay = ({
   overlay,
   editId,
@@ -100,11 +107,14 @@ const LeafOverlay = ({
     editId,
   };
   return <RL.FeatureGroup>
-    {overlay.map(({ features, id }, layerKey) => (
-      <RL.FeatureGroup key={id || layerKey}>
-        {features.map((f, featureKey) => renderFeatureOverlay(commonProps, f, f.id || featureKey))}
-      </RL.FeatureGroup>
-    ))}
+    {unlistify(overlay
+      .filter(({ properties }) => !properties.hidden)
+      .map(({ features, id }, layerKey) => (
+        <RL.FeatureGroup key={id || layerKey}>
+          {features.map((f, featureKey) => renderFeatureOverlay(commonProps, f, f.id || featureKey))}
+        </RL.FeatureGroup>
+      )))
+    }
   </RL.FeatureGroup>;
 }
 

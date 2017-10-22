@@ -5,7 +5,7 @@ export const appLoad = (state) => {
   };
 };
 
-export const addCollection = (properties) => {
+export const addLayer = (properties) => {
   return {
     type: 'ADD_COLLECTION',
     id: Date.now(),
@@ -22,6 +22,18 @@ export const addFeature = (collectionId, { geometry, style, properties }) => {
     style,
     properties,
   };
+};
+
+export const setLayerHidden = (id, hidden) => {
+  return {
+    type: 'SET_LAYER_HIDDEN',
+    id,
+    hidden,
+  };
+};
+
+export const openBrowseMode = () => {
+  return { type: 'OPEN_BROWSE_MODE' };
 };
 
 export const openSearch = () => {
@@ -51,7 +63,6 @@ export const openLayerEditor = (layerId) => {
 };
 
 export const openOverlayEditor = () => {
-  alert('openOverlayEditor is not implemented yet'); // XXX
   return { type: 'OPEN_OVERLAY_EDITOR' };
 };
 
@@ -60,7 +71,7 @@ export const openWaypointsEditor = () => {
   return { type: 'OPEN_WAYPOINTS_EDITOR' };
 };
 
-export const removeCollection = (id) => {
+export const removeLayer = (id) => {
   return {
     type: 'REMOVE_COLLECTION',
     id,
@@ -111,7 +122,7 @@ export const trackWindowSize = ({ height, width }) => {
   };
 };
 
-export const updateCollection = (id, properties) => {
+export const updateLayer = (id, properties) => {
   return {
     type: 'UPDATE_COLLECTION',
     id,
