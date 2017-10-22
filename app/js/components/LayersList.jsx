@@ -87,21 +87,24 @@ const LayersList = ({
   })
   // TODO push public layers to groups['Public Layers']
   return <List>
-    {Object.keys(groups).map(groupName =>
-      <div key={groupName}>
-        <ListSubheader>{groupName}</ListSubheader>
-        {groups[groupName].map(layer =>
-          <Layer
-            key={layer.id}
-            layer={layer}
-            dispatchers={{
-              openLayerEditor,
-              setLayerHidden,
-            }}
-          />
-        )}
-      </div>
-    )}
+    {Object.keys(groups)
+      .filter(groupName => groups[groupName].length)
+      .map(groupName =>
+        <div key={groupName}>
+          <ListSubheader>{groupName}</ListSubheader>
+          {groups[groupName].map(layer =>
+            <Layer
+              key={layer.id}
+              layer={layer}
+              dispatchers={{
+                openLayerEditor,
+                setLayerHidden,
+              }}
+            />
+          )}
+        </div>
+      )
+    }
   </List>
 }
 
