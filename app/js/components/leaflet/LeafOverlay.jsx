@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as RL from 'react-leaflet';
 
+import { centered } from '../../utils/Math';
+
 function setEditableOnRef(e, elementId, editId) {
   if (!e) return;
   const isEditable = editId == elementId;
@@ -32,7 +34,7 @@ function FeatureOverlayImage(props) {
   const { editId, globalOpacity } = props.commonProps;
   return <RL.ImageOverlay
     opacity={globalOpacity}
-    {...geometry}
+    positions={centered(geometry.positions)}
     {...style}
   />;
 }
@@ -43,7 +45,7 @@ function FeatureOverlayLine(props) {
   return <RL.Polyline
     ref={e => setEditableOnRef(e, id, editId)}
     opacity={globalOpacity}
-    {...geometry}
+    positions={centered(geometry.positions)}
     {...style}
   />;
 }
@@ -76,12 +78,14 @@ function FeatureOverlayPolygon(props) {
 function FeatureOverlayCircle(props) {
   const { id, geometry, style } = props.feature;
   const { editId, globalOpacity } = props.commonProps;
+  const [z, x] = geometry.center;
   return <RL.Circle
     ref={e => setEditableOnRef(e, id, editId)} // TODO circle editing is broken
     opacity={globalOpacity}
     fillOpacity={geometry.filled ? globalOpacity : 0}
     {...geometry}
     {...style}
+    center={[z + .5, x + .5]}
   />;
 }
 

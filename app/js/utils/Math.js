@@ -14,7 +14,7 @@ export function boundsToCircle(bounds) {
   const [x, z] = intCoords(bounds.getCenter());
   const [e, n] = intCoords(bounds.getNorthEast());
   const [w, s] = intCoords(bounds.getSouthWest());
-  const radius = parseInt(Math.min(Math.abs(e - w), Math.abs(s - n)) / 2);
+  const radius = Math.round(Math.min(Math.abs(e - w), Math.abs(s - n)) / 2);
   return { x, z, radius };
 }
 
@@ -26,4 +26,10 @@ export function deepLatLngToArr(o) {
   if (Array.isArray(o))
     return o.map(e => deepLatLngToArr(e));
   return [Math.round(o.lat), Math.round(o.lng)];
+}
+
+export function centered(positions) {
+  if (Array.isArray(positions[0]))
+    return positions.map(e => centered(e));
+  return [positions[0] + .5, positions[1] + .5];
 }
