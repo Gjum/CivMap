@@ -38,6 +38,7 @@ class LeafMap extends React.Component {
   onRef(ref) {
     if (!ref) return;
     const map = ref.leafletElement;
+    map.invalidateSize()
     if (this.map === map) return;
     this.map = map;
     this.props.trackMap(map);
@@ -86,6 +87,7 @@ const mapStateToProps = ({ control, mapConfig, mapView }, ownProps) => {
     mapBgColor: mapConfig.basemaps[mapView.basemapId].bgColor,
     lastView: mapView.lastView,
     _windowWidth: control.windowWidth, // dummy, only to trigger a re-render
+    _appMode: control.appMode, // dummy, only to trigger a re-render
   };
 };
 
