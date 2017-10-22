@@ -81,8 +81,8 @@ div {
 .container.split {
   grid-template:
       "appbar" auto
-      "map" 1fr
-      "mainlist" 284px;
+      "mainlist" 284px
+      "map" 1fr;
 }
 .container.full-map {
   grid-template:
