@@ -37,25 +37,22 @@ export const openBrowseMode = () => {
 };
 
 export const openSearch = () => {
-  alert('openSearch is not implemented yet'); // XXX
   return { type: 'OPEN_SEARCH' };
 };
 
 export const openShare = () => {
-  alert('openShare is not implemented yet'); // XXX
   return { type: 'OPEN_SHARE' };
 };
 
-export const openFeatureEditor = (featureId) => {
-  alert('openFeatureEditor is not implemented yet'); // XXX
+export const openFeatureEditor = (featureId, layerId) => {
   return {
     type: 'OPEN_FEATURE_EDITOR',
     featureId,
+    layerId,
   };
 };
 
 export const openLayerEditor = (layerId) => {
-  alert('openLayerEditor is not implemented yet'); // XXX
   return {
     type: 'OPEN_LAYER_EDITOR',
     layerId,
@@ -64,11 +61,6 @@ export const openLayerEditor = (layerId) => {
 
 export const openOverlayEditor = () => {
   return { type: 'OPEN_OVERLAY_EDITOR' };
-};
-
-export const openWaypointsEditor = () => {
-  alert('openWaypointsEditor is not implemented yet'); // XXX
-  return { type: 'OPEN_WAYPOINTS_EDITOR' };
 };
 
 export const removeLayer = (id) => {

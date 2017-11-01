@@ -3,7 +3,8 @@ import { createStore, combineReducers } from 'redux';
 export const defaultControlState = {
   appMode: 'BROWSE',
   drawerOpen: false,
-  editId: null,
+  featureId: null,
+  layerId: null,
   windowHeight: NaN,
   windowWidth: NaN,
 };
@@ -16,6 +17,17 @@ const control = (state = defaultControlState, action) => {
       return { ...state, drawerOpen: false };
     case 'OPEN_BROWSE_MODE':
       return { ...state, drawerOpen: false, appMode: 'BROWSE' };
+    case 'OPEN_FEATURE_EDITOR':
+      return {
+        ...state, drawerOpen: false, appMode: 'FEATURE',
+        featureId: action.featureId,
+        layerId: action.layerId,
+      };
+    case 'OPEN_LAYER_EDITOR':
+      return {
+        ...state, drawerOpen: false, appMode: 'LAYER',
+        layerId: action.layerId,
+      };
     case 'OPEN_OVERLAY_EDITOR':
       return { ...state, drawerOpen: false, appMode: 'OVERLAY' };
     case 'TRACK_WINDOW_SIZE':

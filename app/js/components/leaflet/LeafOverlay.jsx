@@ -2,36 +2,28 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as RL from 'react-leaflet';
 
+import { openFeatureEditor } from '../../actions';
+
 import { centered } from '../../utils/Math';
 
-function setEditableOnRef(e, elementId, editId) {
-  if (!e) return;
-  const isEditable = editId == elementId;
-  if (isEditable && !e.leafletElement.editEnabled) {
-    e.leafletElement.enableEdit(e.leafletElement._map); // XXX is that _map correct?
-  } else if (!isEditable && e.leafletElement.editEnabled) {
-    e.leafletElement.disableEdit();
-  }
-}
-
-function renderFeatureOverlay(commonProps, feature, key) {
+function renderFeatureOverlay(commonProps, feature, layerId, key) {
   if (feature.geometry.type == "image")
-    return <FeatureOverlayImage feature={feature} key={key} commonProps={commonProps} />;
+    return <FeatureOverlayImage feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
   if (feature.geometry.type == "line")
-    return <FeatureOverlayLine feature={feature} key={key} commonProps={commonProps} />;
+    return <FeatureOverlayLine feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
   if (feature.geometry.type == "marker")
-    return <FeatureOverlayMarker feature={feature} key={key} commonProps={commonProps} />;
+    return <FeatureOverlayMarker feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
   if (feature.geometry.type == "polygon")
-    return <FeatureOverlayPolygon feature={feature} key={key} commonProps={commonProps} />;
+    return <FeatureOverlayPolygon feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
   if (feature.geometry.type == "circle")
-    return <FeatureOverlayCircle feature={feature} key={key} commonProps={commonProps} />;
+    return <FeatureOverlayCircle feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
 
   console.error("[FeaturesOverlay] Unknown feature geometry type", feature);
 }
 
 function FeatureOverlayImage(props) {
   const { id, geometry, style } = props.feature;
-  const { editId, globalOpacity } = props.commonProps;
+  const { featureId, globalOpacity } = props.commonProps;
   return <RL.ImageOverlay
     opacity={globalOpacity}
     positions={centered(geometry.positions)}
@@ -41,21 +33,20 @@ function FeatureOverlayImage(props) {
 
 function FeatureOverlayLine(props) {
   const { id, geometry, style } = props.feature;
-  const { editId, globalOpacity } = props.commonProps;
+  const { featureId, globalOpacity } = props.commonProps;
   return <RL.Polyline
-    ref={e => setEditableOnRef(e, id, editId)}
     opacity={globalOpacity}
     positions={centered(geometry.positions)}
     {...style}
   />;
 }
 
-function FeatureOverlayMarker(props) {
-  const { id, geometry, style } = props.feature;
-  const { editId, globalOpacity } = props.commonProps;
+function FeatureOverlayMarker({ commonProps, feature, layerId }) {
+  const { id, geometry, style } = feature;
+  const { featureId, globalOpacity, openFeatureEditor } = commonProps;
   const [z, x] = geometry.position;
   return <RL.Marker
-    ref={e => setEditableOnRef(e, id, editId)}
+    onclick={() => openFeatureEditor(id, layerId)}
     opacity={globalOpacity}
     {...geometry}
     {...style}
@@ -65,9 +56,8 @@ function FeatureOverlayMarker(props) {
 
 function FeatureOverlayPolygon(props) {
   const { id, geometry, style } = props.feature;
-  const { editId, globalOpacity } = props.commonProps;
+  const { featureId, globalOpacity } = props.commonProps;
   return <RL.Polygon
-    ref={e => setEditableOnRef(e, id, editId)}
     opacity={globalOpacity}
     fillOpacity={geometry.filled ? globalOpacity : 0}
     {...geometry}
@@ -77,10 +67,9 @@ function FeatureOverlayPolygon(props) {
 
 function FeatureOverlayCircle(props) {
   const { id, geometry, style } = props.feature;
-  const { editId, globalOpacity } = props.commonProps;
+  const { featureId, globalOpacity } = props.commonProps;
   const [z, x] = geometry.center;
   return <RL.Circle
-    ref={e => setEditableOnRef(e, id, editId)} // TODO circle editing is broken
     opacity={globalOpacity}
     fillOpacity={geometry.filled ? globalOpacity : 0}
     {...geometry}
@@ -97,32 +86,41 @@ function unlistify(list) {
 }
 
 const LeafOverlay = ({
+  featureId,
+  layerId,
   overlay,
-  editId,
+  openFeatureEditor,
 }) => {
   if (!overlay)
     return null;
   const commonProps = {
     globalOpacity: 1,
-    editId,
+    featureId,
+    layerId,
+    openFeatureEditor,
   };
   return <RL.FeatureGroup>
     {unlistify(overlay
       .filter(({ properties }) => !properties.hidden)
-      .map(({ features, id }, layerKey) => (
-        <RL.FeatureGroup key={id || layerKey}>
-          {features.map((f, featureKey) => renderFeatureOverlay(commonProps, f, f.id || featureKey))}
+      .map(({ features, id: layerId }, layerKey) => (
+        <RL.FeatureGroup key={layerId || layerKey}>
+          {features.map((f, featureKey) => renderFeatureOverlay(commonProps, f, layerId, f.id || featureKey))}
         </RL.FeatureGroup>
       )))
     }
   </RL.FeatureGroup>;
 }
 
-const mapStateToProps = ({ overlay, control: { editId } }) => {
+const mapStateToProps = ({ overlay, control: { featureId, layerId } }) => {
   return {
     overlay,
-    editId,
+    featureId,
+    layerId,
   };
 };
 
-export default connect(mapStateToProps)(LeafOverlay);
+const mapDispatchToProps = {
+  openFeatureEditor,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LeafOverlay);

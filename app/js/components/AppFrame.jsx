@@ -5,9 +5,11 @@ import Divider from 'material-ui/Divider';
 import List from 'material-ui/List';
 
 import AppBarBrowse from './AppBarBrowse.jsx';
+import AppBarFeature from './AppBarFeature.jsx'
 import AppBarOverlay from './AppBarOverlay.jsx';
 import AppDrawer from './AppDrawer.jsx';
 import BasemapSelectorList from './BasemapSelectorList.jsx';
+import FeatureInfo from './FeatureInfo.jsx'
 import LayersList from './LayersList.jsx';
 import LayersMenuItem from './LayersMenuItem.jsx';
 import LeafMap from './leaflet/LeafMap.jsx';
@@ -48,6 +50,19 @@ const BROWSE = () => (
   </div>
 );
 
+const FEATURE = () => (
+  <div className='full'>
+    {drawer()}
+    <div className="container split">
+      <AppBarFeature />
+      <LeafMap />
+      <div className="mainlist">
+        <FeatureInfo />
+      </div>
+    </div>
+  </div>
+);
+
 const OVERLAY = () => (
   <div className='full'>
     {drawer()}
@@ -63,6 +78,7 @@ const OVERLAY = () => (
 
 const modes = {
   BROWSE,
+  FEATURE,
   OVERLAY,
 };
 
