@@ -21,9 +21,9 @@
   <!-- add Roboto font: http://www.google.com/fonts#UsePlace:use/Collection:Roboto:400,300,500 -->
   <script>
     var WebFontConfig = {
-      google: { families: [ 'Roboto:400,300,500:latin' ] }
+      google: { families: ['Roboto:400,300,500:latin'] }
     };
-    (function() {
+    (function () {
       var wf = document.createElement('script');
       wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
       wf.type = 'text/javascript';
@@ -34,75 +34,89 @@
   </script>
   <script src="bundle.js"></script>
   <script type="text/javascript">
-    var defaultFeatureGroup = {
-      properties: { name: "Claims Maps", },
-      features: [
-        {
-          properties: {
-            type: "claimImage",
-            name: "Jecowa transparent",
-          },
-          geometry: {
-            type: "image",
-            url: "https://www.mediafire.com/convkey/7bcf/d539122c3ohp7bxag.jpg",
-            bounds: [[-4096, -4096], [4096, 4096]],
-          },
-        },
-        {
-          geometry: {
-            type: "circle",
-            center: [200, -300],
-            radius: 100,
-          },
-        },
-        {
-          geometry: {
-            type: "line",
-            positions: [
-              [200, -300],
-              [300, -300],
-              [200, -400],
-            ],
-          },
-        },
-        {
-          properties: {
-            type: "claim",
-            name: "Fenriss",
-          },
-          geometry: {
-            type: "polygon",
-            positions: [[[252,162],[266,192],[280,242],[288,298],[286,378],[6,688],[-14,686],[-96,654],[-180,628],[-216,598],[-228,540],[-324,434],[-326,404],[-302,382],[-288,352],[-320,352],[-342,360],[-378,326],[-418,286],[-422,242],[-404,220],[-376,214],[-340,188],[-300,170],[-290,132],[-264,128],[-238,146],[-128,102],[-50,140],[36,152],[60,134],[96,158],[166,144]],[[-406,64],[-304,110],[-324,174],[-362,184],[-398,170],[-472,100],[-444,70],[-424,62]]],
-          },
-        },
-      ],
-    };
-    CivMap.start({
-      attribution: 'CivMap SNAPSHOT',
-      tilesUrl: 'https://raw.githubusercontent.com/civexmap/tiles/master/',
-      borderSquareRadius: 4000,
-      basemaps: [
-        'terrain',
-        'height',
-        'night',
-        'biome',
-        'simple',
-        'light',
-      ],
-      options: {
-        basemap: 'terrain',
-        installedPlugins: [
-          CivMap.FeaturesPlugin,
-          CivMap.WaypointsPlugin,
+    function doStart(featureGroup) {
+      CivMap.start({
+        attribution: 'CivMap SNAPSHOT',
+        tilesUrl: 'https://raw.githubusercontent.com/civexmap/tiles/master/',
+        borderSquareRadius: 4000,
+        basemaps: [
+          'terrain',
+          'height',
+          'night',
+          'biome',
+          'simple',
+          'light',
         ],
-        plugins: {
-          features: {
-            globalOpacity: .5,
-            featureGroup: defaultFeatureGroup,
+        options: {
+          basemap: 'terrain',
+          installedPlugins: [
+            CivMap.FeaturesPlugin,
+            CivMap.WaypointsPlugin,
+          ],
+          plugins: {
+            features: {
+              globalOpacity: .5,
+              featureGroup: featureGroup,
+            },
           },
         },
-      },
-    }, function (ref) { window.civMap = ref; });
+      }, function (ref) { window.civMap = ref; });
+    }
+
+    var jsonUrl = null;
+    location.hash.slice(1).split('#').map(function (part) {
+      let [key, vals] = part.split('=', 2);
+      if (key == 'json') jsonUrl = vals;
+    });
+
+    if (jsonUrl) {
+      CivMap.getJSON(jsonUrl, doStart);
+    } else {
+      var defaultFeatureGroup = {
+        properties: { name: "Claims Maps", },
+        features: [
+          {
+            properties: {
+              type: "claimImage",
+              name: "Jecowa transparent",
+            },
+            geometry: {
+              type: "image",
+              url: "https://www.mediafire.com/convkey/7bcf/d539122c3ohp7bxag.jpg",
+              bounds: [[-4096, -4096], [4096, 4096]],
+            },
+          },
+          {
+            geometry: {
+              type: "circle",
+              center: [200, -300],
+              radius: 100,
+            },
+          },
+          {
+            geometry: {
+              type: "line",
+              positions: [
+                [200, -300],
+                [300, -300],
+                [200, -400],
+              ],
+            },
+          },
+          {
+            properties: {
+              type: "claim",
+              name: "Fenriss",
+            },
+            geometry: {
+              type: "polygon",
+              positions: [[[252, 162], [266, 192], [280, 242], [288, 298], [286, 378], [6, 688], [-14, 686], [-96, 654], [-180, 628], [-216, 598], [-228, 540], [-324, 434], [-326, 404], [-302, 382], [-288, 352], [-320, 352], [-342, 360], [-378, 326], [-418, 286], [-422, 242], [-404, 220], [-376, 214], [-340, 188], [-300, 170], [-290, 132], [-264, 128], [-238, 146], [-128, 102], [-50, 140], [36, 152], [60, 134], [96, 158], [166, 144]], [[-406, 64], [-304, 110], [-324, 174], [-362, 184], [-398, 170], [-472, 100], [-444, 70], [-424, 62]]],
+            },
+          },
+        ],
+      };
+      doStart(defaultFeatureGroup);
+    }
   </script>
 </body>
 

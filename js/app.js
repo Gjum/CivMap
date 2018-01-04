@@ -5,11 +5,13 @@ import {Main} from './Main';
 import {WaypointsPluginInfo} from './Waypoints';
 import {ClaimsPluginInfo} from './Claims';
 import {FeaturesPluginInfo} from './FeaturesPlugin';
+import {getJSON} from './Util';
 
 exports.Main = Main;
 exports.ClaimsPlugin = ClaimsPluginInfo;
 exports.WaypointsPlugin = WaypointsPluginInfo;
 exports.FeaturesPlugin = FeaturesPluginInfo;
+exports.getJSON = getJSON;
 
 export function start(config, onRef) {
   // Needed for onTouchTap
