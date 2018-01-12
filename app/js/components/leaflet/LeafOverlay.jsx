@@ -1,126 +1,118 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import * as RL from 'react-leaflet';
+import React from 'react'
+import { connect } from 'react-redux'
+import * as RL from 'react-leaflet'
 
-import { openFeatureEditor } from '../../actions';
+import { openFeatureEditor } from '../../actions'
 
-import { centered } from '../../utils/Math';
-
-function renderFeatureOverlay(commonProps, feature, layerId, key) {
-  if (feature.geometry.type == "image")
-    return <FeatureOverlayImage feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
-  if (feature.geometry.type == "line")
-    return <FeatureOverlayLine feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
-  if (feature.geometry.type == "marker")
-    return <FeatureOverlayMarker feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
-  if (feature.geometry.type == "polygon")
-    return <FeatureOverlayPolygon feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
-  if (feature.geometry.type == "circle")
-    return <FeatureOverlayCircle feature={feature} key={key} layerId={layerId} commonProps={commonProps} />;
-
-  console.error("[FeaturesOverlay] Unknown feature geometry type", feature);
+function centered(positions) {
+  if (Array.isArray(positions[0]))
+    return positions.map(e => centered(e));
+  return [positions[0] + .5, positions[1] + .5];
 }
 
-function FeatureOverlayImage(props) {
-  const { id, geometry, style } = props.feature;
-  const { featureId, globalOpacity } = props.commonProps;
-  return <RL.ImageOverlay
-    opacity={globalOpacity}
-    positions={centered(geometry.positions)}
-    {...style}
-  />;
+function renderFeatureOverlay(feature, key, onClick) {
+  const props = { feature, onClick, key }
+  switch (feature.geometry.type) {
+    case "marker": return <FeatureOverlayMarker {...props} />
+    case "circle": return <FeatureOverlayCircle {...props} />
+    case "image": return <FeatureOverlayImage {...props} />
+    case "line": return <FeatureOverlayLine {...props} />
+    case "polygon": return <FeatureOverlayPolygon {...props} />
+    default:
+      console.error("[FeaturesOverlay] Unknown feature geometry type", feature)
+  }
 }
 
-function FeatureOverlayLine(props) {
-  const { id, geometry, style } = props.feature;
-  const { featureId, globalOpacity } = props.commonProps;
-  return <RL.Polyline
-    opacity={globalOpacity}
-    positions={centered(geometry.positions)}
-    {...style}
-  />;
-}
-
-function FeatureOverlayMarker({ commonProps, feature, layerId }) {
-  const { id, geometry, style } = feature;
-  const { featureId, globalOpacity, openFeatureEditor } = commonProps;
-  const [z, x] = geometry.position;
+function FeatureOverlayMarker({ feature, onClick, key }) {
+  const { id, geometry, style } = feature
+  const [z, x] = geometry.position
   return <RL.Marker
-    onclick={() => openFeatureEditor(id, layerId)}
-    opacity={globalOpacity}
-    {...geometry}
+    onclick={() => onClick(id)}
+    {...geometry} // TODO unused? how about CircleMarker?
     {...style}
     position={[z + .5, x + .5]}
-  />;
+  />
 }
 
-function FeatureOverlayPolygon(props) {
-  const { id, geometry, style } = props.feature;
-  const { featureId, globalOpacity } = props.commonProps;
-  return <RL.Polygon
-    opacity={globalOpacity}
-    fillOpacity={geometry.filled ? globalOpacity : 0}
-    {...geometry}
-    {...style}
-  />;
-}
-
-function FeatureOverlayCircle(props) {
-  const { id, geometry, style } = props.feature;
-  const { featureId, globalOpacity } = props.commonProps;
-  const [z, x] = geometry.center;
+function FeatureOverlayCircle({ feature, onClick, key }) {
+  const { id, geometry, style } = feature
+  const [z, x] = geometry.center
   return <RL.Circle
-    opacity={globalOpacity}
-    fillOpacity={geometry.filled ? globalOpacity : 0}
-    {...geometry}
+    onclick={() => onClick(id)}
+    {...geometry} // TODO enter radius explicitly?
     {...style}
     center={[z + .5, x + .5]}
-  />;
+  />
+}
+
+function FeatureOverlayImage({ feature, onClick, key }) {
+  const { id, geometry, style } = feature
+  return <RL.ImageOverlay
+    onclick={() => onClick(id)}
+    {...geometry}
+    {...style}
+  />
+}
+
+function FeatureOverlayLine({ feature, onClick, key }) {
+  const { id, geometry, style } = feature
+  return <RL.Polyline
+    onclick={() => onClick(id)}
+    {...style}
+    positions={centered(geometry.positions)}
+  />
+}
+
+function FeatureOverlayPolygon({ feature, onClick, key }) {
+  const { id, geometry, style } = feature
+  return <RL.Polygon
+    onclick={() => onClick(id)}
+    {...style}
+    positions={centered(geometry.positions)}
+  />
 }
 
 // RL.FeatureGroup has weird expectations about its children...
-function unlistify(list) {
+function prepareListForFeatureGroup(list) {
   if (!list || list.length > 1) return list
-  if (list.length < 1) return null
-  return list[0]
+  if (list.length === 1) return list[0]
+  return null
 }
 
 const LeafOverlay = ({
-  featureId,
-  layerId,
-  overlay,
+  features,
+  layers,
+  visibleLayers,
   openFeatureEditor,
 }) => {
-  if (!overlay)
-    return null;
-  const commonProps = {
-    globalOpacity: 1,
-    featureId,
-    layerId,
-    openFeatureEditor,
-  };
+
+  const visibleFeatures = []
+  visibleLayers.forEach(layerId =>
+    layers[layerId].features.forEach(featureId =>
+      visibleFeatures.push(features[featureId])
+    )
+  )
+
+  const onClick = openFeatureEditor
+
   return <RL.FeatureGroup>
-    {unlistify(overlay
-      .filter(({ properties }) => !properties.hidden)
-      .map(({ features, id: layerId }, layerKey) => (
-        <RL.FeatureGroup key={layerId || layerKey}>
-          {features.map((f, featureKey) => renderFeatureOverlay(commonProps, f, layerId, f.id || featureKey))}
-        </RL.FeatureGroup>
-      )))
-    }
-  </RL.FeatureGroup>;
+    {prepareListForFeatureGroup(
+      visibleFeatures.map((f, featureKey) =>
+        renderFeatureOverlay(f, f.id || featureKey, onClick))
+    )}
+  </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ overlay, control: { featureId, layerId } }) => {
+const mapStateToProps = ({ features, layers, visibleLayers }) => {
   return {
-    overlay,
-    featureId,
-    layerId,
-  };
-};
+    features,
+    layers,
+    visibleLayers,
+  }
+}
 
 const mapDispatchToProps = {
   openFeatureEditor,
-};
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(LeafOverlay);
+export default connect(mapStateToProps, mapDispatchToProps)(LeafOverlay)

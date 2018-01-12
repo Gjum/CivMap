@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 
 import store from '../store';
 
-import AppFrame from './AppFrame.jsx';
+import AppFrame from './AppFrame';
 
 export default (
   <Provider store={store}>

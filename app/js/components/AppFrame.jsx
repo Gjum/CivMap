@@ -4,88 +4,45 @@ import { connect } from 'react-redux';
 import Divider from 'material-ui/Divider';
 import List from 'material-ui/List';
 
-import AppBarBrowse from './AppBarBrowse.jsx';
-import AppBarFeature from './AppBarFeature.jsx'
-import AppBarOverlay from './AppBarOverlay.jsx';
-import AppDrawer from './AppDrawer.jsx';
-import BasemapSelectorList from './BasemapSelectorList.jsx';
-import FeatureInfo from './FeatureInfo.jsx'
-import LayersList from './LayersList.jsx';
-import LayersMenuItem from './LayersMenuItem.jsx';
-import LeafMap from './leaflet/LeafMap.jsx';
-import ViewResetMenuItem from './ViewResetMenuItem.jsx';
-import WaypointsMenuItem from './WaypointsMenuItem.jsx';
-
-const drawer = () => (
-  <AppDrawer>
-    <div className='drawer-content'>
-      <BasemapSelectorList />
-      <Divider />
-      <List>
-        <WaypointsMenuItem />
-        <LayersMenuItem />
-        <ViewResetMenuItem />
-      </List>
-    </div>
-  </AppDrawer>
-)
-
-const defaultLayout = () => (
-  <div className='full'>
-    {drawer()}
-    <div className="container full-map">
-      <AppBarBrowse />
-      <LeafMap />
-    </div>
-  </div>
-);
-
-const BROWSE = () => (
-  <div className='full'>
-    {drawer()}
-    <div className="container full-map">
-      <AppBarBrowse />
-      <LeafMap />
-    </div>
-  </div>
-);
-
-const FEATURE = () => (
-  <div className='full'>
-    {drawer()}
-    <div className="container split">
-      <AppBarFeature />
-      <LeafMap />
-      <div className="mainlist">
-        <FeatureInfo />
-      </div>
-    </div>
-  </div>
-);
-
-const OVERLAY = () => (
-  <div className='full'>
-    {drawer()}
-    <div className="container split">
-      <AppBarOverlay />
-      <LeafMap />
-      <div className="mainlist">
-        <LayersList />
-      </div>
-    </div>
-  </div>
-);
+import * as BROWSE from './browse';
+import * as FEATURE from './feature';
+import AppDrawer from './AppDrawer';
+import BasemapSelectorList from './BasemapSelectorList';
+import LayersMenuItem from './layers/LayersMenuItem';
+import LeafMap from './leaflet/LeafMap';
+import ViewResetMenuItem from './ViewResetMenuItem';
+import WaypointsMenuItem from './WaypointsMenuItem';
 
 const modes = {
   BROWSE,
   FEATURE,
-  OVERLAY,
+  // LAYER, LAYERS,
 };
 
 const AppFrame = ({
   appMode,
 }) => {
-  return modes[appMode]();
+  const { Appbar, Detail } = modes[appMode]
+  return <div className='full'>
+    <AppDrawer>
+      <div className='drawer-content'>
+        <BasemapSelectorList />
+        <Divider />
+        <List>
+          <WaypointsMenuItem />
+          <LayersMenuItem />
+          <ViewResetMenuItem />
+        </List>
+      </div>
+    </AppDrawer>
+    <div className={"container " + (
+      Detail ? "split" : "full-map"
+    )}>
+      <Appbar />
+      <LeafMap />
+      {Detail && <div className="mainlist"><Detail /></div>}
+    </div>
+  </div>
 };
 
 const mapStateToProps = ({ control: { appMode } }) => {

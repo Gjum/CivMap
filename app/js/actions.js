@@ -5,31 +5,16 @@ export const appLoad = (state) => {
   };
 };
 
-export const addLayer = (properties) => {
+export const createFeature = ({ id, geometry, style, properties }) => {
   return {
-    type: 'ADD_COLLECTION',
-    id: Date.now(),
-    properties,
-  };
-};
-
-export const addFeature = (collectionId, { geometry, style, properties }) => {
-  return {
-    type: 'ADD_FEATURE',
-    collectionId,
-    featureId: Date.now(),
-    geometry,
-    style,
-    properties,
-  };
-};
-
-export const setLayerHidden = (id, hidden) => {
-  return {
-    type: 'SET_LAYER_HIDDEN',
-    id,
-    hidden,
-  };
+    type: 'CREATE_FEATURE',
+    feature: {
+      id: id || Date.now(),
+      geometry,
+      style,
+      properties,
+    }
+  }
 };
 
 export const openBrowseMode = () => {
@@ -63,16 +48,20 @@ export const openOverlayEditor = () => {
   return { type: 'OPEN_OVERLAY_EDITOR' };
 };
 
-export const removeLayer = (id) => {
-  return {
-    type: 'REMOVE_COLLECTION',
-    id,
-  };
+export const openWaypointsEditor = () => {
+  return { type: 'OPEN_WAYPOINTS_EDITOR' };
 };
 
 export const removeFeature = (id) => {
   return {
     type: 'REMOVE_FEATURE',
+    id,
+  };
+};
+
+export const removeLayer = (id) => {
+  return {
+    type: 'REMOVE_LAYER',
     id,
   };
 };
@@ -92,13 +81,6 @@ export const setDrawerOpen = () => {
   return { type: 'OPEN_DRAWER' };
 };
 
-export const trackMap = (map) => {
-  return {
-    type: 'TRACK_MAP',
-    map,
-  };
-};
-
 export const trackMapView = (lastView) => {
   return {
     type: 'TRACK_MAP_VIEW',
@@ -114,20 +96,18 @@ export const trackWindowSize = ({ height, width }) => {
   };
 };
 
-export const updateLayer = (id, properties) => {
+export const updateLayer = (layer) => {
   return {
-    type: 'UPDATE_COLLECTION',
-    id,
-    properties,
+    type: 'UPDATE_LAYER',
+    id: layer.id,
+    layer,
   };
 };
 
-export const updateFeature = (id, { geometry, style, properties }) => {
+export const updateFeature = (feature) => {
   return {
     type: 'UPDATE_FEATURE',
-    id,
-    geometry,
-    style,
-    properties,
+    id: feature.id,
+    feature,
   };
 };

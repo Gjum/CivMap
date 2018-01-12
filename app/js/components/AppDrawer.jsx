@@ -14,7 +14,7 @@ const AppDrawer = ({
     <Drawer
       className="drawer"
       open={drawerOpen}
-      onRequestClose={setDrawerClosed}
+      onClose={setDrawerClosed}
     >
       {children}
     </Drawer>

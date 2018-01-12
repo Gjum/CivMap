@@ -9,19 +9,24 @@ import Typography from 'material-ui/Typography';
 
 import MenuIcon from 'material-ui-icons/Menu';
 import SearchIcon from 'material-ui-icons/Search';
-import CloseIcon from 'material-ui-icons/Close';
+import ModeEditIcon from 'material-ui-icons/ModeEdit';
 
-import { openBrowseMode, openLayerEditor, openSearch, openShare, setDrawerOpen } from '../actions';
+import { openOverlayEditor, openSearch, openShare, setDrawerOpen } from '../../actions';
 
 const AppBarBrowse = ({
   lastView,
   borderApothem,
-  openBrowseMode,
-  openLayerEditor,
+  openOverlayEditor,
   openSearch,
   openShare,
   setDrawerOpen,
 }) => {
+
+  let title = 'ccMap';
+  if (lastView && lastView.radius < borderApothem) {
+    title = `${lastView.x}, ${lastView.z}`;
+  }
+
   return (
     <div className='appbar custom-appbar'>
       <IconButton
@@ -30,7 +35,9 @@ const AppBarBrowse = ({
         <MenuIcon />
       </IconButton>
 
-      <div className='appbar-stretch'>Layers</div>
+      <div className='appbar-stretch'>
+        {title}
+      </div>
 
       <IconButton
         disabled
@@ -45,9 +52,9 @@ const AppBarBrowse = ({
         <ShareIcon />
       </IconButton>
       <IconButton
-        onClick={openBrowseMode}
+        onClick={openOverlayEditor}
       >
-        <CloseIcon />
+        <ModeEditIcon />
       </IconButton>
     </div>
   );
@@ -61,8 +68,7 @@ const mapStateToProps = ({ mapConfig, mapView }) => {
 };
 
 const mapDispatchToProps = {
-  openBrowseMode,
-  openLayerEditor,
+  openOverlayEditor,
   openSearch,
   openShare,
   setDrawerOpen,

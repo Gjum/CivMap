@@ -1,7 +1,3 @@
-export function xz(x, z) {
-  return [z, x];
-}
-
 export function intCoords(point) {
   var x = parseInt(point.lng);
   var z = parseInt(point.lat);
@@ -26,10 +22,4 @@ export function deepLatLngToArr(o) {
   if (Array.isArray(o))
     return o.map(e => deepLatLngToArr(e));
   return [Math.round(o.lat), Math.round(o.lng)];
-}
-
-export function centered(positions) {
-  if (Array.isArray(positions[0]))
-    return positions.map(e => centered(e));
-  return [positions[0] + .5, positions[1] + .5];
 }
