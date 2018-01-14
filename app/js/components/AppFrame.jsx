@@ -6,6 +6,7 @@ import List from 'material-ui/List';
 
 import * as BROWSE from './browse';
 import * as FEATURE from './feature';
+import * as LAYERS from './layers';
 import AppDrawer from './AppDrawer';
 import BasemapSelectorList from './BasemapSelectorList';
 import LayersMenuItem from './layers/LayersMenuItem';
@@ -16,7 +17,8 @@ import WaypointsMenuItem from './WaypointsMenuItem';
 const modes = {
   BROWSE,
   FEATURE,
-  // LAYER, LAYERS,
+  LAYERS,
+  // LAYER,
 };
 
 const AppFrame = ({
