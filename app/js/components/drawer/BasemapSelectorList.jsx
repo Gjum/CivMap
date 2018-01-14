@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Avatar from 'material-ui/Avatar';
 import List, { ListItem, ListItemAvatar, ListItemText, ListSubheader } from 'material-ui/List';
 
-import { setDrawerClosed, setActiveBasemap } from '../actions';
+import { setDrawerClosed, setActiveBasemap } from '../../actions';
 
 const BasemapIcon = ({ basemapId, basemapPreview, tilesRoot }) => {
   return (

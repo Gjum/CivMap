@@ -8,7 +8,7 @@ import LeafBaseMap from './LeafBaseMap';
 import LeafOverlay from './LeafOverlay';
 
 import { trackMapView } from '../../actions';
-import { boundsToCircle, circleToBounds } from '../../utils/Math';
+import { boundsToContainedCircle, circleToBounds } from '../../utils/Math';
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
 
@@ -45,7 +45,7 @@ class LeafMap extends React.Component {
   }
 
   onViewChange(e) {
-    const newView = boundsToCircle(e.target.getBounds());
+    const newView = boundsToContainedCircle(e.target.getBounds());
     this.waitingForView = newView;
     this.props.trackMapView(newView);
   }

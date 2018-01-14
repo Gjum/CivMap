@@ -41,7 +41,7 @@ const control = (state = defaultControlState, action) => {
 
 export const defaultMapView = {
   basemapId: null,
-  lastView: null,
+  lastView: null, // describes the enclosed "circle" TODO rename
 }
 
 const mapView = (state = defaultMapView, action) => {
@@ -52,10 +52,14 @@ const mapView = (state = defaultMapView, action) => {
       return { ...state, basemapId: action.basemapId }
     case 'TRACK_MAP_VIEW':
       return { ...state, lastView: action.lastView }
+    case 'SET_MAP_VIEW':
+      return { ...state, lastView: action.viewport }
     default:
       return state
   }
 }
+
+export const setMapView = (viewport) => ({ type: 'SET_MAP_VIEW', viewport })
 
 ///// XXX refactor everything above /////
 // ... according to which subscribers read it

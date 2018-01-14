@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle';
 
-import { setDrawerClosed, openWaypointsEditor } from '../actions';
+import { setDrawerClosed, openWaypointsEditor } from '../../actions';
 
 const WaypointsMenuItem = ({
   openWaypointsEditor,

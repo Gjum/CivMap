@@ -36,12 +36,11 @@ function FeatureOverlayMarker({ feature, onClick }) {
 
 function FeatureOverlayCircle({ feature, onClick }) {
   const { id, geometry, style } = feature
-  const [z, x] = geometry.center
   return <RL.Circle
     onclick={() => onClick(id)}
-    {...geometry} // TODO enter radius explicitly?
     {...style}
-    center={[z + .5, x + .5]}
+    center={centered(geometry.center)}
+    radius={geometry.radius}
   />
 }
 

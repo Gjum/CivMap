@@ -1,14 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import Divider from 'material-ui/Divider';
 import Drawer from 'material-ui/Drawer';
+import List from 'material-ui/List';
 
-import { setDrawerClosed } from '../actions';
+import { setDrawerClosed } from '../../actions';
+
+import BasemapSelectorList from './BasemapSelectorList';
+import ViewResetMenuItem from './ViewResetMenuItem';
+import WaypointsMenuItem from './WaypointsMenuItem';
 
 const AppDrawer = ({
   drawerOpen,
   setDrawerClosed,
-  children,
 }) => {
   return (
     <Drawer
@@ -16,7 +21,14 @@ const AppDrawer = ({
       open={drawerOpen}
       onClose={setDrawerClosed}
     >
-      {children}
+      <div className='drawer-content'>
+        <BasemapSelectorList />
+        <Divider />
+        <List>
+          <WaypointsMenuItem />
+          <ViewResetMenuItem />
+        </List>
+      </div>
     </Drawer>
   );
 };
