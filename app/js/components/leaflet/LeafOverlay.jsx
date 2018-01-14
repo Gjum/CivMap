@@ -11,19 +11,19 @@ function centered(positions) {
 }
 
 function renderFeatureOverlay(feature, key, onClick) {
-  const props = { feature, onClick, key }
+  const props = { feature, onClick }
   switch (feature.geometry.type) {
-    case "marker": return <FeatureOverlayMarker {...props} />
-    case "circle": return <FeatureOverlayCircle {...props} />
-    case "image": return <FeatureOverlayImage {...props} />
-    case "line": return <FeatureOverlayLine {...props} />
-    case "polygon": return <FeatureOverlayPolygon {...props} />
+    case "marker": return <FeatureOverlayMarker key={key} {...props} />
+    case "circle": return <FeatureOverlayCircle key={key} {...props} />
+    case "image": return <FeatureOverlayImage key={key} {...props} />
+    case "line": return <FeatureOverlayLine key={key} {...props} />
+    case "polygon": return <FeatureOverlayPolygon key={key} {...props} />
     default:
       console.error("[FeaturesOverlay] Unknown feature geometry type", feature)
   }
 }
 
-function FeatureOverlayMarker({ feature, onClick, key }) {
+function FeatureOverlayMarker({ feature, onClick }) {
   const { id, geometry, style } = feature
   const [z, x] = geometry.position
   return <RL.Marker
@@ -34,7 +34,7 @@ function FeatureOverlayMarker({ feature, onClick, key }) {
   />
 }
 
-function FeatureOverlayCircle({ feature, onClick, key }) {
+function FeatureOverlayCircle({ feature, onClick }) {
   const { id, geometry, style } = feature
   const [z, x] = geometry.center
   return <RL.Circle
@@ -45,7 +45,7 @@ function FeatureOverlayCircle({ feature, onClick, key }) {
   />
 }
 
-function FeatureOverlayImage({ feature, onClick, key }) {
+function FeatureOverlayImage({ feature, onClick }) {
   const { id, geometry, style } = feature
   return <RL.ImageOverlay
     onclick={() => onClick(id)}
@@ -54,7 +54,7 @@ function FeatureOverlayImage({ feature, onClick, key }) {
   />
 }
 
-function FeatureOverlayLine({ feature, onClick, key }) {
+function FeatureOverlayLine({ feature, onClick }) {
   const { id, geometry, style } = feature
   return <RL.Polyline
     onclick={() => onClick(id)}
@@ -63,7 +63,7 @@ function FeatureOverlayLine({ feature, onClick, key }) {
   />
 }
 
-function FeatureOverlayPolygon({ feature, onClick, key }) {
+function FeatureOverlayPolygon({ feature, onClick }) {
   const { id, geometry, style } = feature
   return <RL.Polygon
     onclick={() => onClick(id)}
