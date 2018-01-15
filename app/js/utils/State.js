@@ -46,7 +46,7 @@ export function loadDefaultAppState() {
   store.dispatch(appLoad(defaultAppState));
 }
 
-// export function loadAppStateFromLocalStorage() {
+export function loadAppStateFromLocalStorage() {
 //   try {
 //     const stateJson = window.localStorage.getItem('civMap.state');
 //     if (!stateJson) return;
@@ -70,7 +70,7 @@ export function loadDefaultAppState() {
 //   } catch (e) {
 //     console.error('loading localStorage state failed', e);
 //   }
-// }
+}
 
 export function loadPublicLayers(url) {
   getJSON(url,

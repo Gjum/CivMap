@@ -14,8 +14,8 @@ import InvisibleIcon from 'material-ui-icons/VisibilityOff';
 import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle'
 import VisibleIcon from 'material-ui-icons/Visibility';
 
-import { openLayerEditor, removeLayer } from '../../actions'
-import { hideLayer, showLayer } from '../../store'
+import { removeLayer } from '../../actions'
+import { hideLayer, openLayerEditor, showLayer } from '../../store'
 
 /**
  * @param {[{geometry: {type}}]} features

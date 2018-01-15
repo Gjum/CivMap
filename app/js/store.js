@@ -2,11 +2,12 @@ import { createStore, combineReducers } from 'redux'
 
 // TODO some of this causes the map to resize, some does not
 export const defaultControlState = {
-  appMode: 'BROWSE',
+  appMode: 'BROWSE', // TODO rename these
   drawerOpen: false,
   featureId: null,
   layerId: null,
-  windowHeight: NaN,
+  searchQuery: null,
+  windowHeight: NaN, // TODO move window size to its own substate?
   windowWidth: NaN,
 }
 
@@ -30,6 +31,11 @@ const control = (state = defaultControlState, action) => {
       }
     case 'OPEN_OVERLAY_EDITOR':
       return { ...state, drawerOpen: false, appMode: 'LAYERS' }
+    case 'OPEN_SEARCH':
+      return {
+        ...state, drawerOpen: false, appMode: 'SEARCH',
+        searchQuery: action.query
+      }
     case 'OPEN_WAYPOINTS_EDITOR':
       return { ...state, drawerOpen: false, appMode: 'WAYPOINTS' }
     case 'TRACK_WINDOW_SIZE':
@@ -38,6 +44,8 @@ const control = (state = defaultControlState, action) => {
       return state
   }
 }
+
+export const openLayerEditor = (layerId) => ({ type: 'OPEN_LAYER_EDITOR', layerId })
 
 export const defaultMapView = {
   basemapId: null,
@@ -61,15 +69,12 @@ const mapView = (state = defaultMapView, action) => {
 
 export const setMapView = (viewport) => ({ type: 'SET_MAP_VIEW', viewport })
 
-///// XXX refactor everything above /////
-// ... according to which subscribers read it
-
 // TODO redo this according to todo.md
 export const defaultMapConfig = {
   basemapPreview: '/z-2/0,0.png',
   basemaps: {},
-  borderApothem: NaN,
   tilesRoot: null,
+  borderApothem: NaN,
 }
 
 const mapConfig = (state = defaultMapConfig, action) => {
@@ -158,6 +163,9 @@ const layer = (state, action) => {
         ...state.layer,
         properties: action.layer.properties,
       }
+    case 'REMOVE_FEATURE':
+      if (state.features.includes(action.id)) return state
+      return state.features.filter(fid => fid != action.id)
 
     default:
       return state
@@ -180,6 +188,8 @@ const layers = (state = {}, action) => {
       const newState = Object.assign({}, state)
       delete newState[action.id]
       return newState
+    case 'REMOVE_FEATURE':
+      return state // XXX how to iterate all object key/values
 
     case 'APP_LOAD':
       const newLayers = {}

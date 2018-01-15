@@ -21,9 +21,7 @@ export const openBrowseMode = () => {
   return { type: 'OPEN_BROWSE_MODE' };
 };
 
-export const openSearch = () => {
-  return { type: 'OPEN_SEARCH' };
-};
+export const openSearch = (query = "") => ({ type: 'OPEN_SEARCH', query })
 
 export const openShare = () => {
   return { type: 'OPEN_SHARE' };
@@ -33,13 +31,6 @@ export const openFeatureEditor = (featureId, layerId) => {
   return {
     type: 'OPEN_FEATURE_EDITOR',
     featureId,
-    layerId,
-  };
-};
-
-export const openLayerEditor = (layerId) => {
-  return {
-    type: 'OPEN_LAYER_EDITOR',
     layerId,
   };
 };
