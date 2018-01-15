@@ -5,18 +5,6 @@ export const appLoad = (state) => {
   };
 };
 
-export const createFeature = ({ id, geometry, style, properties }) => {
-  return {
-    type: 'CREATE_FEATURE',
-    feature: {
-      id: id || Date.now(),
-      geometry,
-      style,
-      properties,
-    }
-  }
-};
-
 export const openBrowseMode = () => {
   return { type: 'OPEN_BROWSE_MODE' };
 };

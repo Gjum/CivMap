@@ -1,20 +1,20 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from 'react'
+import { connect } from 'react-redux'
 
-import * as BROWSE from './browse';
-import * as FEATURE from './feature';
-import * as LAYER from './layer';
-import * as LAYERS from './layers';
+import * as BROWSE from './browse'
+import * as FEATURE from './feature'
+import * as LAYER from './layer'
+import * as LAYERS from './layers'
 
-import AppDrawer from './drawer/AppDrawer';
-import LeafMap from './leaflet/LeafMap';
+import AppDrawer from './drawer/AppDrawer'
+import LeafMap from './leaflet/LeafMap'
 
 const modes = {
   BROWSE,
   FEATURE,
   LAYER,
   LAYERS,
-};
+}
 
 const AppFrame = ({
   appMode,
@@ -30,12 +30,12 @@ const AppFrame = ({
       {Detail && <div className="mainlist"><Detail /></div>}
     </div>
   </div>
-};
+}
 
 const mapStateToProps = ({ control: { appMode } }) => {
   return {
     appMode,
-  };
-};
+  }
+}
 
-export default connect(mapStateToProps)(AppFrame);
+export default connect(mapStateToProps)(AppFrame)

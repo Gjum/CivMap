@@ -40,6 +40,7 @@
     "leaflet-editable": "^1.1.0",
     "material-ui": "^1.0.0-beta.17",
     "material-ui-icons": "^1.0.0-beta.17",
+    "node-uuid": "^1.4.8",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "react-leaflet": "^1.7.1",

@@ -74,9 +74,7 @@ const LayersList = ({
 }) => {
   const groups = {
     'Visible Layers': visibleLayers,
-    'Hidden Layers': Object.values(layers)
-      .map(l => l.id)
-      .filter(lid => !visibleLayers.includes(lid)),
+    'Hidden Layers': Object.keys(layers).filter(lid => !visibleLayers.includes(lid)),
     'Public Layers': [],
   }
   return <List>

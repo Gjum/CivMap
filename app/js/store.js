@@ -1,4 +1,5 @@
 import { createStore, combineReducers } from 'redux'
+import { v4 } from 'node-uuid'
 
 // TODO some of this causes the map to resize, some does not
 export const defaultControlState = {
@@ -172,6 +173,22 @@ const layer = (state, action) => {
   }
 }
 
+export const createFeature = (feature) => ({
+  type: 'CREATE_FEATURE',
+  feature: {
+    id: feature.id || v4(),
+    ...feature,
+  }
+})
+
+export const createLayer = (layer) => ({
+  type: 'CREATE_LAYER',
+  layer: {
+    id: layer.id || v4(),
+    ...layer,
+  }
+})
+
 export const loadLayer = (layer) => ({ type: 'LOAD_LAYER', layer })
 
 const layers = (state = {}, action) => {
@@ -220,13 +237,12 @@ export const showLayer = (layerId) => ({ type: 'SHOW_LAYER', layerId })
 export const hideLayer = (layerId) => ({ type: 'HIDE_LAYER', layerId })
 
 const combinedStore = combineReducers({
+  control,
+  mapView,
+  mapConfig,
   features,
   layers,
   visibleLayers,
-  mapConfig,
-  // TODO restructure the following store members:
-  control,
-  mapView,
 })
 
 const store = createStore(combinedStore, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
