@@ -67,14 +67,6 @@ export const trackMapView = (lastView) => {
   };
 };
 
-export const trackWindowSize = ({ height, width }) => {
-  return {
-    type: 'TRACK_WINDOW_SIZE',
-    height,
-    width,
-  };
-};
-
 export const updateLayer = (layer) => {
   return {
     type: 'UPDATE_LAYER',

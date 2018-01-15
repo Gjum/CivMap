@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom'
 import AppRoot from './components/AppRoot'
 import { loadAppStateFromLocalStorage, loadDefaultAppState, loadPublicLayers } from './utils/State' // xxx remove after rewrite
 import { listenToWindowResize } from './utils/WindowSize'
-// import { setupLocalStorageSync } from './utils/LocalStorageSync'
+import { setupLocalStorageSync } from './utils/LocalStorageSync'
 
 import store from './store'
-module.exports = store
+export default store
 
 // XXX implement new init logic
 
@@ -22,7 +22,7 @@ if (customUrl) {
 loadPublicLayers("layers.json")
 
 listenToWindowResize()
-// setupLocalStorageSync()
+setupLocalStorageSync()
 
 ReactDOM.render(
   AppRoot,

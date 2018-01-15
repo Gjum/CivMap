@@ -1,5 +1,4 @@
-import { trackWindowSize } from '../actions';
-import store from '../store';
+import store, { trackWindowSize } from '../store';
 
 export function listenToWindowResize() {
   window.onresize = e => {

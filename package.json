@@ -38,6 +38,7 @@
     "immutability-helper": "^2.4.0",
     "leaflet": "^1.2.0",
     "leaflet-editable": "^1.1.0",
+    "lodash": "^4.17.4",
     "material-ui": "^1.0.0-beta.17",
     "material-ui-icons": "^1.0.0-beta.17",
     "node-uuid": "^1.4.8",

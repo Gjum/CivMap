@@ -1,6 +1,7 @@
 import { createStore, combineReducers } from 'redux'
 import { v4 } from 'node-uuid'
 
+// this is session-local only, doesn't get persisted/shared
 // TODO some of this causes the map to resize, some does not
 export const defaultControlState = {
   appMode: 'BROWSE', // TODO rename these
@@ -46,8 +47,13 @@ const control = (state = defaultControlState, action) => {
   }
 }
 
+export const trackWindowSize = ({ width, height }) => ({
+  type: 'TRACK_WINDOW_SIZE', width, height
+})
+
 export const openLayerEditor = (layerId) => ({ type: 'OPEN_LAYER_EDITOR', layerId })
 
+// should be session-local, but we persist it anyway for convenience
 export const defaultMapView = {
   basemapId: null,
   lastView: null, // describes the enclosed "circle" TODO rename
@@ -70,7 +76,10 @@ const mapView = (state = defaultMapView, action) => {
 
 export const setMapView = (viewport) => ({ type: 'SET_MAP_VIEW', viewport })
 
-// TODO redo this according to todo.md
+// just stores the default config
+// no need to persist as it is rebuilt on load,
+// and we might update this server-side
+// TODO redo basemap config layout according to todo.md
 export const defaultMapConfig = {
   basemapPreview: '/z-2/0,0.png',
   basemaps: {},
