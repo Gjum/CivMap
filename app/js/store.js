@@ -195,7 +195,8 @@ const layer = (state, action) => {
       }
     case 'REMOVE_FEATURE': {
       if (!state.features.includes(action.id)) return state
-      return state.features.filter(fid => fid != action.id)
+      const features = state.features.filter(fid => fid != action.id)
+      return { ...state, features }
     }
     default:
       return state
@@ -237,6 +238,7 @@ export const addLayer = (layer) => ({
   }
 })
 
+// TODO we always load layers in bulk, optimise by using loadOverlay instead
 export const loadLayer = (layer) => ({ type: 'LOAD_LAYER', layer })
 
 export const updateLayer = (layer) => ({ type: 'UPDATE_LAYER', layer })

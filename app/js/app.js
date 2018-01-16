@@ -6,26 +6,31 @@ import { createStore } from 'redux'
 import AppFrame from './components/AppFrame'
 import { combinedReducers } from './store'
 import { loadAppStateFromLocalStorage, setupLocalStorageSync } from './utils/LocalStorageSync'
-import { loadDefaultAppState, loadLayersAsync } from './utils/State'
+import { loadDefaultAppState } from './utils/State'
+import { loadAppStateFromUrlData, parseUrlHash } from './utils/Url'
 import { listenToWindowResize } from './utils/WindowSize'
 
-// XXX implement new async init logic
+const preloadedState = {} // TODO unused
+const store = createStore(combinedReducers, preloadedState,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
-const store = createStore(combinedReducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
-
-export default store
+export default store // TODO this is our "api" for now
 
 loadDefaultAppState(store)
 
 loadAppStateFromLocalStorage(store)
-// TODO remove unreferenced features
-
-// TODO load from json if passed in url
-
-loadLayersAsync("layers.json", store)
+setupLocalStorageSync(store)
 
 listenToWindowResize(store)
-setupLocalStorageSync(store)
+
+// TODO load from json if passed in url
+// this can be blocking-async (pass continuation callback)
+// or we show a loading animation in a corner
+
+const urlData = parseUrlHash(location.hash)
+loadAppStateFromUrlData(urlData, store)
+
+// TODO remove unreferenced features/visibleLayers
 
 ReactDOM.render(
   <Provider store={store}>

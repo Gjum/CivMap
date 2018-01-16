@@ -1,6 +1,5 @@
 
-import { appLoad, defaultMapView, loadLayer } from '../store'
-import { getJSON } from '../utils/Net'
+import { appLoad, defaultMapView, loadLayer, showLayer } from '../store'
 
 export const defaultAppState = {
   mapConfig: {
@@ -30,18 +29,4 @@ defaultAppState.mapView.viewport = {
 
 export function loadDefaultAppState(store) {
   store.dispatch(appLoad(defaultAppState))
-}
-
-export function loadLayersAsync(url, store) {
-  getJSON(url,
-    data => {
-      data.layers.forEach(layer => {
-        store.dispatch(loadLayer(layer))
-      })
-      console.log('Loaded', data.layers.length, 'public layers from', url)
-    },
-    err => {
-      console.error("Could not load public layers from " + url, err)
-    }
-  )
 }
