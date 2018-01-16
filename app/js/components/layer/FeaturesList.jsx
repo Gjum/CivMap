@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import IconButton from 'material-ui/IconButton';
+import IconButton from 'material-ui/IconButton'
 import List, {
   ListSubheader,
   ListItem,
@@ -10,10 +10,10 @@ import List, {
   ListItemText,
 } from 'material-ui/List'
 
-import CloseIcon from 'material-ui-icons/Close';
+import DeleteIcon from 'material-ui-icons/Delete'
 import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle'
 
-import { openFeatureEditor, removeFeature } from '../../actions'
+import { openFeatureEditor, removeFeature } from '../../store'
 
 const FeatureListEntry = ({
   feature,
@@ -32,7 +32,7 @@ const FeatureListEntry = ({
       <IconButton
         onClick={() => dispatch(removeFeature(feature.id))}
       >
-        <CloseIcon />
+        <DeleteIcon />
       </IconButton>
     </ListItemSecondaryAction>
   </ListItem>

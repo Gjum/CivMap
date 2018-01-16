@@ -1,30 +1,35 @@
+import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 
-import AppRoot from './components/AppRoot'
-import { loadAppStateFromLocalStorage, loadDefaultAppState, loadPublicLayers } from './utils/State' // xxx remove after rewrite
+import AppFrame from './components/AppFrame'
+import { combinedReducers } from './store'
+import { loadAppStateFromLocalStorage, setupLocalStorageSync } from './utils/LocalStorageSync'
+import { loadDefaultAppState, loadLayersAsync } from './utils/State'
 import { listenToWindowResize } from './utils/WindowSize'
-import { setupLocalStorageSync } from './utils/LocalStorageSync'
 
-import store from './store'
+// XXX implement new async init logic
+
+const store = createStore(combinedReducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+
 export default store
 
-// XXX implement new init logic
+loadDefaultAppState(store)
 
-loadDefaultAppState()
+loadAppStateFromLocalStorage(store)
+// TODO remove unreferenced features
 
-const customUrl = false
-if (customUrl) {
-  // TODO load from url
-} else {
-  // loadAppStateFromLocalStorage()
-}
+// TODO load from json if passed in url
 
-loadPublicLayers("layers.json")
+loadLayersAsync("layers.json", store)
 
-listenToWindowResize()
-setupLocalStorageSync()
+listenToWindowResize(store)
+setupLocalStorageSync(store)
 
 ReactDOM.render(
-  AppRoot,
+  <Provider store={store}>
+    <AppFrame />
+  </Provider>,
   document.getElementById('app-root')
 )

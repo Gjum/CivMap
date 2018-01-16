@@ -1,4 +1,4 @@
-import { createStore, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { v4 } from 'node-uuid'
 
 // this is session-local only, doesn't get persisted/shared
@@ -47,34 +47,49 @@ const control = (state = defaultControlState, action) => {
   }
 }
 
-export const trackWindowSize = ({ width, height }) => ({
-  type: 'TRACK_WINDOW_SIZE', width, height
-})
+export const openBrowseMode = () => ({ type: 'OPEN_BROWSE_MODE' })
+
+export const openFeatureEditor = (featureId) => ({ type: 'OPEN_FEATURE_EDITOR', featureId })
 
 export const openLayerEditor = (layerId) => ({ type: 'OPEN_LAYER_EDITOR', layerId })
+
+export const openLayers = () => ({ type: 'OPEN_OVERLAY_EDITOR' })
+
+export const openSearch = (query = "") => ({ type: 'OPEN_SEARCH', query })
+
+export const openShare = () => ({ type: 'OPEN_SHARE' })
+
+export const openWaypointsEditor = () => ({ type: 'OPEN_WAYPOINTS_EDITOR' })
+
+export const setDrawerClosed = () => ({ type: 'CLOSE_DRAWER' })
+
+export const setDrawerOpen = () => ({ type: 'OPEN_DRAWER' })
+
+export const trackWindowSize = ({ width, height }) => (
+  { type: 'TRACK_WINDOW_SIZE', width, height })
 
 // should be session-local, but we persist it anyway for convenience
 export const defaultMapView = {
   basemapId: null,
-  lastView: null, // describes the enclosed "circle" TODO rename
+  viewport: null, // describes the enclosed "circle" TODO rename
 }
 
 const mapView = (state = defaultMapView, action) => {
   switch (action.type) {
     case 'APP_LOAD':
-      return { ...state, ...action.state.mapView }
+      return action.state.mapView ? { ...state, ...action.state.mapView } : state
     case 'SET_ACTIVE_BASEMAP':
       return { ...state, basemapId: action.basemapId }
-    case 'TRACK_MAP_VIEW':
-      return { ...state, lastView: action.lastView }
-    case 'SET_MAP_VIEW':
-      return { ...state, lastView: action.viewport }
+    case 'SET_VIEWPORT':
+      return { ...state, viewport: action.viewport }
     default:
       return state
   }
 }
 
-export const setMapView = (viewport) => ({ type: 'SET_MAP_VIEW', viewport })
+export const setActiveBasemap = (basemapId) => ({ type: 'SET_ACTIVE_BASEMAP', basemapId })
+
+export const setViewport = (viewport) => ({ type: 'SET_VIEWPORT', viewport })
 
 // just stores the default config
 // no need to persist as it is rebuilt on load,
@@ -90,7 +105,7 @@ export const defaultMapConfig = {
 const mapConfig = (state = defaultMapConfig, action) => {
   switch (action.type) {
     case 'APP_LOAD':
-      return { ...state, ...action.state.mapConfig }
+      return action.state.mapConfig ? { ...state, ...action.state.mapConfig } : state
     default:
       return state
   }
@@ -98,74 +113,77 @@ const mapConfig = (state = defaultMapConfig, action) => {
 
 const feature = (state, action) => {
   switch (action.type) {
-    case 'CREATE_FEATURE':
-    case 'LOAD_FEATURE':
+    case 'ADD_FEATURE':
       return {
         id: action.feature.id,
         geometry: action.feature.geometry,
         style: action.feature.style || {},
         properties: action.feature.properties || {},
       }
-    case 'UPDATE_FEATURE':
-      if (action.id != state.id) return state
+    case 'UPDATE_FEATURE': {
+      if (action.feature.id != state.id) return state
       return {
         ...state,
-        geometry: action.geometry || state.geometry,
-        style: action.style || state.style,
-        properties: action.properties || state.properties,
+        geometry: action.feature.geometry || state.geometry,
+        style: action.feature.style || state.style,
+        properties: action.feature.properties || state.properties,
       }
+    }
     default:
       return state
   }
 }
-
-export const loadFeature = (feature) => ({ type: 'LOAD_FEATURE', feature })
 
 const features = (state = {}, action) => {
   switch (action.type) {
-    case 'CREATE_FEATURE':
-      const newFeature = feature(undefined, action)
+    case 'APP_LOAD':
+      return action.state.features ? { ...state, ...action.state.features } : state
+    case 'ADD_FEATURE':
+    case 'UPDATE_FEATURE': {
+      const newFeature = feature(state[action.feature.id], action)
       return { ...state, [newFeature.id]: newFeature }
-    case 'LOAD_FEATURE':
-      return { ...state, [action.feature.id]: action.feature }
-    case 'UPDATE_FEATURE':
-      return { ...state, [action.id]: feature(state[action.id], action.feature) }
-    case 'REMOVE_FEATURE':
-      const newState = Object.assign({}, state)
+    }
+    case 'REMOVE_FEATURE': {
+      const newState = { ...state }
       delete newState[action.id]
       return newState
-
+    }
     case 'LOAD_LAYER': {
-      const newFeatures = {}
+      const newState = { ...state }
       action.layer.features.forEach(f =>
-        newFeatures[f.id] = feature(null, loadFeature(f))
-      )
-      return { ...state, ...newFeatures }
+        newState[f.id] = feature(null, addFeature(f)))
+      return newState
     }
-
-    case 'APP_LOAD': {
-      const newFeatures = {}
-      action.state.overlay.forEach(l =>
-        (l.features || []).forEach(f =>
-          newFeatures[f.id] = feature(null, loadFeature(f))
-        )
-      )
-      return { ...state, ...newFeatures }
-    }
-
     default:
       return state
   }
 }
 
+export const addFeature = (feature) => ({
+  type: 'ADD_FEATURE',
+  feature: {
+    id: feature.id || v4(),
+    ...feature,
+  }
+})
+
+export const updateFeature = (feature) => ({ type: 'UPDATE_FEATURE', feature })
+
+export const removeFeature = (id) => ({ type: 'REMOVE_FEATURE', id })
+
 const layer = (state, action) => {
   switch (action.type) {
-    case 'CREATE_LAYER':
+    case 'ADD_LAYER':
+      return {
+        id: action.layer.id,
+        properties: action.layer.properties || {},
+        features: action.layer.properties || [],
+      }
     case 'LOAD_LAYER':
       return {
         id: action.layer.id,
-        properties: action.layer.properties,
-        features: action.layer.features.map(f => f.id),
+        properties: action.layer.properties || {},
+        features: (action.layer.features || []).map(f => f.id),
       }
     case 'UPDATE_LAYER':
       if (action.id != state.id) return state
@@ -173,25 +191,44 @@ const layer = (state, action) => {
         ...state.layer,
         properties: action.layer.properties,
       }
-    case 'REMOVE_FEATURE':
-      if (state.features.includes(action.id)) return state
+    case 'REMOVE_FEATURE': {
+      if (!state.features.includes(action.id)) return state
       return state.features.filter(fid => fid != action.id)
-
+    }
     default:
       return state
   }
 }
 
-export const createFeature = (feature) => ({
-  type: 'CREATE_FEATURE',
-  feature: {
-    id: feature.id || v4(),
-    ...feature,
+const layers = (state = {}, action) => {
+  switch (action.type) {
+    case 'APP_LOAD':
+      return action.state.layers ? { ...state, ...action.state.layers } : state
+    case 'ADD_LAYER':
+    case 'LOAD_LAYER':
+    case 'UPDATE_LAYER': {
+      const newLayer = layer(state[action.layer.id], action)
+      return { ...state, [newLayer.id]: newLayer }
+    }
+    case 'REMOVE_LAYER': {
+      const newState = { ...state }
+      delete newState[action.id]
+      return newState
+    }
+    case 'REMOVE_FEATURE': {
+      const newState = {}
+      Object.values(state).forEach(l => {
+        newState[l.id] = layer(l, action)
+      })
+      return newState
+    }
+    default:
+      return state
   }
-})
+}
 
-export const createLayer = (layer) => ({
-  type: 'CREATE_LAYER',
+export const addLayer = (layer) => ({
+  type: 'ADD_LAYER',
   layer: {
     id: layer.id || v4(),
     ...layer,
@@ -200,37 +237,15 @@ export const createLayer = (layer) => ({
 
 export const loadLayer = (layer) => ({ type: 'LOAD_LAYER', layer })
 
-const layers = (state = {}, action) => {
-  switch (action.type) {
-    case 'LOAD_LAYER':
-      return {
-        ...state,
-        [action.layer.id]: layer(state[action.layer.id],
-          loadLayer(action.layer))
-      }
-    case 'UPDATE_LAYER':
-      return { ...state, [action.id]: layer(state[action.layer.id], action) }
-    case 'REMOVE_LAYER':
-      const newState = Object.assign({}, state)
-      delete newState[action.id]
-      return newState
-    case 'REMOVE_FEATURE':
-      return state // XXX how to iterate all object key/values
+export const updateLayer = (layer) => ({ type: 'UPDATE_LAYER', layer })
 
-    case 'APP_LOAD':
-      const newLayers = {}
-      action.state.overlay.forEach(l =>
-        newLayers[l.id] = layer(undefined, loadLayer(l))
-      )
-      return { ...state, ...newLayers }
-
-    default:
-      return state
-  }
-}
+export const removeLayer = (id) => ({ type: 'REMOVE_LAYER', id })
 
 const visibleLayers = (state = [], action) => {
   switch (action.type) {
+    case 'APP_LOAD':
+      return action.state.visibleLayers || state
+
     case 'SHOW_LAYER':
       return [action.layerId, ...state]
 
@@ -243,9 +258,10 @@ const visibleLayers = (state = [], action) => {
 }
 
 export const showLayer = (layerId) => ({ type: 'SHOW_LAYER', layerId })
+
 export const hideLayer = (layerId) => ({ type: 'HIDE_LAYER', layerId })
 
-const combinedStore = combineReducers({
+export const combinedReducers = combineReducers({
   control,
   mapView,
   mapConfig,
@@ -254,6 +270,4 @@ const combinedStore = combineReducers({
   visibleLayers,
 })
 
-const store = createStore(combinedStore, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
-
-export default store
+export const appLoad = (state) => ({ type: 'APP_LOAD', state })

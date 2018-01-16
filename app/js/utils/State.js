@@ -1,8 +1,6 @@
 
-import { appLoad } from '../actions';
-import { loadLayer, showLayer } from '../store';
-import store, { defaultMapView } from '../store';
-import { getJSON } from '../utils/Net';
+import { appLoad, defaultMapView, loadLayer } from '../store'
+import { getJSON } from '../utils/Net'
 
 export const defaultAppState = {
   mapConfig: {
@@ -18,61 +16,23 @@ export const defaultAppState = {
   },
 
   mapView: {
-    lastView: { x: 0, z: 0, radius: 13000 },
+    viewport: { x: 0, z: 0, radius: 13000 },
     basemapId: 'terrain',
   },
+}
 
-  overlay: [],
-};
-
-const defaultBasemap = Object.values(defaultAppState.mapConfig.basemaps).find(b => b.isDefault) || {};
-defaultAppState.mapView.basemapId = defaultBasemap.id;
-defaultAppState.mapView.lastView = {
+const defaultBasemap = Object.values(defaultAppState.mapConfig.basemaps).find(b => b.isDefault) || {}
+defaultAppState.mapView.basemapId = defaultBasemap.id
+defaultAppState.mapView.viewport = {
   x: 0, z: 0,
   radius: defaultAppState.mapConfig.borderApothem,
-};
-
-defaultAppState.overlay = [
-  {
-    id: 1502486398800,
-    properties: { name: 'My Waypoints', isWaypointsLayer: true },
-    features: [
-      { id: 1502486398801, geometry: { type: 'marker', position: [-5100, -6723] }, properties: { name: "Gjum's House in Impasse" } },
-    ],
-  },
-]
-
-export function loadDefaultAppState() {
-  store.dispatch(appLoad(defaultAppState));
 }
 
-export function loadAppStateFromLocalStorage() {
-//   try {
-//     const stateJson = window.localStorage.getItem('civMap.state');
-//     if (!stateJson) return;
-
-//     const { mapView } = JSON.parse(stateJson);
-
-//     if (!mapView.basemapId) {
-//       const defaultBasemap = Object.values(store.getState().mapConfig.basemaps).find(b => b.isDefault) || {};
-//       mapView.basemapId = defaultBasemap.id;
-//     }
-
-//     const appState = { mapView };
-
-//     const overlayJson = window.localStorage.getItem('civMap.overlay');
-//     if (overlayJson) {
-//       appState.overlay = JSON.parse(overlayJson);
-//     }
-
-//     store.dispatch(appLoad(appState));
-
-//   } catch (e) {
-//     console.error('loading localStorage state failed', e);
-//   }
+export function loadDefaultAppState(store) {
+  store.dispatch(appLoad(defaultAppState))
 }
 
-export function loadPublicLayers(url) {
+export function loadLayersAsync(url, store) {
   getJSON(url,
     data => {
       data.layers.forEach(layer => {

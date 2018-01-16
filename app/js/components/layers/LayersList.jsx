@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import IconButton from 'material-ui/IconButton';
+import IconButton from 'material-ui/IconButton'
 import List, {
   ListSubheader,
   ListItem,
@@ -10,12 +10,11 @@ import List, {
   ListItemText,
 } from 'material-ui/List'
 
-import InvisibleIcon from 'material-ui-icons/VisibilityOff';
+import InvisibleIcon from 'material-ui-icons/VisibilityOff'
 import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle'
-import VisibleIcon from 'material-ui-icons/Visibility';
+import VisibleIcon from 'material-ui-icons/Visibility'
 
-import { removeLayer } from '../../actions'
-import { hideLayer, openLayerEditor, showLayer } from '../../store'
+import { hideLayer, openLayerEditor, removeLayer, showLayer } from '../../store'
 
 /**
  * @param {[{geometry: {type}}]} features

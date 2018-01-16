@@ -1,5 +1,5 @@
-const webpack = require('webpack');
-const defaultConf = require('./webpack.config.js');
+const webpack = require('webpack')
+const defaultConf = require('./webpack.config.js')
 
 module.exports = Object.assign({}, defaultConf, {
   plugins: [
@@ -19,4 +19,4 @@ module.exports = Object.assign({}, defaultConf, {
     // Allows error warnings but does not stop compiling.
     new webpack.NoErrorsPlugin(),
   ],
-});
+})

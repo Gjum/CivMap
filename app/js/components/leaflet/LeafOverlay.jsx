@@ -2,12 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
 
-import { openFeatureEditor } from '../../actions'
+import { openFeatureEditor } from '../../store'
 
 function centered(positions) {
   if (Array.isArray(positions[0]))
-    return positions.map(e => centered(e));
-  return [positions[0] + .5, positions[1] + .5];
+    return positions.map(e => centered(e))
+  return [positions[0] + .5, positions[1] + .5]
 }
 
 function renderFeatureOverlay(feature, key, onClick) {
@@ -86,11 +86,13 @@ const LeafOverlay = ({
 }) => {
 
   const visibleFeatures = []
-  visibleLayers.forEach(layerId =>
-    layers[layerId].features.forEach(featureId =>
+  visibleLayers.forEach(layerId => {
+    const layer = layers[layerId]
+    if (!layer) return
+    layer.features.forEach(featureId =>
       visibleFeatures.push(features[featureId])
     )
-  )
+  })
 
   const onClick = openFeatureEditor
 

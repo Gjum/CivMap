@@ -5,6 +5,17 @@
   },
   "layers": [
     {
+      "id": "123Testing",
+      "properties": { "name": "Test" },
+      "features": [
+        { "id": "test01", "geometry": { "type": "marker", "position": [-1000, 1000] }, "properties": { "name": "Test Marker" } },
+        { "id": "test02", "geometry": { "type": "line", "positions": [[-5100, -6700], [-2055, -6700]] }, "properties": { "name": "Test Line" } },
+        { "id": "test03", "geometry": { "type": "polygon", "positions": [[5100, 6700], [2055, 6700], [0,0]] }, "properties": { "name": "Test Polygon" } },
+        { "id": "test04", "geometry": { "type": "circle", "center": [2000, -3000], "radius": 1000 }, "properties": { "name": "Test Circle" } },
+        { "id": "test05", "geometry": { "type": "image", "bounds": [[-1750, -6700], [-3650, -3500]], "url": "https://cdn.discordapp.com/attachments/362770560691732480/402483425019166720/Villa_Esplendida.png" }, "properties": { "name": "Test Image" } }
+      ]
+    },
+    {
       "id": "1502486398869",
       "properties": { "name": "Cities" },
       "features": [

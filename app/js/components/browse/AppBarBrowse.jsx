@@ -1,77 +1,74 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from 'react'
+import { connect } from 'react-redux'
 
-import { default as MuiAppBar } from 'material-ui/AppBar';
-import IconButton from 'material-ui/IconButton';
-import ShareIcon from 'material-ui-icons/Share';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
+import { default as MuiAppBar } from 'material-ui/AppBar'
+import IconButton from 'material-ui/IconButton'
+import ShareIcon from 'material-ui-icons/Share'
+import Toolbar from 'material-ui/Toolbar'
+import Tooltip from 'material-ui/Tooltip'
+import Typography from 'material-ui/Typography'
 
-import MenuIcon from 'material-ui-icons/Menu';
-import SearchIcon from 'material-ui-icons/Search';
-import ModeEditIcon from 'material-ui-icons/ModeEdit';
+import MenuIcon from 'material-ui-icons/Menu'
+import SearchIcon from 'material-ui-icons/Search'
+import LayersIcon from 'material-ui-icons/Layers'
 
-import { openOverlayEditor, openSearch, openShare, setDrawerOpen } from '../../actions';
+import { openLayers, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarBrowse = ({
-  lastView,
+  viewport,
   borderApothem,
-  openOverlayEditor,
+  openLayers,
   openSearch,
   openShare,
   setDrawerOpen,
 }) => {
 
-  let title = 'ccMap';
-  if (lastView && lastView.radius < borderApothem) {
-    title = `${lastView.x}, ${lastView.z}`;
+  let title = 'ccMap'
+  if (viewport && viewport.radius < borderApothem) {
+    title = `${viewport.x}, ${viewport.z}`
   }
 
-  return (
-    <div className='appbar custom-appbar'>
-      <IconButton
-        onClick={setDrawerOpen}
-      >
-        <MenuIcon />
-      </IconButton>
+  return <div className='appbar custom-appbar'>
+    <IconButton onClick={setDrawerOpen}>
+      <MenuIcon />
+    </IconButton>
 
-      <div className='appbar-stretch'>
-        {title}
-      </div>
+    <div className='appbar-stretch'>
+      {title}
+    </div>
 
-      <IconButton
-        disabled
-        onClick={openSearch}
-      >
+    <Tooltip title="Search everything">
+      <IconButton disabled onClick={openSearch}>
         <SearchIcon />
       </IconButton>
-      <IconButton
-        disabled
-        onClick={openShare}
-      >
+    </Tooltip>
+
+    <Tooltip title="Share what you see">
+      <IconButton disabled onClick={openShare}>
         <ShareIcon />
       </IconButton>
-      <IconButton
-        onClick={openOverlayEditor}
-      >
-        <ModeEditIcon />
+    </Tooltip>
+
+    <Tooltip title="Edit layers">
+      <IconButton onClick={openLayers}>
+        <LayersIcon />
       </IconButton>
-    </div>
-  );
-};
+    </Tooltip>
+  </div>
+}
 
 const mapStateToProps = ({ mapConfig, mapView }) => {
   return {
-    lastView: mapView.lastView,
+    viewport: mapView.viewport,
     borderApothem: mapConfig.borderApothem,
-  };
-};
+  }
+}
 
 const mapDispatchToProps = {
-  openOverlayEditor,
+  openLayers,
   openSearch,
   openShare,
   setDrawerOpen,
-};
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppBarBrowse);
+export default connect(mapStateToProps, mapDispatchToProps)(AppBarBrowse)

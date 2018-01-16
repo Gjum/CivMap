@@ -3,34 +3,28 @@ import { connect } from 'react-redux'
 
 import Button from 'material-ui/Button'
 import IconButton from 'material-ui/IconButton'
-import Tooltip from 'material-ui/Tooltip'
 
-import CloseIcon from 'material-ui-icons/Close'
+import DeleteIcon from 'material-ui-icons/Delete' // TODO delete feature
 import ShareIcon from 'material-ui-icons/Share'
 
-import { openLayerEditor, removeFeature } from '../../actions'
-import { setMapView } from '../../store'
+import { openLayerEditor, removeFeature, setViewport } from '../../store'
 import { circleBoundsFromFeatureGeometry } from '../../utils/Math'
 
 const FeatureInfo = ({
   feature,
-  openLayerEditor, // XXX go back to feature's layer
+  openLayerEditor, // TODO go back to feature's layer
   removeFeature,
-  setMapView,
+  setViewport,
 }) => {
   const circleBounds = circleBoundsFromFeatureGeometry(feature.geometry)
-  return (
-    <div>
-      <h1>{feature.properties.name}</h1>
-      <Tooltip title="Search">
-        <Button raised dense
-        onClick={() => setMapView(circleBounds)}
-        >Show on map</Button>
-      </Tooltip>
-      ({feature.geometry.type})
+  return <div>
+    <h1>{feature.properties.name}</h1>
+    <Button raised dense onClick={() => setViewport(circleBounds)}>
+      Show on map
+      </Button>
+    ({feature.geometry.type})
       <pre>{JSON.stringify(feature, null, '  ')}</pre>
-    </div>
-  )
+  </div>
 }
 
 const mapStateToProps = ({ features, control }) => {
@@ -42,7 +36,7 @@ const mapStateToProps = ({ features, control }) => {
 const mapDispatchToProps = {
   openLayerEditor,
   removeFeature,
-  setMapView,
+  setViewport,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(FeatureInfo)

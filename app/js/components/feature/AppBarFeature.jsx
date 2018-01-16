@@ -11,37 +11,35 @@ import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 import CloseIcon from 'material-ui-icons/Close'
 
-import { openBrowseMode, openLayerEditor, openSearch, openShare, setDrawerOpen } from '../../actions'
+import { openBrowseMode, openLayerEditor, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarFeature = ({
   feature,
   openBrowseMode,
-  openLayerEditor, // XXX go back to feature's layer
+  openLayerEditor, // TODO go back to feature's layer
   openSearch,
   openShare,
   setDrawerOpen,
 }) => {
-  return (
-    <div className='appbar custom-appbar'>
-      <IconButton onClick={setDrawerOpen}>
-        <MenuIcon />
-      </IconButton>
+  return <div className='appbar custom-appbar'>
+    <IconButton onClick={setDrawerOpen}>
+      <MenuIcon />
+    </IconButton>
 
-      <div className='appbar-stretch'>{feature.properties.name || 'Some ' + feature.geometry.type}</div>
+    <div className='appbar-stretch'>{feature.properties.name || 'Some ' + feature.geometry.type}</div>
 
-      <IconButton disabled onClick={openSearch}>
-        <SearchIcon />
-      </IconButton>
+    <IconButton disabled onClick={openSearch}>
+      <SearchIcon />
+    </IconButton>
 
-      <IconButton disabled onClick={openShare}>
-        <ShareIcon />
-      </IconButton>
+    <IconButton disabled onClick={openShare}>
+      <ShareIcon />
+    </IconButton>
 
-      <IconButton onClick={openBrowseMode}>
-        <CloseIcon />
-      </IconButton>
-    </div>
-  )
+    <IconButton onClick={openBrowseMode}>
+      <CloseIcon />
+    </IconButton>
+  </div>
 }
 
 const mapStateToProps = ({ features, control }) => {
