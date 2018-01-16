@@ -42,6 +42,7 @@ export function flatLatLngs(o) {
 
 export function circleBoundsFromFeatureGeometry(geometry) {
   switch (geometry.type) {
+    case 'label':
     case 'marker': {
       const { position: [z, x] } = geometry
       return { z, x, radius: 100 } // TODO arbitrary radius

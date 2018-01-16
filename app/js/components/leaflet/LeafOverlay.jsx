@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
 
+import LeafLabel from './LeafLabel'
 import { openFeatureDetail } from '../../store'
 
 function centered(positions) {
@@ -14,6 +15,7 @@ function renderFeatureOverlay(feature, key, onClick) {
   const props = { feature, onClick }
   switch (feature.geometry.type) {
     case "marker": return <FeatureOverlayMarker key={key} {...props} />
+    case "label": return <FeatureOverlayLabel key={key} {...props} />
     case "circle": return <FeatureOverlayCircle key={key} {...props} />
     case "image": return <FeatureOverlayImage key={key} {...props} />
     case "line": return <FeatureOverlayLine key={key} {...props} />
@@ -24,12 +26,26 @@ function renderFeatureOverlay(feature, key, onClick) {
 }
 
 function FeatureOverlayMarker({ feature, onClick }) {
+  // TODO custom icon
   const { id, geometry, style } = feature
   const [z, x] = geometry.position
   return <RL.Marker
     onclick={() => onClick(id)}
-    {...geometry} // TODO unused? how about CircleMarker?
     {...style}
+    position={[z + .5, x + .5]}
+  />
+}
+
+// TODO CircleMarker
+
+function FeatureOverlayLabel({ feature, onClick }) {
+  const { id, geometry, style, properties = {} } = feature
+  const [z, x] = geometry.position
+  if (!properties.name) return null
+  return <LeafLabel
+    onclick={() => onClick(id)}
+    {...style}
+    text={properties.name}
     position={[z + .5, x + .5]}
   />
 }

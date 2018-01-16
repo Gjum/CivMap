@@ -43,6 +43,31 @@ div {
   image-rendering: -moz-crisp-edges !important;
 }
 
+.leaflabel-text {
+  pointer-events: all !important;
+  font-size: 12px;
+  line-height: 1em;
+  font-weight: bold;
+  color: white;
+  text-shadow: black 0px 0px 5px;
+}
+
+.leaflabel {
+  pointer-events: none !important;
+  /* http://howtocenterincss.com/#contentType=text&container.width=200px&container.height=200px&horizontal=center&vertical=middle&browser.IE=none
+  setting fixed width/height is done by LeafLabel
+  */
+  display:flex;
+  text-align: center;
+  justify-content:center;
+  align-items:center;
+}
+
+.leaflabel-black {
+  color: black;
+  text-shadow: white 0px 0px 5px;
+}
+
 .mainlist,
 .custom-appbar {
   z-index: 1000;
