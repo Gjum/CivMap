@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
 
-import { openFeatureEditor } from '../../store'
+import { openFeatureDetail } from '../../store'
 
 function centered(positions) {
   if (Array.isArray(positions[0]))
@@ -82,7 +82,7 @@ const LeafOverlay = ({
   features,
   layers,
   visibleLayers,
-  openFeatureEditor,
+  openFeatureDetail,
 }) => {
 
   const visibleFeatures = []
@@ -94,7 +94,7 @@ const LeafOverlay = ({
     )
   })
 
-  const onClick = openFeatureEditor
+  const onClick = openFeatureDetail
 
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
@@ -113,7 +113,7 @@ const mapStateToProps = ({ features, layers, visibleLayers }) => {
 }
 
 const mapDispatchToProps = {
-  openFeatureEditor,
+  openFeatureDetail,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LeafOverlay)

@@ -14,7 +14,7 @@ import InvisibleIcon from 'material-ui-icons/VisibilityOff'
 import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle'
 import VisibleIcon from 'material-ui-icons/Visibility'
 
-import { hideLayer, openLayerEditor, removeLayer, showLayer } from '../../store'
+import { hideLayer, openLayerDetail, removeLayer, showLayer } from '../../store'
 
 /**
  * @param {[{geometry: {type}}]} features
@@ -50,7 +50,7 @@ const Layer = ({
   visible,
   dispatch,
 }) => {
-  return <ListItem button onClick={() => dispatch(openLayerEditor(layer.id))}>
+  return <ListItem button onClick={() => dispatch(openLayerDetail(layer.id))}>
     <ListItemIcon><PersonPinCircleIcon /></ListItemIcon>
     <ListItemText
       primary={layer.properties.name}

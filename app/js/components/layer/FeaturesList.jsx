@@ -13,7 +13,7 @@ import List, {
 import DeleteIcon from 'material-ui-icons/Delete'
 import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle'
 
-import { openFeatureEditor, removeFeature } from '../../store'
+import { openFeatureDetail, removeFeature } from '../../store'
 
 const FeatureListEntry = ({
   feature,
@@ -21,7 +21,7 @@ const FeatureListEntry = ({
 }) => {
   const icon = <PersonPinCircleIcon /> // TODO depends on geometry.type
   return <ListItem button
-    onClick={() => dispatch(openFeatureEditor(feature.id))}
+    onClick={() => dispatch(openFeatureDetail(feature.id))}
   >
     <ListItemIcon>{icon}</ListItemIcon>
     <ListItemText

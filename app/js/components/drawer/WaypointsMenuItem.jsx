@@ -4,16 +4,16 @@ import { connect } from 'react-redux'
 import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List'
 import PersonPinCircleIcon from 'material-ui-icons/PersonPinCircle'
 
-import { openWaypointsEditor } from '../../store'
+import { openWaypointsImport } from '../../store'
 
 const WaypointsMenuItem = ({
-  openWaypointsEditor,
+  openWaypointsImport,
   setDrawerClosed,
 }) => {
   return <ListItem button
     disabled
     onClick={() => {
-      openWaypointsEditor()
+      openWaypointsImport()
     }}
   >
     <ListItemIcon><PersonPinCircleIcon /></ListItemIcon>
@@ -25,7 +25,7 @@ const WaypointsMenuItem = ({
 }
 
 const mapDispatchToProps = {
-  openWaypointsEditor,
+  openWaypointsImport,
 }
 
 export default connect(undefined, mapDispatchToProps)(WaypointsMenuItem)

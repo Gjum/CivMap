@@ -7,12 +7,12 @@ import IconButton from 'material-ui/IconButton'
 import DeleteIcon from 'material-ui-icons/Delete' // TODO delete feature
 import ShareIcon from 'material-ui-icons/Share'
 
-import { openLayerEditor, removeFeature, setViewport } from '../../store'
+import { openLayerDetail, removeFeature, setViewport } from '../../store'
 import { circleBoundsFromFeatureGeometry } from '../../utils/Math'
 
 const FeatureInfo = ({
   feature,
-  openLayerEditor, // TODO go back to feature's layer
+  openLayerDetail, // TODO go back to feature's layer
   removeFeature,
   setViewport,
 }) => {
@@ -34,7 +34,7 @@ const mapStateToProps = ({ features, control }) => {
 }
 
 const mapDispatchToProps = {
-  openLayerEditor,
+  openLayerDetail,
   removeFeature,
   setViewport,
 }

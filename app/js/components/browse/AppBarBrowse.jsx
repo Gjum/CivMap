@@ -12,12 +12,12 @@ import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 import LayersIcon from 'material-ui-icons/Layers'
 
-import { openLayers, openSearch, openShare, setDrawerOpen } from '../../store'
+import { openLayersSelect, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarBrowse = ({
   viewport,
   borderApothem,
-  openLayers,
+  openLayersSelect,
   openSearch,
   openShare,
   setDrawerOpen,
@@ -50,7 +50,7 @@ const AppBarBrowse = ({
     </Tooltip>
 
     <Tooltip title="Edit layers">
-      <IconButton onClick={openLayers}>
+      <IconButton onClick={openLayersSelect}>
         <LayersIcon />
       </IconButton>
     </Tooltip>
@@ -65,7 +65,7 @@ const mapStateToProps = ({ mapConfig, mapView }) => {
 }
 
 const mapDispatchToProps = {
-  openLayers,
+  openLayersSelect,
   openSearch,
   openShare,
   setDrawerOpen,

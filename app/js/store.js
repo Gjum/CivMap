@@ -15,33 +15,36 @@ export const defaultControlState = {
 
 const control = (state = defaultControlState, action) => {
   switch (action.type) {
-    case 'OPEN_DRAWER':
+    case 'SET_DRAWER_OPEN':
       return { ...state, drawerOpen: true }
-    case 'CLOSE_DRAWER':
+    case 'SET_DRAWER_CLOSED':
       return { ...state, drawerOpen: false }
+
     case 'OPEN_BROWSE_MODE':
       return { ...state, drawerOpen: false, appMode: 'BROWSE' }
-    case 'OPEN_FEATURE_EDITOR':
+    case 'OPEN_FEATURE_DETAIL':
       return {
         ...state, drawerOpen: false, appMode: 'FEATURE',
         featureId: action.featureId,
       }
-    case 'OPEN_LAYER_EDITOR':
+    case 'OPEN_LAYER_DETAIL':
       return {
         ...state, drawerOpen: false, appMode: 'LAYER',
         layerId: action.layerId,
       }
-    case 'OPEN_OVERLAY_EDITOR':
+    case 'OPEN_LAYERS_SELECT':
       return { ...state, drawerOpen: false, appMode: 'LAYERS' }
     case 'OPEN_SEARCH':
       return {
         ...state, drawerOpen: false, appMode: 'SEARCH',
         searchQuery: action.query
       }
-    case 'OPEN_WAYPOINTS_EDITOR':
+    case 'OPEN_WAYPOINTS_IMPORT':
       return { ...state, drawerOpen: false, appMode: 'WAYPOINTS' }
+
     case 'TRACK_WINDOW_SIZE':
       return { ...state, windowHeight: action.height, windowWidth: action.width }
+
     default:
       return state
   }
@@ -49,24 +52,23 @@ const control = (state = defaultControlState, action) => {
 
 export const openBrowseMode = () => ({ type: 'OPEN_BROWSE_MODE' })
 
-export const openFeatureEditor = (featureId) => ({ type: 'OPEN_FEATURE_EDITOR', featureId })
+export const openFeatureDetail = (featureId) => ({ type: 'OPEN_FEATURE_DETAIL', featureId })
 
-export const openLayerEditor = (layerId) => ({ type: 'OPEN_LAYER_EDITOR', layerId })
+export const openLayerDetail = (layerId) => ({ type: 'OPEN_LAYER_DETAIL', layerId })
 
-export const openLayers = () => ({ type: 'OPEN_OVERLAY_EDITOR' })
+export const openLayersSelect = () => ({ type: 'OPEN_LAYERS_SELECT' })
 
 export const openSearch = (query = "") => ({ type: 'OPEN_SEARCH', query })
 
 export const openShare = () => ({ type: 'OPEN_SHARE' })
 
-export const openWaypointsEditor = () => ({ type: 'OPEN_WAYPOINTS_EDITOR' })
+export const openWaypointsImport = () => ({ type: 'OPEN_WAYPOINTS_IMPORT' })
 
-export const setDrawerClosed = () => ({ type: 'CLOSE_DRAWER' })
+export const setDrawerClosed = () => ({ type: 'SET_DRAWER_CLOSED' })
 
-export const setDrawerOpen = () => ({ type: 'OPEN_DRAWER' })
+export const setDrawerOpen = () => ({ type: 'SET_DRAWER_OPEN' })
 
-export const trackWindowSize = ({ width, height }) => (
-  { type: 'TRACK_WINDOW_SIZE', width, height })
+export const trackWindowSize = ({ width, height }) => ({ type: 'TRACK_WINDOW_SIZE', width, height })
 
 // should be session-local, but we persist it anyway for convenience
 export const defaultMapView = {
