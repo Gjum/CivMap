@@ -34,7 +34,7 @@ const AppBarBrowse = ({
     </IconButton>
 
     <div className='appbar-stretch'>
-      {title}
+      CivMap
     </div>
 
     <Tooltip title="Search everything">

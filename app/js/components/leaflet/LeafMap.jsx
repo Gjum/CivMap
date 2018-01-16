@@ -41,7 +41,6 @@ class LeafMap extends React.Component {
     map.invalidateSize()
     if (this.map === map) return
     this.map = map
-    // TODO how to display mouse pos
     this.checkAndSetView(this.props.viewport)
   }
 
@@ -49,6 +48,17 @@ class LeafMap extends React.Component {
     const newView = boundsToContainedCircle(e.target.getBounds())
     this.waitingForView = newView
     this.props.setViewport(newView)
+  }
+
+  onCoordsRef(ref) {
+    if (!ref) return
+    this.coordsRef = ref
+  }
+
+  onMouseMove(e) {
+    if (!this.coordsRef) return
+    const { lat: z, lng: x } = e.latlng
+    this.coordsRef.innerText = `X ${parseInt(x)} ${parseInt(z)} Z`
   }
 
   render() {
@@ -69,10 +79,15 @@ class LeafMap extends React.Component {
         minZoom={-6}
         attributionControl={false}
         zoomControl={false}
-        onmove={this.onViewChange.bind(this)}
+        onmoveend={this.onViewChange.bind(this)}
         onzoomend={this.onViewChange.bind(this)}
+        onmousemove={this.onMouseMove.bind(this)}
         editable
       >
+        <div
+          className='leafmap-coords'
+          ref={this.onCoordsRef.bind(this)}
+        >X 0 0 Z</div>
         <LeafBaseMap />
         <LeafOverlay />
       </RL.Map>
