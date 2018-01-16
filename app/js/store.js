@@ -78,8 +78,14 @@ export const defaultMapView = {
 
 const mapView = (state = defaultMapView, action) => {
   switch (action.type) {
-    case 'APP_LOAD':
-      return action.state.mapView ? { ...state, ...action.state.mapView } : state
+    case 'APP_LOAD': {
+      if (!action.state.mapView) return state
+      const {
+        basemapId = state.basemapId,
+        viewport = state.viewport,
+       } = action.state.mapView
+      return { basemapId, viewport }
+    }
     case 'SET_ACTIVE_BASEMAP':
       return { ...state, basemapId: action.basemapId }
     case 'SET_VIEWPORT':
@@ -106,8 +112,16 @@ export const defaultMapConfig = {
 
 const mapConfig = (state = defaultMapConfig, action) => {
   switch (action.type) {
-    case 'APP_LOAD':
-      return action.state.mapConfig ? { ...state, ...action.state.mapConfig } : state
+    case 'APP_LOAD': {
+      if (!action.state.mapConfig) return state
+      const {
+        basemapPreview = state.basemapPreview,
+        basemaps = state.basemaps,
+        tilesRoot = state.tilesRoot,
+        borderApothem = state.borderApothem,
+       } = action.state.mapConfig
+      return { basemapPreview, basemaps, tilesRoot, borderApothem }
+    }
     default:
       return state
   }
@@ -248,9 +262,12 @@ export const removeLayer = (id) => ({ type: 'REMOVE_LAYER', id })
 const visibleLayers = (state = [], action) => {
   switch (action.type) {
     case 'APP_LOAD':
-      return action.state.visibleLayers || state
+      if (!Array.isArray(action.state.visibleLayers))
+        return state
+      return action.state.visibleLayers
 
     case 'SHOW_LAYER':
+      if (state.includes(action.layerId)) return state
       return [action.layerId, ...state]
 
     case 'HIDE_LAYER':

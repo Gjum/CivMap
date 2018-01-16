@@ -1,17 +1,13 @@
-import throttle from 'lodash/throttle'
-
-import { appLoad } from '../store'
-
 let lastLocalStorageError = {}
 
-function saveState(store) {
+export function saveAppStateToLocalStorage(state) {
   try {
     const {
       mapView,
       visibleLayers,
       features,
       layers,
-    } = store.getState()
+    } = state
 
     // TODO skip if unchanged
     const data = {
@@ -34,14 +30,7 @@ function saveState(store) {
   }
 }
 
-export function setupLocalStorageSync(store) {
-  store.subscribe(throttle(
-    () => saveState(store),
-    1000, { trailing: true }
-  ))
-}
-
-export function loadAppStateFromLocalStorage(store) {
+export function getAppStateFromLocalStorage() {
   try {
     let appState = {}
 
@@ -55,7 +44,7 @@ export function loadAppStateFromLocalStorage(store) {
       appState = { ...appState, ...JSON.parse(viewJson) }
     }
 
-    store.dispatch(appLoad(appState))
+    return appState
 
   } catch (e) {
     console.error('Loading from localStorage failed', e)

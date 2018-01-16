@@ -8,7 +8,7 @@ import DeleteIcon from 'material-ui-icons/Delete' // TODO delete feature
 import ShareIcon from 'material-ui-icons/Share'
 
 import { openLayerDetail, removeFeature, setViewport } from '../../store'
-import { circleBoundsFromFeatureGeometry } from '../../utils/Math'
+import { circleBoundsFromFeatureGeometry } from '../../utils/math'
 
 const FeatureInfo = ({
   feature,

@@ -1,5 +1,5 @@
-import { circleToBounds } from './Math'
-import { getJSON } from './Net'
+import { circleToBounds } from './math'
+import { getJSON } from './net'
 import { loadLayer, openFeatureDetail, setActiveBasemap, setViewport, showLayer } from '../store'
 
 export function loadAppStateFromUrlData(urlData, store) {

@@ -26,7 +26,3 @@ defaultAppState.mapView.viewport = {
   x: 0, z: 0,
   radius: defaultAppState.mapConfig.borderApothem,
 }
-
-export function loadDefaultAppState(store) {
-  store.dispatch(appLoad(defaultAppState))
-}

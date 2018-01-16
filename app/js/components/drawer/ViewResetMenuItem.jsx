@@ -5,7 +5,7 @@ import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List'
 import RestorePageIcon from 'material-ui-icons/RestorePage'
 
 import { appLoad, setDrawerClosed } from '../../store'
-import { defaultAppState } from '../../utils/State'
+import { defaultAppState } from '../../utils/state'
 
 const ViewResetMenuItem = ({
   appLoad,

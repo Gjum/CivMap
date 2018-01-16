@@ -8,7 +8,7 @@ import LeafBaseMap from './LeafBaseMap'
 import LeafOverlay from './LeafOverlay'
 
 import { setViewport } from '../../store'
-import { boundsToContainedCircle, circleToBounds } from '../../utils/Math'
+import { boundsToContainedCircle, circleToBounds } from '../../utils/math'
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
 
