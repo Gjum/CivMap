@@ -79,6 +79,31 @@ div {
   text-shadow: white 0px 0px 5px;
 }
 
+.feature-props-image {
+  height: 200px; /* ~ 360 / (16/9) */
+  background-color: #e0e0e0;
+  /* background-image gets set through javascript */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.feature-props-title {
+  margin: .5em 16px;
+}
+.feature-props-list {
+  list-style: none;
+  padding-left: 0;
+}
+.feature-props-entry {
+  margin: .5em 16px;
+  word-wrap: break-word;
+}
+.feature-props-key {
+  font-weight: bold;
+}
+.feature-props-value {
+}
+
 .mainlist,
 .custom-appbar {
   z-index: 1000;
