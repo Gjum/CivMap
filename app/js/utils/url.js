@@ -1,4 +1,4 @@
-import { circleToBounds } from './math'
+import { circleBoundsFromFeatureGeometry, circleToBounds } from './math'
 import { getJSON } from './net'
 import { loadLayer, openFeatureDetail, setActiveBasemap, setViewport, showLayer } from '../store'
 
@@ -6,20 +6,29 @@ export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {
     store.dispatch(setActiveBasemap(urlData.basemap))
   }
-  if (urlData.viewport) {
-    store.dispatch(setViewport(urlData.viewport))
-  }
   if (urlData.overlayUrl) {
-    loadOverlayJsonAsync(urlData.overlayUrl, store)
+    loadOverlayJsonAsync(urlData.overlayUrl, store, loadDependentThings)
+  } else {
+    loadDependentThings()
   }
-  if (urlData.featureId) {
-    store.dispatch(openFeatureDetail(urlData.featureId))
-  }
-  if (urlData.feature) {
-    // TODO add feature, then open feature detail mode
-  }
-  if (urlData.overlay) {
-    // TODO load overlay, then open layer detail mode
+  function loadDependentThings() {
+    if (urlData.overlay) {
+      // TODO load overlay, open layer detail mode, move into view if no viewport is set
+    }
+    if (urlData.feature) {
+      // TODO load feature, open feature detail mode, move into view if no viewport is set
+    }
+    if (urlData.featureId) {
+      store.dispatch(openFeatureDetail(urlData.featureId))
+      if (!urlData.viewport) {
+        const feature = store.getState().features[urlData.featureId]
+        const viewport = circleBoundsFromFeatureGeometry(feature.geometry)
+        store.dispatch(setViewport(viewport))
+      }
+    }
+    if (urlData.viewport) {
+      store.dispatch(setViewport(urlData.viewport))
+    }
   }
 }
 
@@ -74,7 +83,7 @@ export function parseUrlHash(hash) {
   hash.slice(1).split('#').map(part => {
     const [key, val] = part.split('=', 2)
     if (key == 'c') {
-      let [x, z, radius] = val.split(/,r?/, 3).map(parseFloat)
+      let [x, z, radius] = val.split(/[,r]+/, 3).map(parseFloat)
       if (!radius) urlData.marker = true
       radius = radius || 100
       urlData.viewport = { x, z, radius }
