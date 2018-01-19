@@ -1,6 +1,6 @@
 import { circleBoundsFromFeatureGeometry, circleToBounds } from './math'
 import { getJSON } from './net'
-import { loadLayer, openFeatureDetail, setActiveBasemap, setViewport, showLayer } from '../store'
+import { loadLayer, openFeatureDetail, setActiveBasemap, setViewport, showLayer, setVisibleLayers } from '../store'
 
 export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {
@@ -43,11 +43,11 @@ export function loadOverlayJsonAsync(url, store, cb) {
 
       // TODO remove unreferenced features
 
-      // TODO do this importing in one batch using loadOverlay action
+      // TODO do this import operation in one batch using loadOverlay action
       // also do it in the caller, not in here, to get rid of store dependency
       // also use promises for this
       data.layers.forEach(layer => store.dispatch(loadLayer(layer)))
-      data.visibleLayers.forEach(layerId => store.dispatch(showLayer(layerId)))
+      store.dispatch(setVisibleLayers(data.visibleLayers))
 
       console.log('Loaded', data.layers.length, 'layers from', url)
 

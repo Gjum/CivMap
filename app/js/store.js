@@ -265,6 +265,10 @@ const visibleLayers = (state = [], action) => {
       if (!Array.isArray(action.state.visibleLayers))
         return state
       return action.state.visibleLayers
+    case 'SET_VISIBLE_LAYERS':
+      if (!Array.isArray(action.visibleLayers))
+        return state
+      return action.visibleLayers
 
     case 'SHOW_LAYER':
       if (state.includes(action.layerId)) return state
@@ -281,6 +285,8 @@ const visibleLayers = (state = [], action) => {
 export const showLayer = (layerId) => ({ type: 'SHOW_LAYER', layerId })
 
 export const hideLayer = (layerId) => ({ type: 'HIDE_LAYER', layerId })
+
+export const setVisibleLayers = (visibleLayers) => ({ type: 'SET_VISIBLE_LAYERS', visibleLayers })
 
 export const combinedReducers = combineReducers({
   control,
