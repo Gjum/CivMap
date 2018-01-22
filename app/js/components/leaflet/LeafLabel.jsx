@@ -5,7 +5,7 @@ import * as RL from 'react-leaflet'
 // TODO label data: position, offset, direction, text (lines?)
 // atm: centered, auto-wrapped with css
 
-export default class LeafLabel extends React.Component {
+export default class LeafLabel extends React.PureComponent {
   componentWillMount() {
     this.recreateLabel(this.props)
   }

@@ -4,12 +4,7 @@ import * as RL from 'react-leaflet'
 
 import LeafLabel from './LeafLabel'
 import { openFeatureDetail } from '../../store'
-
-function centered(positions) {
-  if (Array.isArray(positions[0]))
-    return positions.map(e => centered(e))
-  return [positions[0] + .5, positions[1] + .5]
-}
+import { centered } from '../../utils/math'
 
 function renderFeatureOverlay(feature, key, onClick) {
   const props = { feature, onClick }

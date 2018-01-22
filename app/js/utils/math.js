@@ -40,6 +40,12 @@ export function flatLatLngs(o) {
   return o
 }
 
+export function centered(positions) {
+  if (Array.isArray(positions[0]))
+    return positions.map(e => centered(e))
+  return [positions[0] + .5, positions[1] + .5]
+}
+
 export function circleBoundsFromFeatureGeometry(geometry) {
   switch (geometry.type) {
     case 'label':

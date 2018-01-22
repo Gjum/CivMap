@@ -1,6 +1,6 @@
 import { circleBoundsFromFeatureGeometry, circleToBounds } from './math'
 import { getJSON } from './net'
-import { loadLayer, openFeatureDetail, setActiveBasemap, setViewport, showLayer, setVisibleLayers } from '../store'
+import { loadLayer, openFeatureDetail, setActiveBasemap, setViewport, setVisibleLayers } from '../store'
 
 export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {

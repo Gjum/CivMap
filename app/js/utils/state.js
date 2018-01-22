@@ -1,6 +1,3 @@
-
-import { appLoad, defaultMapView, loadLayer, showLayer } from '../store'
-
 export const defaultAppState = {
   mapConfig: {
     basemapPreview: '/z-2/0,0.png',
