@@ -3,82 +3,42 @@ import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
 
 import LeafLabel from './LeafLabel'
+import EditableLine from './EditableLine'
+import EditableMarker from './EditableMarker'
+import EditablePolygon from './EditablePolygon'
 import { openFeatureDetail } from '../../store'
 import { centered } from '../../utils/math'
 
-function renderFeatureOverlay(feature, key, onClick) {
-  const props = { feature, onClick }
-  switch (feature.geometry.type) {
-    case "marker": return <FeatureOverlayMarker key={key} {...props} />
-    case "label": return <FeatureOverlayLabel key={key} {...props} />
-    case "circle": return <FeatureOverlayCircle key={key} {...props} />
-    case "image": return <FeatureOverlayImage key={key} {...props} />
-    case "line": return <FeatureOverlayLine key={key} {...props} />
-    case "polygon": return <FeatureOverlayPolygon key={key} {...props} />
-    default:
-      console.error("[FeaturesOverlay] Unknown feature geometry type", feature)
-  }
-}
-
-function FeatureOverlayMarker({ feature, onClick }) {
-  // TODO custom icon
-  const { id, geometry, style } = feature
-  const [z, x] = geometry.position
-  return <RL.Marker
-    onclick={() => onClick(id)}
-    {...style}
-    position={[z + .5, x + .5]}
-  />
-}
-
 // TODO CircleMarker
 
-function FeatureOverlayLabel({ feature, onClick }) {
+function FeatureOverlayLabel({ feature, dispatch }) {
   const { id, geometry, style, properties = {} } = feature
   const [z, x] = geometry.position
   if (!properties.name) return null
   return <LeafLabel
-    onclick={() => onClick(id)}
+    onclick={() => dispatch(openFeatureDetail(id))}
     {...style}
     text={properties.name}
     position={[z + .5, x + .5]}
   />
 }
 
-function FeatureOverlayCircle({ feature, onClick }) {
+function FeatureOverlayCircle({ feature, dispatch }) {
   const { id, geometry, style } = feature
   return <RL.Circle
-    onclick={() => onClick(id)}
+    onclick={() => dispatch(openFeatureDetail(id))}
     {...style}
     center={centered(geometry.center)}
     radius={geometry.radius}
   />
 }
 
-function FeatureOverlayImage({ feature, onClick }) {
+function FeatureOverlayImage({ feature, dispatch }) {
   const { id, geometry, style } = feature
   return <RL.ImageOverlay
-    onclick={() => onClick(id)}
+    onclick={() => dispatch(openFeatureDetail(id))}
     {...geometry}
     {...style}
-  />
-}
-
-function FeatureOverlayLine({ feature, onClick }) {
-  const { id, geometry, style } = feature
-  return <RL.Polyline
-    onclick={() => onClick(id)}
-    {...style}
-    positions={centered(geometry.positions)}
-  />
-}
-
-function FeatureOverlayPolygon({ feature, onClick }) {
-  const { id, geometry, style } = feature
-  return <RL.Polygon
-    onclick={() => onClick(id)}
-    {...style}
-    positions={centered(geometry.positions)}
   />
 }
 
@@ -90,41 +50,49 @@ function prepareListForFeatureGroup(list) {
 }
 
 const LeafOverlay = ({
+  editFeatureId,
   features,
   layers,
   visibleLayers,
-  openFeatureDetail,
+  dispatch,
 }) => {
 
-  const visibleFeatures = []
+  const visibleFeatures = {}
   visibleLayers.forEach(layerId => {
     const layer = layers[layerId]
     if (!layer) return
     layer.features.forEach(featureId =>
-      visibleFeatures.push(features[featureId])
+      visibleFeatures[featureId] = features[featureId]
     )
   })
 
-  const onClick = openFeatureDetail
-
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
-      visibleFeatures.map((f, featureKey) =>
-        renderFeatureOverlay(f, f.id || featureKey, onClick))
+      Object.values(visibleFeatures).map((feature, i) => {
+        const editable = editFeatureId === feature.id
+        const props = { feature, editable, dispatch }
+        switch (feature.geometry.type) {
+          case "marker": return <EditableMarker key={feature.id || i} {...props} />
+          case "label": return <FeatureOverlayLabel key={feature.id || i} {...props} />
+          case "circle": return <FeatureOverlayCircle key={feature.id || i} {...props} />
+          case "image": return <FeatureOverlayImage key={feature.id || i} {...props} />
+          case "line": return <EditableLine key={feature.id || i} {...props} />
+          case "polygon": return <EditablePolygon key={feature.id || i} {...props} />
+          default:
+            console.error("[FeaturesOverlay] Unknown feature geometry type", feature)
+        }
+      })
     )}
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ features, layers, visibleLayers }) => {
+const mapStateToProps = ({ control, features, layers, visibleLayers }) => {
   return {
+    editFeatureId: control.appMode === 'EDIT' ? control.editFeatureId : null,
     features,
     layers,
     visibleLayers,
   }
 }
 
-const mapDispatchToProps = {
-  openFeatureDetail,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(LeafOverlay)
+export default connect(mapStateToProps)(LeafOverlay)

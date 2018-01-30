@@ -4,11 +4,12 @@ import { connect } from 'react-redux'
 import Button from 'material-ui/Button'
 import IconButton from 'material-ui/IconButton'
 
-import DeleteIcon from 'material-ui-icons/Delete' // TODO delete feature
+import DeleteIcon from 'material-ui-icons/Delete'
+import EditIcon from 'material-ui-icons/Edit'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
 import LayersIcon from 'material-ui-icons/Layers'
 
-import { openBrowseMode, openLayerDetail, removeFeature, setViewport } from '../../store'
+import { openBrowseMode, openEditMode, openLayerDetail, removeFeature, setViewport } from '../../store'
 import { circleBoundsFromFeatureGeometry } from '../../utils/math'
 
 export function isImageUrl(value) {
@@ -73,6 +74,7 @@ const FeatureInfo = ({
   feature,
   prevLayerId,
   openBrowseMode,
+  openEditMode,
   openLayerDetail,
   removeFeature,
   setViewport,
@@ -97,6 +99,13 @@ const FeatureInfo = ({
     </div>
     <div style={{ margin: '16px' }}>
       <Button raised onClick={() => {
+        openEditMode(feature.id)
+      }}>
+        <EditIcon />
+        Edit
+      </Button>
+
+      <Button raised onClick={() => {
         removeFeature(feature.id)
         openBrowseMode() // TODO show layer instead
       }}>
@@ -120,6 +129,7 @@ const mapStateToProps = ({ features, control }) => {
 
 const mapDispatchToProps = {
   openBrowseMode,
+  openEditMode,
   openLayerDetail,
   removeFeature,
   setViewport,

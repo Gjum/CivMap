@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import * as BROWSE from './browse'
+import * as EDIT from './edit'
 import * as FEATURE from './feature'
 import * as LAYER from './layer'
 import * as LAYERS from './layers'
@@ -11,6 +12,7 @@ import LeafMap from './leaflet/LeafMap'
 
 const modes = {
   BROWSE,
+  EDIT,
   FEATURE,
   LAYER,
   LAYERS,

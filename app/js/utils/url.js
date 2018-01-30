@@ -94,7 +94,7 @@ export function parseUrlHash(hash) {
     else if (key == 'feature') urlData.feature = JSON.parse(val)
     else if (key == 'overlay') urlData.overlay = JSON.parse(val)
     else if (key == 'u') urlData.overlayUrl = val
-    else console.log("Unknown url hash entry", part)
+    else console.error("Unknown url hash entry", part)
   })
 
   return urlData

@@ -6,6 +6,7 @@ import { v4 } from 'node-uuid'
 export const defaultControlState = {
   appMode: 'BROWSE', // TODO rename these
   drawerOpen: false,
+  editFeatureId: null,
   featureId: null,
   layerId: null,
   searchQuery: null,
@@ -22,6 +23,8 @@ const control = (state = defaultControlState, action) => {
 
     case 'OPEN_BROWSE_MODE':
       return { ...state, drawerOpen: false, appMode: 'BROWSE' }
+    case 'OPEN_EDIT_MODE':
+      return { ...state, drawerOpen: false, appMode: 'EDIT', editFeatureId: action.featureId }
     case 'OPEN_FEATURE_DETAIL':
       return {
         ...state, drawerOpen: false, appMode: 'FEATURE',
@@ -51,6 +54,8 @@ const control = (state = defaultControlState, action) => {
 }
 
 export const openBrowseMode = () => ({ type: 'OPEN_BROWSE_MODE' })
+
+export const openEditMode = (featureId) => ({ type: 'OPEN_EDIT_MODE', featureId })
 
 export const openFeatureDetail = (featureId) => ({ type: 'OPEN_FEATURE_DETAIL', featureId })
 
