@@ -8,15 +8,17 @@ import Toolbar from 'material-ui/Toolbar'
 import Tooltip from 'material-ui/Tooltip'
 import Typography from 'material-ui/Typography'
 
+import EditIcon from 'material-ui-icons/Edit'
 import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 import LayersIcon from 'material-ui-icons/Layers'
 
-import { openLayersSelect, openSearch, openShare, setDrawerOpen } from '../../store'
+import { openEditMode, openLayersSelect, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarBrowse = ({
   viewport,
   borderApothem,
+  openEditMode,
   openLayersSelect,
   openSearch,
   openShare,
@@ -38,13 +40,13 @@ const AppBarBrowse = ({
     </div>
 
     <Tooltip title="Search everything">
-      <IconButton disabled onClick={openSearch}>
+      <IconButton disabled onClick={() => openSearch()}>
         <SearchIcon />
       </IconButton>
     </Tooltip>
 
     <Tooltip title="Share what you see">
-      <IconButton disabled onClick={openShare}>
+      <IconButton disabled onClick={() => openShare()}>
         <ShareIcon />
       </IconButton>
     </Tooltip>
@@ -52,6 +54,12 @@ const AppBarBrowse = ({
     <Tooltip title="Edit layers">
       <IconButton onClick={openLayersSelect}>
         <LayersIcon />
+      </IconButton>
+    </Tooltip>
+
+    <Tooltip title="Draw on the map">
+      <IconButton onClick={() => openEditMode(null)}>
+        <EditIcon />
       </IconButton>
     </Tooltip>
   </div>
@@ -65,6 +73,7 @@ const mapStateToProps = ({ mapConfig, mapView }) => {
 }
 
 const mapDispatchToProps = {
+  openEditMode,
   openLayersSelect,
   openSearch,
   openShare,

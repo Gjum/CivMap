@@ -2,7 +2,7 @@ import React from 'react'
 import * as RL from 'react-leaflet'
 
 import { centered, deepLatLngToArr } from '../../utils/math'
-import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
+import { openFeatureDetail, updateFeature } from '../../store'
 
 export default class EditableLine extends React.PureComponent {
   startEditing() {

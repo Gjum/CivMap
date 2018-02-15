@@ -8,7 +8,6 @@ import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
 import { openFeatureDetail } from '../../store'
-import { centered } from '../../utils/math'
 
 // TODO CircleMarker
 

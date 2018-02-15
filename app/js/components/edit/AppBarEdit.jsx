@@ -26,7 +26,10 @@ const AppBarFeature = ({
       <MenuIcon />
     </IconButton>
 
-    <div className='appbar-stretch'>{feature.properties.name || 'Some ' + feature.geometry.type}</div>
+    <div className='appbar-stretch'>{
+      feature ? (feature.properties.name || 'Some ' + feature.geometry.type)
+      : 'Create new Feature'
+    }</div>
 
     <IconButton disabled onClick={openSearch}>
       <SearchIcon />

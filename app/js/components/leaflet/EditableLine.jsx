@@ -5,43 +5,47 @@ import { centered, deepLatLngToArr } from '../../utils/math'
 import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
 
 export default class EditableLine extends React.PureComponent {
-  startEditing() {
-    const editor = this.featureRef.enableEdit()
-    editor.reset()
 
-    if (this.props.feature.geometry.positions.length <= 0) {
+  setupEditing() {
+    const positions = this.props.feature.geometry.positions
+    if (!positions || positions.length <= 0) {
       this.featureRef.editor.newShape()
     }
+    else {
+      this.featureRef.editor.disable() // continueForward() is no-op (or broken) while editing
+      this.featureRef.editor.continueForward()
+      this.featureRef.editor.enable() // re-add corner markers
+    }
 
-    if (!this.isListening) {
-      this.isListening = true
-      this.featureRef.on('editable:drawing:clicked', this.updatePositions.bind(this))
-      this.featureRef.on('editable:vertex:dragend', this.updatePositions.bind(this))
-      this.featureRef.on('editable:vertex:deleted', this.updatePositions.bind(this))
+    if (!this.featureRef.civMapIsListening) {
+      this.featureRef.civMapIsListening = true
+      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
+      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
+      this.featureRef.on('editable:vertex:deleted', this.updatePositions)
     }
   }
 
-  stopEditing() {
-    this.featureRef.disableEdit()
-  }
-
-  updatePositions(e) {
+  updatePositions = (e) => {
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
+    // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
     const geometry = { ...feature.geometry, positions }
     this.props.dispatch(updateFeature({ ...feature, geometry }))
   }
 
-  onRef(ref) {
+  onRef = (ref) => {
     if (!ref || !ref.leafletElement) return
 
     this.featureRef = ref.leafletElement
 
+    // let leaflet-edit internals finish init'ing before we interact with it
     setTimeout(() => {
       if (this.props.editable) {
-        this.startEditing()
+        const editor = this.featureRef.enableEdit()
+        this.setupEditing()
+        this.featureRef.editor.reset()
       } else {
-        this.stopEditing()
+        this.featureRef.disableEdit()
       }
     }, 0)
   }
@@ -51,10 +55,10 @@ export default class EditableLine extends React.PureComponent {
     const { id, geometry, style } = feature
 
     return <RL.Polyline
-      ref={this.onRef.bind(this)}
+      ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
-      positions={centered(geometry.positions)}
+      positions={!geometry.positions ? [] : centered(geometry.positions)}
     />
   }
 }
