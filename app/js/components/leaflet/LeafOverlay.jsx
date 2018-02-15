@@ -41,6 +41,7 @@ function prepareListForFeatureGroup(list) {
 }
 
 const LeafOverlay = ({
+  detailFeatureId,
   editFeatureId,
   features,
   layers,
@@ -56,6 +57,13 @@ const LeafOverlay = ({
       visibleFeatures[featureId] = features[featureId]
     )
   })
+
+  if (editFeatureId) {
+    visibleFeatures[editFeatureId] = features[editFeatureId]
+  }
+  if (detailFeatureId) {
+    visibleFeatures[detailFeatureId] = features[detailFeatureId]
+  }
 
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
@@ -79,6 +87,7 @@ const LeafOverlay = ({
 
 const mapStateToProps = ({ control, features, layers, visibleLayers }) => {
   return {
+    detailFeatureId: control.appMode === 'FEATURE' ? control.featureId : null,
     editFeatureId: control.appMode === 'EDIT' ? control.editFeatureId : null,
     features,
     layers,
