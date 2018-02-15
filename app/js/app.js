@@ -16,6 +16,7 @@ const store = createStore(combinedReducers, preloadedState,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 export default store // TODO this is our "api" for now
+// TODO encapsulate in init() function, pass branding options (defaults, texts, links etc.)
 
 listenToWindowResize(store)
 
