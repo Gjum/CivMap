@@ -5,14 +5,27 @@ import { centered, deepLatLngToArr } from '../../utils/math'
 import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
 
 export default class EditableLine extends React.PureComponent {
+  resetEditor = () => {
+    if (!this.featureRef) {
+      console.error('trying to set polyline editing without featureRef')
+      return
+    }
+    // if (this.props.editable == this.featureRef.editEnabled()) return
+    if (!this.props.editable) {
+      this.featureRef.disableEdit()
+      return
+    }
 
-  setupEditing() {
+    this.featureRef.enableEdit() // create editor
+    this.featureRef.editor.reset()
+
     const positions = this.props.feature.geometry.positions
-    if (!positions || positions.length <= 0) {
+    if (!positions || positions.length <= 0 || positions[positions.length - 1].length <= 0) {
+      this.featureRef.editor.disable() // newShape() is broken while editing
       this.featureRef.editor.newShape()
     }
     else {
-      this.featureRef.editor.disable() // continueForward() is no-op (or broken) while editing
+      this.featureRef.editor.disable() // continueForward() is broken while editing
       this.featureRef.editor.continueForward()
       this.featureRef.editor.enable() // re-add corner markers
     }
@@ -26,7 +39,11 @@ export default class EditableLine extends React.PureComponent {
   }
 
   updatePositions = (e) => {
-    const positions = deepLatLngToArr(this.featureRef.getLatLngs())
+    let positions = deepLatLngToArr(this.featureRef.getLatLngs())
+    // normalize to polyline [[[z, x], ...], ...]
+    if (Array.isArray(positions[0]) && !Array.isArray(positions[0][0])) {
+      positions = [positions]
+    }
     // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
     const geometry = { ...feature.geometry, positions }
@@ -36,23 +53,22 @@ export default class EditableLine extends React.PureComponent {
   onRef = (ref) => {
     if (!ref || !ref.leafletElement) return
 
+    if (this.featureRef) {
+      this.featureRef.remove()
+    }
+
     this.featureRef = ref.leafletElement
 
-    // let leaflet-edit internals finish init'ing before we interact with it
-    setTimeout(() => {
-      if (this.props.editable) {
-        const editor = this.featureRef.enableEdit()
-        this.setupEditing()
-        this.featureRef.editor.reset()
-      } else {
-        this.featureRef.disableEdit()
-      }
-    }, 0)
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
   }
 
   render() {
     const { feature, dispatch, editable } = this.props
     const { id, geometry, style } = feature
+
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
 
     return <RL.Polyline
       ref={this.onRef}
