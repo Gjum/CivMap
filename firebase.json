@@ -1,7 +1,4 @@
 {
-  "projects": {
-    "default": "civclassics"
-  },
   "hosting": {
     "public": "dist",
     "rewrites": [

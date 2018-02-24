@@ -3,6 +3,9 @@ node_js: "node"
 
 script: npm run build
 
+before_deploy:
+  - "git log -1 --pretty='Deploying Firebase: travis#'$TRAVIS_BUILD_NUMBER' git-%h %B'"
+
 deploy:
   provider: firebase
   message: "$(git log -1 --pretty='travis#'$TRAVIS_BUILD_NUMBER' git-%h %B')"
