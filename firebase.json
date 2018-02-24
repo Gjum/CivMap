@@ -1,4 +1,5 @@
 {
+  "firebase": "civclassics",
   "hosting": {
     "public": "dist",
     "rewrites": [
