@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as L from 'leaflet'
@@ -17,6 +18,15 @@ var mcCRS = L.extend({}, L.CRS.Simple, {
 })
 
 class LeafMap extends React.Component {
+  static childContextTypes = {
+    leafMap: PropTypes.object,
+  }
+
+  getChildContext() {
+    // TODO this might not fire early enough because we use this.map and not this.state.map
+    return { leafMap: this.map }
+  }
+
   componentWillReceiveProps(newProps) {
     const { viewport } = newProps
     if (viewport !== this.props.viewport) {

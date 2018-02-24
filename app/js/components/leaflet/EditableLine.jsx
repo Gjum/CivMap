@@ -10,7 +10,6 @@ export default class EditableLine extends React.PureComponent {
       console.error('trying to set polyline editing without featureRef')
       return
     }
-    // if (this.props.editable == this.featureRef.editEnabled()) return
     if (!this.props.editable) {
       this.featureRef.disableEdit()
       return
@@ -52,10 +51,6 @@ export default class EditableLine extends React.PureComponent {
 
   onRef = (ref) => {
     if (!ref || !ref.leafletElement) return
-
-    if (this.featureRef) {
-      this.featureRef.remove()
-    }
 
     this.featureRef = ref.leafletElement
 

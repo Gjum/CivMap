@@ -1,33 +1,40 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
+import { intCoords } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
 export default class EditableMarker extends React.PureComponent {
-  startEditing() {
+  static contextTypes = {
+    leafMap: PropTypes.object,
+  }
+
+  resetEditor = () => {
     const editor = this.featureRef.enableEdit()
     editor.reset()
 
-    const { feature } = this.props
-    if (!feature.geometry.position) {
-      // XXX add on click, show "click on map" prompt/tooltip, change cursor
-      editor.startMarker()
+    if (!this.featureRef) {
+      console.error('trying to set marker editing without featureRef')
+      return
+    }
+    if (!this.props.editable) {
+      this.featureRef.disableEdit()
+      return
     }
 
-    if (!this.isListening) {
-      this.isListening = true
-      this.featureRef.on('editable:dragend', this.updatePositions.bind(this))
+    this.featureRef.enableEdit() // create editor
+    this.featureRef.editor.reset()
+
+    if (!this.featureRef.civMapIsListening) {
+      this.featureRef.civMapIsListening = true
+      this.featureRef.on('editable:dragend', this.updatePositions)
     }
   }
 
-  stopEditing() {
-    this.featureRef.disableEdit()
-  }
-
-  updatePositions(e) {
-    const { lat, lng } = this.featureRef.getLatLng()
+  updatePositions = (e) => {
     const { feature } = this.props
-    const geometry = { ...feature.geometry, position: [parseInt(lat), parseInt(lng)] }
+    const geometry = { ...feature.geometry, position: intCoords(this.featureRef.getLatLng()) }
     this.props.dispatch(updateFeature({ ...feature, geometry }))
   }
 
@@ -36,21 +43,28 @@ export default class EditableMarker extends React.PureComponent {
 
     this.featureRef = ref.leafletElement
 
-    setTimeout(() => {
-      if (this.props.editable) {
-        this.startEditing()
-      } else {
-        this.stopEditing()
-      }
-    }, 0)
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
   }
 
   render() {
     const { feature, dispatch, editable } = this.props
     const { id, geometry, style } = feature
     if (!geometry.position) {
-      geometry.position = [0,0] // XXX get map center from passed-through props
+      const tempMarker = this.context.leafMap.editTools.startMarker()
+      tempMarker.on('editable:drawing:clicked', e => {
+        const { feature } = this.props
+        const geometry = { ...feature.geometry, position: intCoords(tempMarker.getLatLng()) }
+        tempMarker.remove()
+        this.props.dispatch(updateFeature({ ...feature, geometry }))
+      })
+
+      return null
     }
+
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
+
     const [z, x] = geometry.position
 
     return <RL.Marker
