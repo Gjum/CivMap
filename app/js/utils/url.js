@@ -11,7 +11,10 @@ export function loadAppStateFromUrlData(urlData, store) {
   } else {
     loadDependentThings()
   }
-  function loadDependentThings() {
+  function loadDependentThings(data, error) {
+    if (error) {
+      // TODO handle error
+    }
     if (urlData.overlay) {
       // TODO load overlay, open layer detail mode, move into view if no viewport is set
     }
@@ -19,11 +22,15 @@ export function loadAppStateFromUrlData(urlData, store) {
       // TODO load feature, open feature detail mode, move into view if no viewport is set
     }
     if (urlData.featureId) {
-      store.dispatch(openFeatureDetail(urlData.featureId))
-      if (!urlData.viewport) {
-        const feature = store.getState().features[urlData.featureId]
-        const viewport = circleBoundsFromFeatureGeometry(feature.geometry)
-        store.dispatch(setViewport(viewport))
+      const feature = store.getState().features[urlData.featureId]
+      if (feature) {
+        store.dispatch(openFeatureDetail(urlData.featureId))
+        if (!urlData.viewport) {
+          const viewport = circleBoundsFromFeatureGeometry(feature.geometry)
+          store.dispatch(setViewport(viewport))
+        }
+      } else {
+        // TODO handle error
       }
     }
     if (urlData.viewport) {
