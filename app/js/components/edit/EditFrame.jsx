@@ -10,6 +10,7 @@ import Select from 'material-ui/Select'
 import CheckIcon from 'material-ui-icons/Check'
 import DeleteIcon from 'material-ui-icons/Delete'
 import ResetIcon from 'material-ui-icons/Undo'
+import SwapIcon from 'material-ui-icons/SwapCalls'
 
 import CircleIcon from 'material-ui-icons/AddCircle'
 import ImageIcon from 'material-ui-icons/InsertPhoto'
@@ -18,6 +19,7 @@ import MarkerIcon from 'material-ui-icons/AddLocation'
 import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
 
 import { addFeature, openBrowseMode, openEditMode, openFeatureDetail, openLayerDetail, removeFeature, showLayer, updateFeature } from '../../store'
+import { reversePolyPositions } from '../../utils/math'
 
 function makeId() {
   return v4()
@@ -38,13 +40,6 @@ class EditorAny extends React.Component {
       <div style={{ margin: '16px' }}>
 
         <Button raised onClick={() => {
-          dispatch(openFeatureDetail(feature.id))
-        }}>
-          <CheckIcon />
-          Save
-        </Button>
-
-        <Button raised onClick={() => {
           dispatch(updateFeature(originalFeature))
         }}>
           <ResetIcon />
@@ -59,6 +54,32 @@ class EditorAny extends React.Component {
           Delete
         </Button>
 
+        <Button raised onClick={() => {
+          dispatch(openFeatureDetail(feature.id))
+        }}>
+          <CheckIcon />
+          Save
+        </Button>
+
+      </div>
+      <div style={{ margin: '16px' }}>
+        {
+          feature.geometry.type === 'polygon' ?
+            <Button raised onClick={() => {
+              dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, type: "line" } }))
+            }}><LineIcon />Convert to line</Button>
+            : feature.geometry.type === 'line' ?
+              <Button raised onClick={() => {
+                dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, type: "polygon" } }))
+              }}><PolygonIcon />Convert to area</Button>
+              : null
+        }
+        {feature.geometry.type !== 'line' && feature.geometry.type !== 'polygon' ? null :
+          <Button raised onClick={() => {
+            const positions = reversePolyPositions(feature.geometry.positions)
+            dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, positions } }))
+          }}><SwapIcon />Reverse positions</Button>
+        }
       </div>
 
       <FeatureProps featureProps={feature.properties} />

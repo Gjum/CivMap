@@ -46,6 +46,19 @@ export function centered(positions) {
   return [positions[0] + .5, positions[1] + .5]
 }
 
+export function reversePolyPositions(positions) {
+  if (!positions || !Array.isArray(positions) || !Array.isArray(positions[0]))
+    return positions
+  if (!Array.isArray(positions[0][0]))
+    return positions.reverse() // line: [[z,x],p2,...]
+  if (!Array.isArray(positions[0][0][0]))
+    return positions.map(l => l.reverse()) // polyline: [[[z,x],p2,...],l2,...]
+  if (!Array.isArray(positions[0][0][0][0]))
+    return positions.map(s => s.map(l => l.reverse())) // multipolygon: [[[[z,x],p2,...],l2,...],s2,...]
+  console.error('cannot reverse too deeply nested positions:', positions)
+  return positions
+}
+
 export function circleBoundsFromFeatureGeometry(geometry) {
   switch (geometry.type) {
     case 'label':
