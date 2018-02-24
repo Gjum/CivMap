@@ -1,60 +1,75 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
 import { centered, deepLatLngToArr } from '../../utils/math'
-import { openFeatureDetail, updateFeature } from '../../store'
+import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
 
-export default class EditableLine extends React.PureComponent {
-  startEditing() {
-    const editor = this.featureRef.enableEdit()
-    editor.reset()
+// TODO deduplicate polygon/polyline code
 
-    if (this.props.feature.geometry.positions.length <= 0) {
+export default class EditablePolygon extends React.PureComponent {
+  static contextTypes = {
+    leafMap: PropTypes.object,
+  }
+
+  resetEditor = () => {
+    if (!this.featureRef) {
+      console.error('trying to set polygon editing without featureRef')
+      return
+    }
+    if (!this.props.editable) {
+      this.featureRef.disableEdit()
+      return
+    }
+
+    this.featureRef.enableEdit() // create editor
+    this.featureRef.editor.reset()
+
+    const positions = this.props.feature.geometry.positions
+    if (!positions || positions.length <= 0 || positions[positions.length - 1].length <= 0) {
+      this.featureRef.editor.disable() // newShape() is broken while editing
       this.featureRef.editor.newShape()
     }
 
-    if (!this.isListening) {
-      this.isListening = true
-      this.featureRef.on('editable:drawing:clicked', this.updatePositions.bind(this))
-      this.featureRef.on('editable:vertex:dragend', this.updatePositions.bind(this))
-      this.featureRef.on('editable:vertex:deleted', this.updatePositions.bind(this))
+    if (!this.featureRef.civMapIsListening) {
+      this.featureRef.civMapIsListening = true
+      // TODO add holes by clicking on shape
+      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
+      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
+      this.featureRef.on('editable:vertex:deleted', this.updatePositions)
     }
   }
 
-  stopEditing() {
-    this.featureRef.disableEdit()
-  }
-
-  updatePositions(e) {
+  updatePositions = (e) => {
+    this.featureRef.editor.ensureMulti()
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
+    // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
     const geometry = { ...feature.geometry, positions }
     this.props.dispatch(updateFeature({ ...feature, geometry }))
   }
 
-  onRef(ref) {
+  onRef = (ref) => {
     if (!ref || !ref.leafletElement) return
 
     this.featureRef = ref.leafletElement
 
-    setTimeout(() => {
-      if (this.props.editable) {
-        this.startEditing()
-      } else {
-        this.stopEditing()
-      }
-    }, 0)
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
   }
 
   render() {
     const { feature, dispatch, editable } = this.props
     const { id, geometry, style } = feature
 
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
+
     return <RL.Polygon
-      ref={this.onRef.bind(this)}
+      ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
-      positions={centered(geometry.positions)}
+      positions={!geometry.positions ? [] : centered(geometry.positions)}
     />
   }
 }

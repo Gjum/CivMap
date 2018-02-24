@@ -38,11 +38,8 @@ export default class EditableLine extends React.PureComponent {
   }
 
   updatePositions = (e) => {
-    let positions = deepLatLngToArr(this.featureRef.getLatLngs())
-    // normalize to polyline [[[z, x], ...], ...]
-    if (Array.isArray(positions[0]) && !Array.isArray(positions[0][0])) {
-      positions = [positions]
-    }
+    this.featureRef.editor.ensureMulti()
+    const positions = deepLatLngToArr(this.featureRef.getLatLngs())
     // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
     const geometry = { ...feature.geometry, positions }

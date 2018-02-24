@@ -104,7 +104,7 @@ class FeatureCreator extends React.Component {
         this.makeNewAndEdit("line")
       }}><LineIcon />Create line</Button>
       <br />
-      <Button onClick={() => {
+      <Button disabled onClick={() => {
         this.makeNewAndEdit("polygon")
       }}><PolygonIcon />Create area</Button>
       <br />
