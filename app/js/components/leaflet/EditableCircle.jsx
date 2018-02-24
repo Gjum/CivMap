@@ -1,32 +1,44 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
+import { intCoords } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
-export default class EditableMarker extends React.PureComponent {
-  startEditing() {
-    const editor = this.featureRef.enableEdit()
-    editor.reset()
+export default class EditableCircle extends React.PureComponent {
+  static contextTypes = {
+    leafMap: PropTypes.object,
+  }
 
-    if (!this.isListening) {
-      this.isListening = true
-      this.featureRef.on('editable:drawing:clicked', this.updatePositions.bind(this))
-      this.featureRef.on('editable:vertex:dragend', this.updatePositions.bind(this))
-      this.featureRef.on('editable:vertex:deleted', this.updatePositions.bind(this))
+  resetEditor = () => {
+    const editor = this.featureRef.enableEdit()
+    editor.reset() // TODO only reset when radius/center changed
+
+    if (!this.featureRef) {
+      console.error('trying to set circle editing without featureRef')
+      return
+    }
+    if (!this.props.editable) {
+      this.featureRef.disableEdit()
+      return
+    }
+
+    this.featureRef.enableEdit() // create editor
+    this.featureRef.editor.reset()
+
+    if (!this.featureRef.civMapIsListening) {
+      this.featureRef.civMapIsListening = true
+      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
+      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
     }
   }
 
-  stopEditing() {
-    this.featureRef.disableEdit()
-  }
-
-  updatePositions(e) {
-    const { lat, lng } = this.featureRef.getLatLng()
+  updatePositions = (e) => {
     const { feature } = this.props
     const geometry = {
       ...feature.geometry,
-      center: [parseInt(lat), parseInt(lng)],
-      radius: this.featureRef.getRadius(),
+      center: intCoords(this.featureRef.getLatLng()),
+      radius: Math.round(this.featureRef.getRadius()),
     }
     this.props.dispatch(updateFeature({ ...feature, geometry }))
   }
@@ -36,18 +48,34 @@ export default class EditableMarker extends React.PureComponent {
 
     this.featureRef = ref.leafletElement
 
-    setTimeout(() => {
-      if (this.props.editable) {
-        this.startEditing()
-      } else {
-        this.stopEditing()
-      }
-    }, 0)
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
   }
 
   render() {
-    const { feature, dispatch, editable } = this.props
+    let { feature, dispatch, editable } = this.props
+    editable = false // TODO fix radius marker projection
+
     const { id, geometry, style } = feature
+    if (!geometry.center) {
+      const tempCircle = this.context.leafMap.editTools.startCircle()
+      tempCircle.on('editable:vertex:dragend', e => {
+        const { feature } = this.props
+        const geometry = {
+          ...feature.geometry,
+          center: intCoords(tempCircle.getLatLng()),
+          radius: Math.round(tempCircle.getRadius()),
+        }
+        tempCircle.remove()
+        this.props.dispatch(updateFeature({ ...feature, geometry }))
+      })
+
+      return null
+    }
+
+    // let leaflet internals finish updating before we interact with it
+    setTimeout(this.resetEditor, 0)
+
     const [z, x] = geometry.center
 
     return <RL.Circle

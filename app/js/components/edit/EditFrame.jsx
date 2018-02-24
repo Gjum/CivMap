@@ -101,16 +101,16 @@ class FeatureCreator extends React.Component {
       }}><MarkerIcon />Create marker</Button>
       <br />
       <Button onClick={() => {
-        this.makeNewAndEdit("circle")
-      }}><CircleIcon />Create circle</Button>
-      <br />
-      <Button onClick={() => {
         this.makeNewAndEdit("line")
       }}><LineIcon />Create line</Button>
       <br />
       <Button onClick={() => {
         this.makeNewAndEdit("polygon")
       }}><PolygonIcon />Create area</Button>
+      <br />
+      <Button disabled onClick={() => {
+        this.makeNewAndEdit("circle")
+      }}><CircleIcon />Create circle</Button>
       <br />
       <Button disabled onClick={() => {
         this.makeNewAndEdit("image")
