@@ -4,12 +4,12 @@ node_js: "node"
 script: npm run build
 
 before_deploy:
-  - "git log -1 --pretty='Deploying Firebase: travis#'$TRAVIS_BUILD_NUMBER' git-%h %B'"
+  - "git log -1 --pretty='Deploying Firebase: %B travis#'$TRAVIS_BUILD_NUMBER' git-%h'"
 
 deploy:
   skip_cleanup: true
   provider: firebase
-  message: "$(git log -1 --pretty='travis#'$TRAVIS_BUILD_NUMBER' git-%h %B')"
+  message: "$(git log -1 --pretty='%B travis#'$TRAVIS_BUILD_NUMBER' git-%h')"
   token:
     secure: j8ZnLmc81Feo1KmMyIC2iuOIa1SEud1MWcxQZWRFdwHVARHMZxSoZF3A1zgKouIQE7sV3wry8WH0QkCtGADCajhpYFdepAsDaYIMoekXaZBFw2rqWZR1OEzAAQYzKRhXBWL67ligBdQre26NBY0wySYUWSUp9oXDfUsl5+DD9CZHzY0o2XCFSvZpb0ekCs/zGb5STK0ca7J4i4LFO1a5SDfKCEZZR8+anmIVF/vyiCg6kTL8fFx0Vxyl8yT5JbjDhwdEOsR3XHRe6sz4jabshNzDmFfEdgK7MSoY2lrEC9ZLJLAbHcLR2KRz/RTXoJQONccu4QfJU/U/y/Q6h32td5KbkSgE6y/TnwaP/OoE9676sHO1SUqjdv8WiIPpUGNCxSvDgLIwmZa/2PKAiKT/253wHyO74zBPN8dQ7O5VWqCWXF6v6T46wPIkG2JNe4wkskjOYd9PhdMgHEmlp8EbkAo/WAsw/Filt1Ho9STEBOcFh+XBf4tTuwRk5MgwNQtdJ+w/n7wV6+DwddGcn7xQmJ8xdFK024cZrmddWjpA3jhYQibl2ctl7ZWBsLjt/fTBrqLwg3BIwzieg8HU/VndFb73iaRTE274Ft2nAu/GqUxXAbKfmCyNC5Pml0CktVq8kv4k3g6JF9nhVrrH6mHx6xM/kZptAJTU7r7yn4xx8Fg=
 
