@@ -106,7 +106,7 @@ const FeatureStyle = ({ feature, dispatch }) => {
   </div>
 }
 
-class FeatureProps extends React.PureComponent {
+class _FeatureProps extends React.PureComponent {
   constructor(props) {
     super(props)
 
@@ -115,9 +115,33 @@ class FeatureProps extends React.PureComponent {
     }
   }
 
+  renderRailConnectionControls() {
+    const { feature, dispatch } = this.props
+    if (!feature.is_rail_connection) return
+
+    const posStart = feature.line[0][0]
+    const posEnd = feature.line[0][feature.line[0].length - 1]
+    const closestStopIdStart = closestStop(posStart, this.props.features)
+    const closestStopIdEnd = closestStop(posEnd, this.props.features)
+
+    const setStartOrEnd = (startOrEnd, value) => dispatch(updateFeature({ ...feature, [startOrEnd]: value }))
+
+    return <div>
+      {closestStopIdStart && (closestStopIdStart !== feature.rail_start) && <Button raised
+        onClick={() => setStartOrEnd('rail_start', closestStopIdStart)}
+      >Start at {closestStopIdStart}</Button>}
+      {closestStopIdEnd && (closestStopIdEnd !== feature.rail_end) && <Button raised
+        onClick={() => setStartOrEnd('rail_end', closestStopIdEnd)}
+      >End at {closestStopIdEnd}</Button>}
+    </div>
+  }
+
   render() {
     const { feature, dispatch } = this.props
     return <div style={{ margin: '16px' }}>
+
+      {this.renderRailConnectionControls()}
+
       {/* TODO list of key-value text fields */}
       <TextField fullWidth multiline
         rowsMax={9999}
@@ -139,6 +163,29 @@ class FeatureProps extends React.PureComponent {
     </div>
   }
 }
+
+const FeatureProps = connect(({ features }) => {
+  return {
+    features: Object.values(features),
+  }
+})(_FeatureProps)
+
+function closestStop(position, features) {
+  const [fz, fx] = position
+  let stopId = null
+  let minDist = 200 // won't search further than this
+  features.filter(f => f.rail_stop_id)
+    .forEach(f => {
+      const [az, ax] = [f.z, f.x]
+      const da = Math.abs(az - fz) + Math.abs(ax - fx)
+      if (minDist > da) {
+        minDist = da
+        stopId = f.rail_stop_id
+      }
+    })
+  return stopId
+}
+
 
 class FeatureCreator extends React.Component {
   render() {
