@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
 
-import LeafLabel from './LeafLabel'
 import EditableCircle from './EditableCircle'
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
@@ -71,7 +70,6 @@ const LeafOverlay = ({
         const props = { feature, editable, dispatch }
         switch (feature.geometry.type) {
           case "marker": return <EditableMarker key={feature.id || i} {...props} />
-          case "label": return <FeatureOverlayLabel key={feature.id || i} {...props} />
           case "circle": return <EditableCircle key={feature.id || i} {...props} />
           case "image": return <FeatureOverlayImage key={feature.id || i} {...props} />
           case "line": return <EditableLine key={feature.id || i} {...props} />

@@ -1,3 +1,4 @@
+import * as L from 'leaflet'
 import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
@@ -5,15 +6,37 @@ import * as RL from 'react-leaflet'
 import { intCoords } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
+// TODO label data: position, offset, direction, text (, num. lines?)
+
 export default class EditableMarker extends React.PureComponent {
   static contextTypes = {
     leafMap: PropTypes.object,
   }
 
-  resetEditor = () => {
-    const editor = this.featureRef.enableEdit()
-    editor.reset()
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.feature.properties.label
+      !== this.props.feature.properties.label) {
+      this.labelIcon = null
+    }
+  }
 
+  recreateLabel(props) {
+    if (!props.feature.properties.label) {
+      this.labelIcon = null
+      return
+    }
+
+    const html = '<span class="leaflabel-text">' + props.feature.properties.label + '</span>'
+    // TODO set props.brightMap depending on basemap bg color
+    const colorClass = props.brightMap ? 'leaflabel-black' : 'leaflabel-white'
+    this.labelIcon = L.divIcon({
+      className: 'leaflabel ' + colorClass,
+      html,
+      iconSize: [100, 100], // TODO arbitrary
+    })
+  }
+
+  resetEditor = () => {
     if (!this.featureRef) {
       console.error('trying to set marker editing without featureRef')
       return
@@ -65,6 +88,8 @@ export default class EditableMarker extends React.PureComponent {
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
 
+    if (!this.labelIcon) this.recreateLabel(this.props)
+
     const [z, x] = geometry.position
 
     return <RL.Marker
@@ -72,7 +97,7 @@ export default class EditableMarker extends React.PureComponent {
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
       position={[z + .5, x + .5]}
-      title={feature.properties.name}
+      icon={this.labelIcon}
     />
   }
 }
