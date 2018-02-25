@@ -24,6 +24,7 @@ function linkify(val) {
   if (isUrl(val)) return <a href={val} target='_blank'>{val}</a>
 
   const elements = []
+  val = '' + val // make string
   val.split(' ').forEach((word, i) => {
     elements.push(' ')
     if (/^[ru]\/[^ \/]+$/.test(word)) {
