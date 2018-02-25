@@ -83,6 +83,7 @@ const LayersList = ({
         <div key={groupName}>
           <ListSubheader>{groupName}</ListSubheader>
           {groups[groupName].map(layerId =>
+            layers[layerId] &&
             <Layer
               key={layerId}
               visible={groupName === 'Visible Layers'}
