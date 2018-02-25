@@ -6,9 +6,8 @@ import EditableCircle from './EditableCircle'
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
+import PassiveLabel from './PassiveLabel'
 import { openFeatureDetail } from '../../store'
-
-// TODO CircleMarker
 
 function FeatureOverlayImage({ feature, dispatch }) {
   const { id, geometry, style } = feature
@@ -66,6 +65,14 @@ const LeafOverlay = ({
             console.error("[FeaturesOverlay] Unknown feature geometry type", feature)
         }
       })
+    )}
+    {/* show labels for any feature */}
+    {prepareListForFeatureGroup(
+      Object.values(visibleFeatures)
+        .filter(feature => feature.style.label && feature.properties.label)
+        .map((feature, i) => {
+          return <PassiveLabel key={(feature.id || i) + '_label'} feature={feature} />
+        })
     )}
   </RL.FeatureGroup>
 }

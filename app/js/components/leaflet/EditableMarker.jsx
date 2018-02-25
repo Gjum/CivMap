@@ -6,34 +6,41 @@ import * as RL from 'react-leaflet'
 import { intCoords } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
-// TODO label data: position, offset, direction, text (, num. lines?)
-
 export default class EditableMarker extends React.PureComponent {
   static contextTypes = {
     leafMap: PropTypes.object,
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.feature.properties.label
-      !== this.props.feature.properties.label) {
-      this.labelIcon = null
+    if (nextProps.feature.style
+      !== this.props.feature.style) {
+      this.icon = null
     }
   }
 
-  recreateLabel(props) {
-    if (!props.feature.properties.label) {
-      this.labelIcon = null
-      return
-    }
+  recreateIcon(props) {
+    this.icon = null
 
-    const html = '<span class="leaflabel-text">' + props.feature.properties.label + '</span>'
-    // TODO set props.brightMap depending on basemap bg color
-    const colorClass = props.brightMap ? 'leaflabel-black' : 'leaflabel-white'
-    this.labelIcon = L.divIcon({
-      className: 'leaflabel ' + colorClass,
-      html,
-      iconSize: [100, 100], // TODO arbitrary
-    })
+    const { circle_marker, icon_url } = props.feature.style
+
+    if (icon_url) {
+      this.icon = L.icon({
+        iconUrl: icon_url,
+        iconSize: [16, 16], // TODO from style
+        // iconAnchor: [0, 0], // TODO from style
+      })
+    } else if (circle_marker) {
+      // TODO implement all other Path styles
+      const { radius = 10, weight = 2, color = '#000000', fillColor = '#ffffff' } = circle_marker
+      const width = 2 * radius
+      let htmlStyle = `width:${width}px;height:${width}px;`
+      htmlStyle += `border:${weight}px solid ${color};background-color:${fillColor};`
+      this.icon = L.divIcon({
+        className: 'leafmarker-circleicon',
+        html: `<div class="leafmarker-circleicon-circle" style="${htmlStyle}" />`,
+        iconSize: [width, width],
+      })
+    }
   }
 
   resetEditor = () => {
@@ -88,16 +95,22 @@ export default class EditableMarker extends React.PureComponent {
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
 
-    if (!this.labelIcon) this.recreateLabel(this.props)
+    if (!this.icon) this.recreateIcon(this.props)
 
     const [z, x] = geometry.position
 
+    if (this.icon) return <RL.Marker
+      ref={this.onRef.bind(this)}
+      onclick={() => editable || dispatch(openFeatureDetail(id))}
+      {...style}
+      position={[z + .5, x + .5]}
+      icon={this.icon}
+    />
     return <RL.Marker
       ref={this.onRef.bind(this)}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
       position={[z + .5, x + .5]}
-      icon={this.labelIcon}
     />
   }
 }
