@@ -10,18 +10,6 @@ import { openFeatureDetail } from '../../store'
 
 // TODO CircleMarker
 
-function FeatureOverlayLabel({ feature, dispatch }) {
-  const { id, geometry, style, properties = {} } = feature
-  const [z, x] = geometry.position
-  if (!properties.name) return null
-  return <LeafLabel
-    onclick={() => dispatch(openFeatureDetail(id))}
-    {...style}
-    text={properties.name}
-    position={[z + .5, x + .5]}
-  />
-}
-
 function FeatureOverlayImage({ feature, dispatch }) {
   const { id, geometry, style } = feature
   return <RL.ImageOverlay
