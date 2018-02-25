@@ -6,6 +6,7 @@ import Button from 'material-ui/Button'
 import IconButton from 'material-ui/IconButton'
 import { MenuItem } from 'material-ui/Menu'
 import Select from 'material-ui/Select'
+import TextField from 'material-ui/TextField'
 
 import CheckIcon from 'material-ui-icons/Check'
 import DeleteIcon from 'material-ui-icons/Delete'
@@ -82,16 +83,56 @@ class EditorAny extends React.Component {
         }
       </div>
 
-      <FeatureProps featureProps={feature.properties} />
+      <FeatureStyle feature={feature} dispatch={dispatch} />
+      <FeatureProps feature={feature} dispatch={dispatch} />
     </div>
   }
 }
 
-const FeatureProps = ({ featureProps }) => {
-  // TODO list of key-value text fields
+const FeatureStyle = ({ feature, dispatch }) => {
   return <div style={{ margin: '16px' }}>
-    TODO edit properties here
+    {/* TODO offer color palette */}
+    Color: <input type="color"
+      style={{ marginLeft: 16 }}
+      value={feature.style.color || '#00ffff'}
+      onChange={e => dispatch(updateFeature({ ...feature, style: { ...feature.style, color: e.target.value } }))}
+    />
+    {/* TODO controls for weight, opacity, fillColor, fillOpacity, dash{Array,Offset}, ... */}
   </div>
+}
+
+class FeatureProps extends React.PureComponent {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      parseErrorText: undefined,
+    }
+  }
+
+  render() {
+    const { feature, dispatch } = this.props
+    return <div style={{ margin: '16px' }}>
+      {/* TODO list of key-value text fields */}
+      <TextField fullWidth multiline
+        rowsMax={9999}
+        label="JSON"
+        value={this.state.parseErrorText ? undefined : JSON.stringify(feature)}
+        error={!!this.state.parseErrorText}
+        helperText={this.state.parseErrorText}
+        onChange={e => {
+          try {
+            const newFeature = JSON.parse(e.target.value)
+            // TODO validate feature
+            dispatch(updateFeature(newFeature))
+            this.setState({ parseErrorText: undefined })
+          } catch (err) {
+            this.setState({ parseErrorText: '' + err })
+          }
+        }}
+      />
+    </div>
+  }
 }
 
 class FeatureCreator extends React.Component {
