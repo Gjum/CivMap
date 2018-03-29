@@ -1,13 +1,13 @@
 import { circleBoundsFromFeatureGeometry, circleToBounds } from './math'
 import { getJSON } from './net'
-import { loadLayer, openFeatureDetail, setActiveBasemap, setViewport, setVisibleLayers } from '../store'
+import { openFeatureDetail, setActiveBasemap, setViewport, loadFeatures } from '../store'
 
 export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {
     store.dispatch(setActiveBasemap(urlData.basemap))
   }
-  if (urlData.overlayUrl) {
-    loadOverlayJsonAsync(urlData.overlayUrl, store, loadDependentThings)
+  if (urlData.collectionUrl) {
+    loadCollectionJsonAsync(urlData.collectionUrl, store, loadDependentThings)
   } else {
     loadDependentThings()
   }
@@ -15,8 +15,8 @@ export function loadAppStateFromUrlData(urlData, store) {
     if (error) {
       // TODO handle error
     }
-    if (urlData.overlay) {
-      // TODO load overlay, open layer detail mode, move into view if no viewport is set
+    if (urlData.collection) {
+      // TODO load collection, move into view if no viewport is set
     }
     if (urlData.feature) {
       // TODO load feature, open feature detail mode, move into view if no viewport is set
@@ -39,42 +39,41 @@ export function loadAppStateFromUrlData(urlData, store) {
   }
 }
 
-export function loadOverlayJsonAsync(url, store, cb) {
+export function loadCollectionJsonAsync(url, store, cb) {
   getJSON(url,
     data => {
-      if (!data.visibleLayers) {
-        data.visibleLayers = data.layers.map(layer => layer.id)
-      } else {
-        // TODO remove unreferenced visibleLayers
-      }
-
-      // TODO remove unreferenced features
-
-      // TODO do this import operation in one batch using loadOverlay action
-      // also do it in the caller, not in here, to get rid of store dependency
-      // also use promises for this
-      data.layers.forEach(layer => store.dispatch(loadLayer(layer)))
-      store.dispatch(setVisibleLayers(data.visibleLayers))
-
-      console.log('Loaded', data.layers.length, 'layers from', url)
-
+      loadCollectionJson(data, store, url)
       cb && cb(null, data)
     },
     err => {
-      console.error("Could not load public layers from " + url, err)
+      console.error("Could not load collection from " + url, err)
       cb && cb(err)
     }
   )
+}
+
+export function loadCollectionJson(data, store, url) {
+  // TODO check version, fallback/error on unexpected
+  data = { ...data }
+  if (!data.features) data.features = []
+  if (!data.filters) data.filters = []
+
+  store.dispatch(loadFeatures(data.features))
+  // store.dispatch(addFilters(data.filters))
+  // store.dispatch(enableFilters(data.enabledFilters))
+
+  console.log('Loaded collection with', data.features.length, 'features and',
+    data.filters.length, 'filters from', url)
 }
 
 export function parseUrlHash(hash) {
   const urlData = {
     basemap: undefined,
     viewport: undefined,
-    overlayUrl: undefined,
+    collectionUrl: undefined,
     featureId: undefined,
     feature: undefined,
-    overlay: undefined,
+    collection: undefined,
   }
   if (!hash) return urlData
 
@@ -99,8 +98,8 @@ export function parseUrlHash(hash) {
     else if (key == 't') urlData.basemap = val
     else if (key == 'f') urlData.featureId = val
     else if (key == 'feature') urlData.feature = JSON.parse(val)
-    else if (key == 'overlay') urlData.overlay = JSON.parse(val)
-    else if (key == 'u') urlData.overlayUrl = val
+    else if (key == 'collection') urlData.collection = JSON.parse(val)
+    else if (key == 'u') urlData.collectionUrl = val
     else console.error("Unknown url hash entry", part)
   })
 

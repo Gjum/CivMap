@@ -11,12 +11,11 @@ import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 import CloseIcon from 'material-ui-icons/Close'
 
-import { openBrowseMode, openLayerDetail, openSearch, openShare, setDrawerOpen } from '../../store'
+import { openBrowseMode, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarFeature = ({
   feature,
   openBrowseMode,
-  openLayerDetail, // TODO go back to feature's layer
   openSearch,
   openShare,
   setDrawerOpen,
@@ -53,7 +52,6 @@ const mapStateToProps = ({ features, control }) => {
 
 const mapDispatchToProps = {
   openBrowseMode,
-  openLayerDetail,
   openSearch,
   openShare,
   setDrawerOpen,

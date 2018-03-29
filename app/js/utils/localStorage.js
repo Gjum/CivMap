@@ -4,21 +4,17 @@ export function saveAppStateToLocalStorage(state) {
   try {
     const {
       mapView,
-      visibleLayers,
       features,
-      layers,
     } = state
 
     // TODO skip if unchanged
     const data = {
       features,
-      layers,
     }
     window.localStorage.setItem('CivMap.data', JSON.stringify(data))
 
     const view = {
       mapView,
-      visibleLayers,
     }
     window.localStorage.setItem('CivMap.view', JSON.stringify(view))
 

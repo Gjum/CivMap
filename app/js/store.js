@@ -8,7 +8,6 @@ export const defaultControlState = {
   drawerOpen: false,
   editFeatureId: null,
   featureId: null,
-  layerId: null,
   searchQuery: null,
   windowHeight: NaN, // TODO move window size to its own substate?
   windowWidth: NaN,
@@ -30,13 +29,6 @@ const control = (state = defaultControlState, action) => {
         ...state, drawerOpen: false, appMode: 'FEATURE',
         featureId: action.featureId,
       }
-    case 'OPEN_LAYER_DETAIL':
-      return {
-        ...state, drawerOpen: false, appMode: 'LAYER',
-        layerId: action.layerId,
-      }
-    case 'OPEN_LAYERS_SELECT':
-      return { ...state, drawerOpen: false, appMode: 'LAYERS' }
     case 'OPEN_SEARCH':
       return {
         ...state, drawerOpen: false, appMode: 'SEARCH',
@@ -58,10 +50,6 @@ export const openBrowseMode = () => ({ type: 'OPEN_BROWSE_MODE' })
 export const openEditMode = (featureId) => ({ type: 'OPEN_EDIT_MODE', featureId })
 
 export const openFeatureDetail = (featureId) => ({ type: 'OPEN_FEATURE_DETAIL', featureId })
-
-export const openLayerDetail = (layerId) => ({ type: 'OPEN_LAYER_DETAIL', layerId })
-
-export const openLayersSelect = () => ({ type: 'OPEN_LAYERS_SELECT' })
 
 export const openSearch = (query = "") => ({ type: 'OPEN_SEARCH', query })
 
@@ -159,6 +147,12 @@ const features = (state = {}, action) => {
   switch (action.type) {
     case 'APP_LOAD':
       return action.state.features ? { ...state, ...action.state.features } : state
+    case 'LOAD_FEATURES': {
+      const newState = { ...state }
+      action.features.forEach(f =>
+        newState[f.id] = feature(null, addFeature(f)))
+      return newState
+    }
     case 'ADD_FEATURE':
     case 'UPDATE_FEATURE': {
       const newFeature = feature(state[action.feature.id], action)
@@ -169,16 +163,12 @@ const features = (state = {}, action) => {
       delete newState[action.id]
       return newState
     }
-    case 'LOAD_LAYER': {
-      const newState = { ...state }
-      action.layer.features.forEach(f =>
-        newState[f.id] = feature(null, addFeature(f)))
-      return newState
-    }
     default:
       return state
   }
 }
+
+export const loadFeatures = (features) => ({ type: 'LOAD_FEATURES', features })
 
 export const addFeature = (feature) => ({
   type: 'ADD_FEATURE',
@@ -192,114 +182,13 @@ export const updateFeature = (feature) => ({ type: 'UPDATE_FEATURE', feature })
 
 export const removeFeature = (id) => ({ type: 'REMOVE_FEATURE', id })
 
-const layer = (state, action) => {
-  switch (action.type) {
-    case 'ADD_LAYER':
-      return {
-        id: action.layer.id,
-        properties: action.layer.properties || {},
-        features: action.layer.properties || [],
-      }
-    case 'LOAD_LAYER':
-      return {
-        id: action.layer.id,
-        properties: action.layer.properties || {},
-        features: (action.layer.features || []).map(f => f.id),
-      }
-    case 'UPDATE_LAYER':
-      if (action.id != state.id) return state
-      return {
-        ...state.layer,
-        properties: action.layer.properties,
-      }
-    case 'REMOVE_FEATURE': {
-      if (!state.features.includes(action.id)) return state
-      const features = state.features.filter(fid => fid != action.id)
-      return { ...state, features }
-    }
-    default:
-      return state
-  }
-}
-
-const layers = (state = {}, action) => {
-  switch (action.type) {
-    case 'APP_LOAD':
-      return action.state.layers ? { ...state, ...action.state.layers } : state
-    case 'ADD_LAYER':
-    case 'LOAD_LAYER':
-    case 'UPDATE_LAYER': {
-      const newLayer = layer(state[action.layer.id], action)
-      return { ...state, [newLayer.id]: newLayer }
-    }
-    case 'REMOVE_LAYER': {
-      const newState = { ...state }
-      delete newState[action.id]
-      return newState
-    }
-    case 'REMOVE_FEATURE': {
-      const newState = {}
-      Object.values(state).forEach(l => {
-        newState[l.id] = layer(l, action)
-      })
-      return newState
-    }
-    default:
-      return state
-  }
-}
-
-export const addLayer = (layer) => ({
-  type: 'ADD_LAYER',
-  layer: {
-    id: layer.id || v4(),
-    ...layer,
-  }
-})
-
-// TODO we always load layers in bulk, optimise by using loadOverlay instead
-export const loadLayer = (layer) => ({ type: 'LOAD_LAYER', layer })
-
-export const updateLayer = (layer) => ({ type: 'UPDATE_LAYER', layer })
-
-export const removeLayer = (id) => ({ type: 'REMOVE_LAYER', id })
-
-const visibleLayers = (state = [], action) => {
-  switch (action.type) {
-    case 'APP_LOAD':
-      if (!Array.isArray(action.state.visibleLayers))
-        return state
-      return action.state.visibleLayers
-    case 'SET_VISIBLE_LAYERS':
-      if (!Array.isArray(action.visibleLayers))
-        return state
-      return action.visibleLayers
-
-    case 'SHOW_LAYER':
-      if (state.includes(action.layerId)) return state
-      return [action.layerId, ...state]
-
-    case 'HIDE_LAYER':
-      return state.filter(layerId => layerId !== action.layerId)
-
-    default:
-      return state
-  }
-}
-
-export const showLayer = (layerId) => ({ type: 'SHOW_LAYER', layerId })
-
-export const hideLayer = (layerId) => ({ type: 'HIDE_LAYER', layerId })
-
-export const setVisibleLayers = (visibleLayers) => ({ type: 'SET_VISIBLE_LAYERS', visibleLayers })
+// TODO filters: available, active, persist to localStorage
 
 export const combinedReducers = combineReducers({
   control,
   mapView,
   mapConfig,
   features,
-  layers,
-  visibleLayers,
 })
 
 export const appLoad = (state) => ({ type: 'APP_LOAD', state })

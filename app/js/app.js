@@ -27,8 +27,6 @@ store.dispatch(appLoad(getAppStateFromLocalStorage()))
 const urlData = parseUrlHash(location.hash)
 loadAppStateFromUrlData(urlData, store)
 
-// TODO remove unreferenced features/visibleLayers
-
 store.subscribe(throttle(
   () => saveAppStateToLocalStorage(store.getState()),
   1000, { trailing: true }

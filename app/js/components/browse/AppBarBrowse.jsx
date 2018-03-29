@@ -11,21 +11,19 @@ import Typography from 'material-ui/Typography'
 import EditIcon from 'material-ui-icons/Edit'
 import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
-import LayersIcon from 'material-ui-icons/Layers'
 
-import { openEditMode, openLayersSelect, openSearch, openShare, setDrawerOpen } from '../../store'
+import { openEditMode, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarBrowse = ({
   viewport,
   borderApothem,
   openEditMode,
-  openLayersSelect,
   openSearch,
   openShare,
   setDrawerOpen,
 }) => {
 
-  let title = 'ccMap'
+  let title = 'CCMap'
   if (viewport && viewport.radius < borderApothem) {
     title = `${viewport.x}, ${viewport.z}`
   }
@@ -51,12 +49,6 @@ const AppBarBrowse = ({
       </IconButton>
     </Tooltip>
 
-    <Tooltip title="Edit layers">
-      <IconButton onClick={openLayersSelect}>
-        <LayersIcon />
-      </IconButton>
-    </Tooltip>
-
     <Tooltip title="Draw on the map">
       <IconButton onClick={() => openEditMode(null)}>
         <EditIcon />
@@ -74,7 +66,6 @@ const mapStateToProps = ({ mapConfig, mapView }) => {
 
 const mapDispatchToProps = {
   openEditMode,
-  openLayersSelect,
   openSearch,
   openShare,
   setDrawerOpen,

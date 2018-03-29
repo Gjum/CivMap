@@ -29,26 +29,18 @@ const LeafOverlay = ({
   detailFeatureId,
   editFeatureId,
   features,
-  layers,
-  visibleLayers,
   dispatch,
 }) => {
 
-  const visibleFeatures = {}
-  visibleLayers.forEach(layerId => {
-    const layer = layers[layerId]
-    if (!layer) return
-    layer.features.forEach(featureId =>
-      visibleFeatures[featureId] = features[featureId]
-    )
-  })
-
-  if (editFeatureId) {
-    visibleFeatures[editFeatureId] = features[editFeatureId]
-  }
-  if (detailFeatureId) {
-    visibleFeatures[detailFeatureId] = features[detailFeatureId]
-  }
+  // TODO use active filters
+  const visibleFeatures = features
+  // const visibleFeatures = {}
+  // if (editFeatureId) {
+  //   visibleFeatures[editFeatureId] = features[editFeatureId]
+  // }
+  // if (detailFeatureId) {
+  //   visibleFeatures[detailFeatureId] = features[detailFeatureId]
+  // }
 
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
@@ -77,13 +69,11 @@ const LeafOverlay = ({
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ control, features, layers, visibleLayers }) => {
+const mapStateToProps = ({ control, features }) => {
   return {
     detailFeatureId: control.appMode === 'FEATURE' ? control.featureId : null,
     editFeatureId: control.appMode === 'EDIT' ? control.editFeatureId : null,
     features,
-    layers,
-    visibleLayers,
   }
 }
 

@@ -7,9 +7,8 @@ import IconButton from 'material-ui/IconButton'
 import DeleteIcon from 'material-ui-icons/Delete'
 import EditIcon from 'material-ui-icons/Edit'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
-import LayersIcon from 'material-ui-icons/Layers'
 
-import { openBrowseMode, openEditMode, openLayerDetail, removeFeature, setViewport } from '../../store'
+import { openBrowseMode, openEditMode, removeFeature, setViewport } from '../../store'
 import { circleBoundsFromFeatureGeometry } from '../../utils/math'
 
 export function isImageUrl(value) {
@@ -73,10 +72,8 @@ const FeatureProps = ({ featureProps }) => {
 
 const FeatureInfo = ({
   feature,
-  prevLayerId,
   openBrowseMode,
   openEditMode,
-  openLayerDetail,
   removeFeature,
   setViewport,
 }) => {
@@ -90,13 +87,6 @@ const FeatureInfo = ({
         Show on map
       </Button>
 
-      <Button raised
-        disabled={!prevLayerId}
-        onClick={() => openLayerDetail(prevLayerId)}
-      >
-        <LayersIcon />
-        Back to layer
-      </Button>
     </div>
     <div style={{ margin: '16px' }}>
       <Button raised onClick={() => {
@@ -108,7 +98,7 @@ const FeatureInfo = ({
 
       <Button raised onClick={() => {
         removeFeature(feature.id)
-        openBrowseMode() // TODO show layer instead
+        openBrowseMode() // TODO show similar features in search results instead
       }}>
         <DeleteIcon />
         Delete
@@ -124,14 +114,12 @@ const FeatureInfo = ({
 const mapStateToProps = ({ features, control }) => {
   return {
     feature: features[control.featureId],
-    prevLayerId: control.layerId,
   }
 }
 
 const mapDispatchToProps = {
   openBrowseMode,
   openEditMode,
-  openLayerDetail,
   removeFeature,
   setViewport,
 }

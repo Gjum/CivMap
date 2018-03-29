@@ -19,7 +19,7 @@ import LineIcon from 'material-ui-icons/Timeline'
 import MarkerIcon from 'material-ui-icons/AddLocation'
 import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
 
-import { addFeature, openBrowseMode, openEditMode, openFeatureDetail, openLayerDetail, removeFeature, showLayer, updateFeature } from '../../store'
+import { addFeature, openBrowseMode, openEditMode, openFeatureDetail, removeFeature, updateFeature } from '../../store'
 import { reversePolyPositions } from '../../utils/math'
 
 function makeId() {
@@ -49,7 +49,7 @@ class EditorAny extends React.Component {
 
         <Button raised onClick={() => {
           dispatch(removeFeature(feature.id))
-          dispatch(openBrowseMode()) // TODO show layer instead
+          dispatch(openBrowseMode()) // TODO show similar features in search results instead
         }}>
           <DeleteIcon />
           Delete
@@ -75,6 +75,12 @@ class EditorAny extends React.Component {
               }}><PolygonIcon />Convert to area</Button>
               : null
         }
+        {/* {feature.geometry.type !== 'line' && feature.geometry.type !== 'polygon' ? null :
+          <Button raised onClick={() => {
+            const positions = [...feature.geometry.positions, []]
+            dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, positions } }))
+          }}>Add shape</Button>
+        } */}
         {feature.geometry.type !== 'line' && feature.geometry.type !== 'polygon' ? null :
           <Button raised onClick={() => {
             const positions = reversePolyPositions(feature.geometry.positions)
@@ -136,28 +142,15 @@ class FeatureProps extends React.PureComponent {
 }
 
 class FeatureCreator extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      layerId: props.layerId,
-    }
-  }
-
   makeNewAndEdit(type) {
     const { dispatch } = this.props
     const feature = { id: makeId(), geometry: { type: type } }
     dispatch(addFeature(feature))
     dispatch(openEditMode(feature.id))
-
-    const { layerId } = this.state
-    if (layerId) dispatch(showLayer(layerId))
   }
 
   render() {
     return <div>
-      {/* TODO select layer to add feature to */}
-
       <Button onClick={() => {
         this.makeNewAndEdit("marker")
       }}><MarkerIcon />Create marker</Button>
