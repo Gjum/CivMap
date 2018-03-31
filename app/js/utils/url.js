@@ -1,13 +1,13 @@
 import { circleBoundsFromFeatureGeometry, circleToBounds } from './math'
 import { getJSON } from './net'
-import { openFeatureDetail, setActiveBasemap, setViewport, loadFeatures } from '../store'
+import { openFeatureDetail, setActiveBasemap, setViewport, loadFeatures, addFeature } from '../store'
 
 export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {
     store.dispatch(setActiveBasemap(urlData.basemap))
   }
   if (urlData.collectionUrl) {
-    loadCollectionJsonAsync(urlData.collectionUrl, store, loadDependentThings)
+    loadCollectionJsonAsync(urlData.collectionUrl, store.dispatch, loadDependentThings)
   } else {
     loadDependentThings()
   }
@@ -15,11 +15,14 @@ export function loadAppStateFromUrlData(urlData, store) {
     if (error) {
       // TODO handle error
     }
+    // TODO move into view if collectionUrl but no viewport is set
     if (urlData.collection) {
-      // TODO load collection, move into view if no viewport is set
+      // TODO move into view if no viewport is set
+      loadCollectionJson(urlData.collection, store, '#')
     }
     if (urlData.feature) {
-      // TODO load feature, open feature detail mode, move into view if no viewport is set
+      store.dispatch(addFeature(urlData.feature))
+      urlData.featureId = urlData.feature.id
     }
     if (urlData.featureId) {
       const feature = store.getState().features[urlData.featureId]
@@ -39,10 +42,10 @@ export function loadAppStateFromUrlData(urlData, store) {
   }
 }
 
-export function loadCollectionJsonAsync(url, store, cb) {
+export function loadCollectionJsonAsync(url, dispatch, cb) {
   getJSON(url,
     data => {
-      loadCollectionJson(data, store, url)
+      loadCollectionJson(data, dispatch, url)
       cb && cb(null, data)
     },
     err => {
@@ -52,18 +55,22 @@ export function loadCollectionJsonAsync(url, store, cb) {
   )
 }
 
-export function loadCollectionJson(data, store, url) {
-  // TODO check version, fallback/error on unexpected
+export function loadCollectionJson(data, dispatch, source) {
+  // TODO fallback for old versions (1.0.0: layers)
+  if (!data.info || data.info.version !== '2.0.0') {
+    alert(`Can't read Collection version ${data.version}, only 2.0.0 please`)
+    return
+  }
   data = { ...data }
   if (!data.features) data.features = []
   if (!data.filters) data.filters = []
 
-  store.dispatch(loadFeatures(data.features))
-  // store.dispatch(addFilters(data.filters))
-  // store.dispatch(enableFilters(data.enabledFilters))
+  dispatch(loadFeatures(data.features))
+  // dispatch(addFilters(data.filters))
+  // dispatch(enableFilters(data.enabledFilters))
 
   console.log('Loaded collection with', data.features.length, 'features and',
-    data.filters.length, 'filters from', url)
+    data.filters.length, 'filters from', source)
 }
 
 export function parseUrlHash(hash) {
@@ -97,8 +104,8 @@ export function parseUrlHash(hash) {
     else if (key == 'b') urlData.basemap = val
     else if (key == 't') urlData.basemap = val
     else if (key == 'f') urlData.featureId = val
-    else if (key == 'feature') urlData.feature = JSON.parse(val)
-    else if (key == 'collection') urlData.collection = JSON.parse(val)
+    else if (key == 'feature') urlData.feature = JSON.parse(decodeURI(val))
+    else if (key == 'collection') urlData.collection = JSON.parse(decodeURI(val))
     else if (key == 'u') urlData.collectionUrl = val
     else console.error("Unknown url hash entry", part)
   })
