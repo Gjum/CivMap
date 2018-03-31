@@ -8,8 +8,8 @@ import List from 'material-ui/List'
 import { setDrawerClosed } from '../../store'
 
 import BasemapSelectorList from './BasemapSelectorList'
-import ViewResetMenuItem from './ViewResetMenuItem'
-import WaypointsMenuItem from './WaypointsMenuItem'
+import ResetMenuItem from './ResetMenuItem'
+import FileImportMenuItem from './FileImportMenuItem'
 
 const AppDrawer = ({
   drawerOpen,
@@ -24,8 +24,8 @@ const AppDrawer = ({
       <BasemapSelectorList />
       <Divider />
       <List>
-        <WaypointsMenuItem />
-        <ViewResetMenuItem />
+        <FileImportMenuItem />
+        <ResetMenuItem />
       </List>
     </div>
   </Drawer>

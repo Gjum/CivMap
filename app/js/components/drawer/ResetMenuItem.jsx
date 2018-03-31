@@ -2,12 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List'
-import RestorePageIcon from 'material-ui-icons/RestorePage'
+import DeleteForeverIcon from 'material-ui-icons/DeleteForever'
 
 import { appLoad, setDrawerClosed } from '../../store'
 import { defaultAppState } from '../../utils/state'
 
-const ViewResetMenuItem = ({
+const ResetMenuItem = ({
   appLoad,
   setDrawerClosed,
 }) => {
@@ -17,8 +17,8 @@ const ViewResetMenuItem = ({
       setDrawerClosed()
     }}
   >
-    <ListItemIcon><RestorePageIcon /></ListItemIcon>
-    <ListItemText primary='Reset View' />
+    <ListItemIcon><DeleteForeverIcon /></ListItemIcon>
+    <ListItemText primary='Reset all data' />
   </ListItem>
 }
 
@@ -27,4 +27,4 @@ const mapDispatchToProps = {
   setDrawerClosed,
 }
 
-export default connect(undefined, mapDispatchToProps)(ViewResetMenuItem)
+export default connect(undefined, mapDispatchToProps)(ResetMenuItem)
