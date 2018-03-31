@@ -6,6 +6,7 @@ import * as EDIT from './edit'
 import * as FEATURE from './feature'
 
 import AppDrawer from './drawer/AppDrawer'
+import DragDrop from './DragDrop'
 import LeafMap from './leaflet/LeafMap'
 
 const modes = {
@@ -27,6 +28,7 @@ const AppFrame = ({
       <LeafMap />
       {Detail && <div className="mainlist"><Detail /></div>}
     </div>
+    <DragDrop />
   </div>
 }
 

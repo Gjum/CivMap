@@ -8,7 +8,7 @@ import AppFrame from './components/AppFrame'
 import { appLoad, combinedReducers } from './store'
 import { getAppStateFromLocalStorage, saveAppStateToLocalStorage } from './utils/localStorage'
 import { defaultAppState } from './utils/state'
-import { loadAppStateFromUrlData, parseUrlHash } from './utils/url'
+import { loadAppStateFromUrlData, parseUrlHash } from './utils/importExport'
 import { listenToWindowResize } from './utils/windowSize'
 
 const preloadedState = {} // TODO unused
