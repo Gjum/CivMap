@@ -163,6 +163,9 @@ const features = (state = {}, action) => {
       delete newState[action.id]
       return newState
     }
+    case 'CLEAR_FEATURES': {
+      return {}
+    }
     default:
       return state
   }
@@ -181,6 +184,8 @@ export const addFeature = (feature) => ({
 export const updateFeature = (feature) => ({ type: 'UPDATE_FEATURE', feature })
 
 export const removeFeature = (id) => ({ type: 'REMOVE_FEATURE', id })
+
+export const clearFeatures = () => ({ type: 'CLEAR_FEATURES' })
 
 // TODO filters: available, active, persist to localStorage
 
