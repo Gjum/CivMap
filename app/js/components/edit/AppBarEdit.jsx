@@ -26,7 +26,7 @@ const AppBarFeature = ({
     </IconButton>
 
     <div className='appbar-stretch'>{
-      feature ? (feature.properties.name || 'Edit ' + feature.geometry.type)
+      feature ? 'Edit ' + (feature.name || 'some Feature')
       : 'Create new Feature'
     }</div>
 

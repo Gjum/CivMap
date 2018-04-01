@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
-import { intCoords } from '../../utils/math'
+import { intCoords, intCoord } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
 export default class EditableCircle extends React.PureComponent {
@@ -35,12 +35,9 @@ export default class EditableCircle extends React.PureComponent {
 
   updatePositions = (e) => {
     const { feature } = this.props
-    const geometry = {
-      ...feature.geometry,
-      center: intCoords(this.featureRef.getLatLng()),
-      radius: Math.round(this.featureRef.getRadius()),
-    }
-    this.props.dispatch(updateFeature({ ...feature, geometry }))
+    const [z, x] = intCoords(this.featureRef.getLatLng())
+    const radius = Math.round(this.featureRef.getRadius())
+    this.props.dispatch(updateFeature({ ...feature, x, z, radius }))
   }
 
   onRef(ref) {
@@ -56,18 +53,15 @@ export default class EditableCircle extends React.PureComponent {
     let { feature, dispatch, editable } = this.props
     editable = false // TODO fix radius marker projection
 
-    const { id, geometry, style } = feature
-    if (!geometry.center) {
+    const { id, x, z, radius, style = {} } = feature
+
+    if (!radius) {
       const tempCircle = this.context.leafMap.editTools.startCircle()
       tempCircle.on('editable:vertex:dragend', e => {
-        const { feature } = this.props
-        const geometry = {
-          ...feature.geometry,
-          center: intCoords(tempCircle.getLatLng()),
-          radius: Math.round(tempCircle.getRadius()),
-        }
+        const [zNew, xNew] = intCoords(tempCircle.getLatLng())
+        const radiusNew = Math.round(tempCircle.getRadius())
         tempCircle.remove()
-        this.props.dispatch(updateFeature({ ...feature, geometry }))
+        this.props.dispatch(updateFeature({ ...this.props.feature, xNew, zNew, radiusNew }))
       })
 
       return null
@@ -76,14 +70,12 @@ export default class EditableCircle extends React.PureComponent {
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
 
-    const [z, x] = geometry.center
-
     return <RL.Circle
       ref={this.onRef.bind(this)}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
       center={[z + .5, x + .5]}
-      radius={geometry.radius}
+      radius={radius}
     />
   }
 }

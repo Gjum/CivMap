@@ -124,19 +124,12 @@ const feature = (state, action) => {
   switch (action.type) {
     case 'ADD_FEATURE':
       return {
-        id: action.feature.id,
-        geometry: action.feature.geometry,
-        style: action.feature.style || {},
-        properties: action.feature.properties || {},
+        ...action.feature,
+        id: action.feature.id || v4(),
       }
     case 'UPDATE_FEATURE': {
       if (action.feature.id != state.id) return state
-      return {
-        ...state,
-        geometry: action.feature.geometry || state.geometry,
-        style: action.feature.style || state.style,
-        properties: action.feature.properties || state.properties,
-      }
+      return action.feature
     }
     default:
       return state
@@ -149,8 +142,10 @@ const features = (state = {}, action) => {
       return action.state.features ? { ...state, ...action.state.features } : state
     case 'LOAD_FEATURES': {
       const newState = { ...state }
-      action.features.forEach(f =>
-        newState[f.id] = feature(null, addFeature(f)))
+      action.features.forEach(f => {
+        const newFeature = feature(null, addFeature(f))
+        newState[newFeature.id] = newFeature
+      })
       return newState
     }
     case 'ADD_FEATURE':
@@ -173,13 +168,7 @@ const features = (state = {}, action) => {
 
 export const loadFeatures = (features) => ({ type: 'LOAD_FEATURES', features })
 
-export const addFeature = (feature) => ({
-  type: 'ADD_FEATURE',
-  feature: {
-    id: feature.id || v4(),
-    ...feature,
-  }
-})
+export const addFeature = (feature) => ({ type: 'ADD_FEATURE', feature })
 
 export const updateFeature = (feature) => ({ type: 'UPDATE_FEATURE', feature })
 

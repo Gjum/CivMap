@@ -21,7 +21,7 @@ export default class EditableMarker extends React.PureComponent {
   recreateIcon(props) {
     this.icon = null
 
-    const { circle_marker, icon_url } = props.feature.style
+    const { circle_marker, icon_url } = props.feature.style || {}
 
     if (icon_url) {
       this.icon = L.icon({
@@ -31,7 +31,11 @@ export default class EditableMarker extends React.PureComponent {
       })
     } else if (circle_marker) {
       // TODO implement all other Path styles
-      const { radius = 10, weight = 2, color = '#000000', fillColor = '#ffffff' } = circle_marker
+      let { color, fillColor, radius = 5, weight = 0, fillOpacity = .5 } = circle_marker
+      if (!color) color = feature.color
+      if (!color) color = '#000000'
+      if (!fillColor) fillColor = color
+
       const width = 2 * radius
       let htmlStyle = `width:${width}px;height:${width}px;`
       htmlStyle += `border:${weight}px solid ${color};background-color:${fillColor};`
@@ -63,9 +67,9 @@ export default class EditableMarker extends React.PureComponent {
   }
 
   updatePositions = (e) => {
+    const [z, x] = intCoords(this.featureRef.getLatLng())
     const { feature } = this.props
-    const geometry = { ...feature.geometry, position: intCoords(this.featureRef.getLatLng()) }
-    this.props.dispatch(updateFeature({ ...feature, geometry }))
+    this.props.dispatch(updateFeature({ ...feature, x, z }))
   }
 
   onRef(ref) {
@@ -79,14 +83,14 @@ export default class EditableMarker extends React.PureComponent {
 
   render() {
     const { feature, dispatch, editable } = this.props
-    const { id, geometry, style } = feature
-    if (!geometry.position) {
+    const { id, x, z, style = {} } = feature
+
+    if (x === null || z === null) {
       const tempMarker = this.context.leafMap.editTools.startMarker()
       tempMarker.on('editable:drawing:clicked', e => {
-        const { feature } = this.props
-        const geometry = { ...feature.geometry, position: intCoords(tempMarker.getLatLng()) }
+        const [z, x] = intCoords(tempMarker.getLatLng())
         tempMarker.remove()
-        this.props.dispatch(updateFeature({ ...feature, geometry }))
+        this.props.dispatch(updateFeature({ ...this.props.feature, x, z }))
       })
 
       return null
@@ -96,8 +100,6 @@ export default class EditableMarker extends React.PureComponent {
     setTimeout(this.resetEditor, 0)
 
     if (!this.icon) this.recreateIcon(this.props)
-
-    const [z, x] = geometry.position
 
     if (this.icon) return <RL.Marker
       ref={this.onRef.bind(this)}

@@ -65,27 +65,24 @@ class EditorAny extends React.Component {
       </div>
       <div style={{ margin: '16px' }}>
         {
-          feature.geometry.type === 'polygon' ?
+          feature.polygon !== undefined ?
             <Button raised onClick={() => {
-              dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, type: "line" } }))
+              dispatch(updateFeature({ ...feature, line: feature.polygon }))
             }}><LineIcon />Convert to line</Button>
-            : feature.geometry.type === 'line' ?
+            : feature.line !== undefined ?
               <Button raised onClick={() => {
-                dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, type: "polygon" } }))
+                dispatch(updateFeature({ ...feature, polygon: feature.line }))
               }}><PolygonIcon />Convert to area</Button>
               : null
         }
-        {/* {feature.geometry.type !== 'line' && feature.geometry.type !== 'polygon' ? null :
+        {/* TODO button to add new subshape */}
+        {feature.line === undefined && feature.polygon === undefined ? null :
           <Button raised onClick={() => {
-            const positions = [...feature.geometry.positions, []]
-            dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, positions } }))
-          }}>Add shape</Button>
-        } */}
-        {feature.geometry.type !== 'line' && feature.geometry.type !== 'polygon' ? null :
-          <Button raised onClick={() => {
-            const positions = reversePolyPositions(feature.geometry.positions)
-            dispatch(updateFeature({ ...feature, geometry: { ...feature.geometry, positions } }))
-          }}><SwapIcon />Reverse positions</Button>
+            const featureNew = { ...feature }
+            if (feature.polygon) featureNew.polygon = reversePolyPositions(feature.polygon)
+            if (feature.line) featureNew.line = reversePolyPositions(feature.line)
+            dispatch(updateFeature(featureNew))
+          }}><SwapIcon />Reverse line/area direction</Button>
         }
       </div>
 
@@ -96,11 +93,13 @@ class EditorAny extends React.Component {
 }
 
 const FeatureStyle = ({ feature, dispatch }) => {
+  return null // XXX style representation will have to change
+
   return <div style={{ margin: '16px' }}>
     {/* TODO offer color palette */}
     Color: <input type="color"
       style={{ marginLeft: 16 }}
-      value={feature.style.color || '#00ffff'}
+      value={(feature.style || {}).color || '#00ffff'}
       onChange={e => dispatch(updateFeature({ ...feature, style: { ...feature.style, color: e.target.value } }))}
     />
     {/* TODO controls for weight, opacity, fillColor, fillOpacity, dash{Array,Offset}, ... */}
@@ -142,33 +141,33 @@ class FeatureProps extends React.PureComponent {
 }
 
 class FeatureCreator extends React.Component {
-  makeNewAndEdit(type) {
-    const { dispatch } = this.props
-    const feature = { id: makeId(), geometry: { type: type } }
-    dispatch(addFeature(feature))
-    dispatch(openEditMode(feature.id))
-  }
-
   render() {
+    const makeNewAndEdit = (defaultProps) => {
+      const { dispatch } = this.props
+      const feature = { ...defaultProps, id: makeId() }
+      dispatch(addFeature(feature))
+      dispatch(openEditMode(feature.id))
+    }
+
     return <div>
       <Button onClick={() => {
-        this.makeNewAndEdit("marker")
+        makeNewAndEdit({ x: null, z: null })
       }}><MarkerIcon />Create marker</Button>
       <br />
       <Button onClick={() => {
-        this.makeNewAndEdit("line")
+        makeNewAndEdit({ line: null })
       }}><LineIcon />Create line</Button>
       <br />
       <Button disabled onClick={() => {
-        this.makeNewAndEdit("polygon")
+        makeNewAndEdit({ polygon: null })
       }}><PolygonIcon />Create area</Button>
       <br />
       <Button disabled onClick={() => {
-        this.makeNewAndEdit("circle")
+        makeNewAndEdit({ x: null, z: null, radius: null })
       }}><CircleIcon />Create circle</Button>
       <br />
       <Button disabled onClick={() => {
-        this.makeNewAndEdit("image")
+        makeNewAndEdit({ map_image: null })
       }}><ImageIcon />Create image</Button>
     </div>
   }

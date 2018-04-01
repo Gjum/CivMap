@@ -8,6 +8,12 @@ export function intCoords(point) {
   return [z, x]
 }
 
+export function intCoord(c) {
+  let r = parseInt(c)
+  if (c < 0) r -= 1
+  return r
+}
+
 export function boundsToContainedCircle(bounds) {
   const [z, x] = intCoords(bounds.getCenter())
   const [n, e] = intCoords(bounds.getNorthEast())
@@ -59,28 +65,16 @@ export function reversePolyPositions(positions) {
   return positions
 }
 
-export function circleBoundsFromFeatureGeometry(geometry) {
-  switch (geometry.type) {
-    case 'label':
-    case 'marker': {
-      const { position: [z, x] } = geometry
-      return { z, x, radius: 100 } // TODO arbitrary radius
-    }
-    case 'circle': {
-      const { center: [z, x], radius } = geometry
-      return { z, x, radius }
-    }
-    case 'image': {
-      return boundsToEnclosingCircle(L.latLngBounds(geometry.bounds))
-    }
-    case 'line': {
-      return boundsToEnclosingCircle(L.latLngBounds(flatLatLngs(geometry.positions)))
-    }
-    case 'polygon': {
-      return boundsToEnclosingCircle(L.latLngBounds(flatLatLngs(geometry.positions)))
-    }
-    default:
-      console.error("[circleBoundsFromFeatureGeometry] Unknown feature geometry type", geometry)
-      return { x: 0, z: 0, radius: 0 }
+export function circleBoundsFromFeature(feature) {
+  const has = (k) => feature[k] !== undefined
+  // TODO select largest
+  if (has('map_image')) return boundsToEnclosingCircle(L.latLngBounds(feature.map_image.bounds))
+  if (has('polygon')) return boundsToEnclosingCircle(L.latLngBounds(flatLatLngs(feature.polygon)))
+  if (has('line')) return boundsToEnclosingCircle(L.latLngBounds(flatLatLngs(feature.line)))
+  if (has('x') && has('z')) {
+    return { x: feature.x, z: feature.z, radius: feature.radius || 100 } // TODO arbitrary radius
   }
+
+  console.error("[circleBoundsFromFeature] Unknown feature geometry", feature)
+  return { x: 0, z: 0, radius: 0 }
 }

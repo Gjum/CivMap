@@ -9,7 +9,7 @@ import EditIcon from 'material-ui-icons/Edit'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
 
 import { openBrowseMode, openEditMode, removeFeature, setViewport } from '../../store'
-import { circleBoundsFromFeatureGeometry } from '../../utils/math'
+import { circleBoundsFromFeature } from '../../utils/math'
 
 export function isImageUrl(value) {
   return /^https?:\/\/[^\/ ]+\/[^ ]+\.(png|jpe?g|gif|bmp|ico|tif?f)$/i.test(value)
@@ -41,16 +41,25 @@ const FeatureProps = ({ featureProps }) => {
   let otherProps = []
 
   Object.entries(featureProps).forEach(([key, val]) => {
-    if ((key === 'image' || key === 'Image') && isImageUrl(val)) {
+    if (key === 'image' && isImageUrl(val)) {
       image = <div>
         <a href={val} target='_blank' rel='noopener'>
           {/* <img className='feature-props-image' src={val} alt={key} /> */}
           <div className='feature-props-image' style={{ backgroundImage: `url(${val})` }} />
         </a>
       </div>
-    } else if (key === 'Name' || key === 'name') {
+    } else if (key === 'map_image') {
+      // TODO prefer `image` but also preview `mapImage.url`
+    } else if (key === 'style') {
+      // TODO show compact style (color etc)
+    } else if ('XxZz'.includes(key)) { // don't show x/z in props
+    } else if (key === 'id') { // don't show id
+    } else if (key === 'line' || key === 'polygon') {
+      const plural = val.length !== 1 ? 's' : ''
+      otherProps.push({ key, val: `${val.length} point` + plural })
+    } else if (key === 'name') {
       title = <h2 className='feature-props-title'>{val}</h2>
-    } else if (!'XxZz'.includes(key)) {
+    } else {
       otherProps.push({ key, val })
     }
   })
@@ -77,9 +86,13 @@ const FeatureInfo = ({
   removeFeature,
   setViewport,
 }) => {
-  const circleBounds = circleBoundsFromFeatureGeometry(feature.geometry)
+  const circleBounds = circleBoundsFromFeature(feature)
   return <div>
-    <FeatureProps featureProps={feature.properties} />
+    <FeatureProps featureProps={feature} />
+
+    <p style={{ margin: '16px' }}>
+      at {circleBounds.x} {circleBounds.z}
+    </p>
 
     <div style={{ margin: '16px' }}>
       <Button raised onClick={() => setViewport(circleBounds)}>
@@ -104,10 +117,6 @@ const FeatureInfo = ({
         Delete
       </Button>
     </div>
-
-    <p style={{ margin: '16px' }}>
-      {feature.geometry.type} at {circleBounds.x} {circleBounds.z}
-    </p>
   </div>
 }
 

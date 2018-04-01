@@ -1,4 +1,4 @@
-import { circleBoundsFromFeatureGeometry, circleToBounds } from './math'
+import { circleBoundsFromFeature, circleToBounds } from './math'
 import { getJSON } from './net'
 import { openFeatureDetail, setActiveBasemap, setViewport, loadFeatures, addFeature } from '../store'
 
@@ -29,7 +29,7 @@ export function loadAppStateFromUrlData(urlData, store) {
       if (feature) {
         store.dispatch(openFeatureDetail(urlData.featureId))
         if (!urlData.viewport) {
-          const viewport = circleBoundsFromFeatureGeometry(feature.geometry)
+          const viewport = circleBoundsFromFeature(feature)
           store.dispatch(setViewport(viewport))
         }
       } else {
@@ -57,8 +57,8 @@ export function loadCollectionJsonAsync(url, dispatch, cb) {
 
 export function loadCollectionJson(data, dispatch, source) {
   // TODO fallback for old versions (1.0.0: layers)
-  if (!data.info || data.info.version !== '2.0.0') {
-    alert(`Can't read Collection version ${data.version}, only 2.0.0 please`)
+  if (!data.info || data.info.version !== '3.0.0') {
+    alert(`Can't read Collection version ${data.info.version}, only 3.0.0 please`)
     return
   }
   data = { ...data }
@@ -136,19 +136,17 @@ export function processJourneyTileFile(file, dispatch) {
     const s = n + 512
     const e = w + 512
 
-    const fid = `dragdrop-journeymap-tile-${ix}-${iz}`
+    const fid = `ccmap/dragdrop/tile/journeymap/${ix}-${iz}`
+    const name = `JourneyMap tile ${ix},${iz}`
 
     dispatch(addFeature({
       id: fid,
-      geometry: {
-        type: "image",
+      map_image: {
         url: imgUrl,
         bounds: [[n, w], [s, e]],
       },
-      properties: {
-        is_journeymap_tile: true,
-        name: fid,
-      },
+      name: name,
+      is_journeymap_tile: true,
     }))
   }
   reader.readAsDataURL(file)
@@ -186,25 +184,22 @@ export function processVoxelWaypointsFile(file, dispatch) {
         p.blue = parseFloat(p.blue)
         p.enabled = p.enabled == 'true'
 
-        const fid = `dragdrop-voxelmap-waypoint-${p.x},${p.y},${p.z},${p.name}`
-        const color = `rgb(${Math.round(p.red * 255)},${Math.round(p.green * 255)},${Math.round(p.blue * 255)})`
+        const [r, g, b] = [p.red, p.green, p.blue].map(c => Math.round(255 * c))
+
+        const fid = `ccmap/dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
+        const color = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 
         return {
+          ...p,
           id: fid,
-          geometry: {
-            type: "marker",
-            position: [p.z, p.x],
-          },
-          style: { circle_marker: { radius: 4, weight: 0, fillColor: color, color } },
-          properties: {
-            ...p,
-            is_voxelmap_waypoint: true,
-            is_waypoint: true,
-          },
+          color,
+          is_voxelmap_waypoint: true,
+          is_waypoint: true,
         }
       })
 
     dispatch(loadFeatures(features))
+    console.log('Loaded', features.length, 'waypoints from', file.name)
 
     // TODO create+enable preconfigured waypoints filter
   }
@@ -225,25 +220,23 @@ export function processSnitchMasterFile(file, dispatch) {
         z = parseInt(z)
         cull = parseFloat(cull)
 
-        const fid = `dragdrop-snitchmaster-${x},${y},${z},${group}`
+        name = name || `Snitch at ${x},${y},${z} on [${group}]`
+
+        const fid = `ccmap/dragdrop/snitchmaster/${x},${y},${z},${group}`
 
         // TODO colorize groups
 
         return {
           id: fid,
-          geometry: {
-            type: "polygon",
-            positions: [[z - 11, x - 11], [z + 12, x - 11], [z + 12, x + 12], [z - 11, x + 12]],
-          },
-          properties: {
-            is_snitch: true,
-            from_snitchmaster: true,
-            x, y, z, world, source, group, name, cull,
-          },
+          polygon: [[z - 11, x - 11], [z + 12, x - 11], [z + 12, x + 12], [z - 11, x + 12]],
+          name, x, y, z, world, source, group, cull,
+          is_snitch: true,
+          from_snitchmaster: true,
         }
       })
 
     dispatch(loadFeatures(features))
+    console.log('Loaded', features.length, 'snitches from', file.name)
 
     // TODO create+enable preconfigured snitchmaster filter
   }

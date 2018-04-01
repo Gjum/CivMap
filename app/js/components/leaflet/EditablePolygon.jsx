@@ -25,7 +25,7 @@ export default class EditablePolygon extends React.PureComponent {
     this.featureRef.enableEdit() // create editor
     this.featureRef.editor.reset()
 
-    const positions = this.props.feature.geometry.positions
+    const positions = this.props.feature.polygon
     if (!positions || positions.length <= 0 || positions[positions.length - 1].length <= 0) {
       this.featureRef.editor.disable() // newShape() is broken while editing
       this.featureRef.editor.newShape()
@@ -45,8 +45,7 @@ export default class EditablePolygon extends React.PureComponent {
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
     // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
-    const geometry = { ...feature.geometry, positions }
-    this.props.dispatch(updateFeature({ ...feature, geometry }))
+    this.props.dispatch(updateFeature({ ...feature, polygon: positions }))
   }
 
   onRef = (ref) => {
@@ -60,7 +59,7 @@ export default class EditablePolygon extends React.PureComponent {
 
   render() {
     const { feature, dispatch, editable } = this.props
-    const { id, geometry, style } = feature
+    const { id, polygon, style = {} } = feature
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
@@ -69,7 +68,7 @@ export default class EditablePolygon extends React.PureComponent {
       ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
-      positions={!geometry.positions ? [] : centered(geometry.positions)}
+      positions={!polygon ? [] : centered(polygon)}
     />
   }
 }

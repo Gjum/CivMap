@@ -9,11 +9,27 @@ import EditablePolygon from './EditablePolygon'
 import PassiveLabel from './PassiveLabel'
 import { openFeatureDetail } from '../../store'
 
+export function getFeatureComponent(feature, zoom) {
+  const has = (k) => feature[k] !== undefined
+  // TODO take zoom vs size into account
+
+  // order matters: first matching determines display mode
+  if (has('map_image')) return FeatureOverlayImage
+  if (has('polygon')) return EditablePolygon
+  if (has('line')) return EditableLine
+  if (has('x') && has('z')) {
+    if (has('radius')) return EditableCircle
+    return EditableMarker
+  }
+
+  return null
+}
+
 function FeatureOverlayImage({ feature, dispatch }) {
-  const { id, geometry, style } = feature
+  const { id, map_image, style = {} } = feature
   return <RL.ImageOverlay
     onclick={() => dispatch(openFeatureDetail(id))}
-    {...geometry}
+    {...map_image}
     {...style}
   />
 }
@@ -34,38 +50,34 @@ const LeafOverlay = ({
 
   // TODO use active filters
   const visibleFeatures = features
-  // const visibleFeatures = {}
-  // if (editFeatureId) {
-  //   visibleFeatures[editFeatureId] = features[editFeatureId]
-  // }
-  // if (detailFeatureId) {
-  //   visibleFeatures[detailFeatureId] = features[detailFeatureId]
-  // }
+  if (editFeatureId) {
+    visibleFeatures[editFeatureId] = features[editFeatureId]
+  }
+  if (detailFeatureId) {
+    visibleFeatures[detailFeatureId] = features[detailFeatureId]
+  }
 
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
       Object.values(visibleFeatures).map((feature, i) => {
         const editable = editFeatureId === feature.id
         const props = { feature, editable, dispatch }
-        switch (feature.geometry.type) {
-          case "marker": return <EditableMarker key={feature.id || i} {...props} />
-          case "circle": return <EditableCircle key={feature.id || i} {...props} />
-          case "image": return <FeatureOverlayImage key={feature.id || i} {...props} />
-          case "line": return <EditableLine key={feature.id || i} {...props} />
-          case "polygon": return <EditablePolygon key={feature.id || i} {...props} />
-          default:
-            console.error("[FeaturesOverlay] Unknown feature geometry type", feature)
+        const FeatureComponent = getFeatureComponent(feature)
+        if (!FeatureComponent) {
+          console.error("[FeaturesOverlay] Don't know how to display feature", feature)
+          return null
         }
+        return <FeatureComponent key={feature.id || i} {...props} />
       })
     )}
-    {/* show labels for any feature */}
-    {prepareListForFeatureGroup(
+    {/* TODO show labels for any kind of feature */}
+    {/* {prepareListForFeatureGroup(
       Object.values(visibleFeatures)
-        .filter(feature => feature.style.label && feature.properties.label)
+        .filter(feature => feature.label) // TODO should be controlled by filter, not feature
         .map((feature, i) => {
           return <PassiveLabel key={(feature.id || i) + '_label'} feature={feature} />
         })
-    )}
+    )} */}
   </RL.FeatureGroup>
 }
 
