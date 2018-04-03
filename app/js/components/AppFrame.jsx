@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import * as BROWSE from './browse'
 import * as EDIT from './edit'
 import * as FEATURE from './feature'
+import * as FILTERS from './filters'
 
 import AppDrawer from './drawer/AppDrawer'
 import DragDrop from './DragDrop'
@@ -13,6 +14,7 @@ const modes = {
   BROWSE,
   EDIT,
   FEATURE,
+  FILTERS,
 }
 
 const AppFrame = ({

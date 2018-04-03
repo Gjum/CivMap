@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
+import { applyFilterOverrides } from '../../utils/filters'
 import { centered, deepLatLngToArr } from '../../utils/math'
 import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
 
@@ -58,8 +59,8 @@ export default class EditablePolygon extends React.PureComponent {
   }
 
   render() {
-    const { feature, dispatch, editable } = this.props
-    const { id, polygon, style = {} } = feature
+    const { dispatch, editable, feature, filter: { overrides } } = this.props
+    const { id, polygon, style = {} } = applyFilterOverrides({ feature, overrides })
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)

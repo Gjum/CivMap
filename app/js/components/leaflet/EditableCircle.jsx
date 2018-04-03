@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
+import { applyFilterOverrides } from '../../utils/filters'
 import { intCoords, intCoord } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
@@ -50,10 +51,10 @@ export default class EditableCircle extends React.PureComponent {
   }
 
   render() {
-    let { feature, dispatch, editable } = this.props
+    let { dispatch, editable, feature, filter: { overrides } } = this.props
     editable = false // TODO fix radius marker projection
 
-    const { id, x, z, radius, style = {} } = feature
+    const { id, x, z, radius, style = {} } = applyFilterOverrides({ feature, overrides })
 
     if (!radius) {
       const tempCircle = this.context.leafMap.editTools.startCircle()

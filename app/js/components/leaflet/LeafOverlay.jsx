@@ -6,6 +6,7 @@ import EditableCircle from './EditableCircle'
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
+import { applyFilterOverrides, checkFilterCondition } from '../../utils/filters'
 import PassiveLabel from './PassiveLabel'
 import { openFeatureDetail } from '../../store'
 
@@ -45,23 +46,40 @@ const LeafOverlay = ({
   detailFeatureId,
   editFeatureId,
   features,
+  filters,
   dispatch,
 }) => {
 
   // TODO use active filters
-  const visibleFeatures = features
-  if (editFeatureId) {
-    visibleFeatures[editFeatureId] = features[editFeatureId]
+  const filteredFeatures = {}
+  Object.values(features).forEach(feature => {
+    for (let filter of filters) {
+      let matches = true
+      for (let condition of filter.conditions) {
+        if (!checkFilterCondition({ condition, feature })) {
+          matches = false
+          break
+        }
+      }
+      if (matches) {
+        filteredFeatures[feature.id] = { feature, filter }
+        break
+      }
+    }
+  })
+
+  if (features[editFeatureId] && !filteredFeatures[editFeatureId]) {
+    filteredFeatures[editFeatureId] = { feature: features[editFeatureId], filter: { overrides: '{}' } }
   }
-  if (detailFeatureId) {
-    visibleFeatures[detailFeatureId] = features[detailFeatureId]
+  if (features[detailFeatureId] && !filteredFeatures[detailFeatureId]) {
+    filteredFeatures[detailFeatureId] = { feature: features[detailFeatureId], filter: { overrides: '{}' } }
   }
 
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
-      Object.values(visibleFeatures).map((feature, i) => {
+      Object.values(filteredFeatures).map(({ feature, filter }, i) => {
         const editable = editFeatureId === feature.id
-        const props = { feature, editable, dispatch }
+        const props = { dispatch, editable, feature, filter }
         const FeatureComponent = getFeatureComponent(feature)
         if (!FeatureComponent) {
           console.error("[FeaturesOverlay] Don't know how to display feature", feature)
@@ -81,11 +99,12 @@ const LeafOverlay = ({
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ control, features }) => {
+const mapStateToProps = ({ control, features, filters }) => {
   return {
     detailFeatureId: control.appMode === 'FEATURE' ? control.featureId : null,
     editFeatureId: control.appMode === 'EDIT' ? control.editFeatureId : null,
     features,
+    filters,
   }
 }
 

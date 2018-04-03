@@ -1,18 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import CloseIcon from 'material-ui-icons/Close'
 import EditIcon from 'material-ui-icons/Edit'
-import FilterIcon from 'material-ui-icons/FilterList'
 import IconButton from 'material-ui/IconButton'
 import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 import ShareIcon from 'material-ui-icons/Share'
 
-import { openEditMode, openFilters, openSearch, openShare, setDrawerOpen } from '../../store'
+import { openBrowseMode, openEditMode, openSearch, openShare, setDrawerOpen } from '../../store'
 
-const AppBarBrowse = ({
-  viewport,
-  borderApothem,
+const AppBarFilters = ({
+  filters,
   dispatch,
 }) => {
   return <div className='appbar custom-appbar'>
@@ -20,9 +19,7 @@ const AppBarBrowse = ({
       <MenuIcon />
     </IconButton>
 
-    <div className='appbar-stretch'>
-      CivMap
-    </div>
+    <div className='appbar-stretch'>Filters</div>
 
     <IconButton disabled onClick={() => dispatch(openSearch())}>
       <SearchIcon />
@@ -32,21 +29,20 @@ const AppBarBrowse = ({
       <ShareIcon />
     </IconButton>
 
-    <IconButton onClick={() => dispatch(openFilters())}>
-      <FilterIcon />
-    </IconButton>
-
     <IconButton onClick={() => dispatch(openEditMode())}>
       <EditIcon />
+    </IconButton>
+
+    <IconButton onClick={() => dispatch(openBrowseMode())}>
+      <CloseIcon />
     </IconButton>
   </div>
 }
 
-const mapStateToProps = ({ mapConfig, mapView }) => {
+const mapStateToProps = ({ features, control }) => {
   return {
-    viewport: mapView.viewport,
-    borderApothem: mapConfig.borderApothem,
+    feature: features[control.featureId],
   }
 }
 
-export default connect(mapStateToProps)(AppBarBrowse)
+export default connect(mapStateToProps)(AppBarFilters)

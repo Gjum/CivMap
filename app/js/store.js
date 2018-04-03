@@ -7,6 +7,7 @@ export const defaultControlState = {
   appMode: 'BROWSE', // TODO rename these
   drawerOpen: false,
   editFeatureId: null,
+  editFilterId: null,
   featureId: null,
   searchQuery: null,
   windowHeight: NaN, // TODO move window size to its own substate?
@@ -25,17 +26,11 @@ const control = (state = defaultControlState, action) => {
     case 'OPEN_EDIT_MODE':
       return { ...state, drawerOpen: false, appMode: 'EDIT', editFeatureId: action.featureId }
     case 'OPEN_FEATURE_DETAIL':
-      return {
-        ...state, drawerOpen: false, appMode: 'FEATURE',
-        featureId: action.featureId,
-      }
+      return { ...state, drawerOpen: false, appMode: 'FEATURE', featureId: action.featureId }
+    case 'OPEN_FILTERS':
+      return { ...state, drawerOpen: false, appMode: 'FILTERS', editFilterId: action.filterId }
     case 'OPEN_SEARCH':
-      return {
-        ...state, drawerOpen: false, appMode: 'SEARCH',
-        searchQuery: action.query
-      }
-    case 'OPEN_WAYPOINTS_IMPORT':
-      return { ...state, drawerOpen: false, appMode: 'WAYPOINTS' }
+      return { ...state, drawerOpen: false, appMode: 'SEARCH', searchQuery: action.query }
 
     case 'TRACK_WINDOW_SIZE':
       return { ...state, windowHeight: action.height, windowWidth: action.width }
@@ -51,11 +46,11 @@ export const openEditMode = (featureId) => ({ type: 'OPEN_EDIT_MODE', featureId 
 
 export const openFeatureDetail = (featureId) => ({ type: 'OPEN_FEATURE_DETAIL', featureId })
 
+export const openFilters = (filterId = null) => ({ type: 'OPEN_FILTERS', filterId })
+
 export const openSearch = (query = "") => ({ type: 'OPEN_SEARCH', query })
 
 export const openShare = () => ({ type: 'OPEN_SHARE' })
-
-export const openWaypointsImport = () => ({ type: 'OPEN_WAYPOINTS_IMPORT' })
 
 export const setDrawerClosed = () => ({ type: 'SET_DRAWER_CLOSED' })
 
@@ -176,13 +171,32 @@ export const removeFeature = (id) => ({ type: 'REMOVE_FEATURE', id })
 
 export const clearFeatures = () => ({ type: 'CLEAR_FEATURES' })
 
-// TODO filters: available, active, persist to localStorage
+const filters = (state = [], action) => {
+  switch (action.type) {
+    case 'APP_LOAD':
+      return action.state.filters || state
+
+    // TODO two filters lists: available, active
+
+    case 'UPDATE_FILTER': {
+      const newState = [...state]
+      newState[action.filterId] = action.filter
+      return newState
+    }
+
+    default:
+      return state
+  }
+}
+
+export const updateFilter = ({filterId, filter}) => ({ type: 'UPDATE_FILTER', filterId, filter })
 
 export const combinedReducers = combineReducers({
   control,
   mapView,
   mapConfig,
   features,
+  filters,
 })
 
 export const appLoad = (state) => ({ type: 'APP_LOAD', state })

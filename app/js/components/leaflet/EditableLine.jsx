@@ -1,6 +1,7 @@
 import React from 'react'
 import * as RL from 'react-leaflet'
 
+import { applyFilterOverrides } from '../../utils/filters'
 import { centered, deepLatLngToArr } from '../../utils/math'
 import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
 
@@ -55,8 +56,8 @@ export default class EditableLine extends React.PureComponent {
   }
 
   render() {
-    const { feature, dispatch, editable } = this.props
-    const { id, line, style = {} } = feature
+    const { dispatch, editable, feature, filter: { overrides } } = this.props
+    const { id, line, style = {} } = applyFilterOverrides({ feature, overrides })
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)

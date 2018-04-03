@@ -6,6 +6,7 @@ import IconButton from 'material-ui/IconButton'
 
 import DeleteIcon from 'material-ui-icons/Delete'
 import EditIcon from 'material-ui-icons/Edit'
+import FilterIcon from 'material-ui-icons/FilterList'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
 
 import { openBrowseMode, openEditMode, removeFeature, setViewport } from '../../store'
@@ -100,6 +101,10 @@ const FeatureInfo = ({
         Show on map
       </Button>
 
+      <Button raised onClick={() => alert('"Filter similar" is not implemented')} >
+        <FilterIcon />
+        Filter similar
+      </Button>
     </div>
     <div style={{ margin: '16px' }}>
       <Button raised onClick={() => {

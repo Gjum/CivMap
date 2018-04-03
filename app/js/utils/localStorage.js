@@ -5,11 +5,13 @@ export function saveAppStateToLocalStorage(state) {
     const {
       mapView,
       features,
+      filters,
     } = state
 
     // TODO skip if unchanged
     const data = {
       features,
+      filters,
     }
     window.localStorage.setItem('CivMap.data', JSON.stringify(data))
 

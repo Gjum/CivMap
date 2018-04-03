@@ -15,6 +15,19 @@ export const defaultAppState = {
     viewport: { x: 0, z: 0, radius: 13000 },
     basemapId: 'terrain',
   },
+
+  filters: [
+    {
+      conditions: [
+        { type: 'has_key', key: 'is_waypoint' },
+      ],
+      overrides: '{"label":${name},"style":{${...style}, "circle_marker":{"fillOpacity":0.5},"label":{"align":"bottom-left","offset":[6,5]}}}',
+    },
+    {
+      conditions: [], // catch-all
+      overrides: '{"style":{${...style}, "label":{"align":"bottom-left","offset":[6,5]}}}',
+    },
+  ],
 }
 
 const defaultBasemap = Object.values(defaultAppState.mapConfig.basemaps).find(b => b.isDefault) || {}
