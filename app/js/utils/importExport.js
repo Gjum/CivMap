@@ -21,6 +21,10 @@ export function loadAppStateFromUrlData(urlData, store) {
       loadCollectionJson(urlData.collection, store, '#')
     }
     if (urlData.feature) {
+      if (urlData.feature.geometry && urlData.feature.properties) {
+        // probably a v2.0.0 feature
+        urlData.feature = convertFeatureFrom2(urlData.feature)
+      }
       store.dispatch(addFeature(urlData.feature))
       urlData.featureId = urlData.feature.id
     }
@@ -56,14 +60,21 @@ export function loadCollectionJsonAsync(url, dispatch, cb) {
 }
 
 export function loadCollectionJson(data, dispatch, source) {
-  // TODO fallback for old versions (1.0.0: layers)
-  if (!data.info || data.info.version !== '3.0.0') {
-    alert(`Can't read Collection version ${data.info.version}, only 3.0.0 please`)
-    return
-  }
-  data = { ...data }
+  data = { info: {}, ...data }
   if (!data.features) data.features = []
   if (!data.filters) data.filters = []
+
+  if (data.info.version === '0.3.0') {
+    // current version, nothing to convert
+  } else if (data.info.version === '2.0.0') {
+    data = convertCollectionFrom2(data)
+
+    // } else if (data.info.version === '1.0.0') {
+    // TODO convert from 1.0.0: layers
+  } else {
+    alert(`Can't read Collection version ${data.info.version}, use 0.3.0 please`)
+    return
+  }
 
   dispatch(loadFeatures(data.features))
   // dispatch(addFilters(data.filters))
@@ -71,6 +82,53 @@ export function loadCollectionJson(data, dispatch, source) {
 
   console.log('Loaded collection with', data.features.length, 'features and',
     data.filters.length, 'filters from', source)
+}
+
+export function convertFeatureFrom2(f) {
+  switch (f.geometry.type) {
+    case 'marker': {
+      const [z, x] = f.geometry.position
+      return {
+        ...f.properties, style: f.style, id: f.id,
+        x, z,
+      }
+    }
+    case 'circle': {
+      const [z, x] = f.geometry.center
+      return {
+        ...f.properties, style: f.style, id: f.id,
+        x, z, radius: f.geometry.radius,
+      }
+    }
+    case 'line': {
+      return {
+        ...f.properties, style: f.style, id: f.id,
+        line: f.geometry.positions,
+      }
+    }
+    case 'polygon': {
+      return {
+        ...f.properties, style: f.style, id: f.id,
+        polygon: f.geometry.positions,
+      }
+    }
+    case 'image': {
+      const { bounds, url } = f.geometry
+      return {
+        ...f.properties, style: f.style, id: f.id,
+        map_image: { bounds, url },
+      }
+    }
+    default: {
+      console.error('[convertCollectionFrom2] unknown feature geometry', f.geometry.type)
+      return f
+    }
+  }
+}
+
+export function convertCollectionFrom2(data) {
+  const features = data.features.map(convertFeatureFrom2)
+  return { ...data, features }
 }
 
 export function parseUrlHash(hash) {
