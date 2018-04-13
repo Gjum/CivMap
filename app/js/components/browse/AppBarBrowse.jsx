@@ -20,10 +20,6 @@ const AppBarBrowse = ({
       <MenuIcon />
     </IconButton>
 
-    <div className='appbar-stretch'>
-      CivMap
-    </div>
-
     <IconButton disabled onClick={() => dispatch(openSearch())}>
       <SearchIcon />
     </IconButton>
@@ -39,6 +35,10 @@ const AppBarBrowse = ({
     <IconButton onClick={() => dispatch(openEditMode())}>
       <EditIcon />
     </IconButton>
+
+    <div className='appbar-stretch'>
+      CivMap
+    </div>
   </div>
 }
 
