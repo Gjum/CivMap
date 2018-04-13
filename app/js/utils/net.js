@@ -47,7 +47,7 @@ export function postJSON(url, payload, onData, onErr) {
         onData(json)
       } else {
         if (onErr) onErr(this)
-        else console.error('Error getting json from', url, this)
+        else console.error('Error posting json to', url, this)
       }
     }
   }
