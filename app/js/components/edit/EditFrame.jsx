@@ -67,11 +67,15 @@ class EditorAny extends React.Component {
         {
           feature.polygon !== undefined ?
             <Button raised onClick={() => {
-              dispatch(updateFeature({ ...feature, line: feature.polygon }))
+              const f = { ...feature, line: feature.polygon }
+              delete f.polygon
+              dispatch(updateFeature(f))
             }}><LineIcon />Convert to line</Button>
             : feature.line !== undefined ?
               <Button raised onClick={() => {
-                dispatch(updateFeature({ ...feature, polygon: feature.line }))
+                const f = { ...feature, polygon: feature.line }
+                delete f.line
+                dispatch(updateFeature(f))
               }}><PolygonIcon />Convert to area</Button>
               : null
         }
