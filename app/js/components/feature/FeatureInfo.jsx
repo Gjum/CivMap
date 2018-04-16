@@ -96,25 +96,25 @@ const FeatureInfo = ({
     </p>
 
     <div style={{ margin: '16px' }}>
-      <Button raised onClick={() => setViewport(circleBounds)}>
+      <Button variant='raised' onClick={() => setViewport(circleBounds)}>
         <ShowOnMapIcon />
         Show on map
       </Button>
 
-      <Button raised onClick={() => alert('"Filter similar" is not implemented')} >
+      <Button variant='raised' onClick={() => alert('"Filter similar" is not implemented')} >
         <FilterIcon />
         Filter similar
       </Button>
     </div>
     <div style={{ margin: '16px' }}>
-      <Button raised onClick={() => {
+      <Button variant='raised' onClick={() => {
         openEditMode(feature.id)
       }}>
         <EditIcon />
         Edit
       </Button>
 
-      <Button raised onClick={() => {
+      <Button variant='raised' onClick={() => {
         removeFeature(feature.id)
         openBrowseMode() // TODO show similar features in search results instead
       }}>

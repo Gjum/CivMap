@@ -40,14 +40,14 @@ class EditorAny extends React.Component {
     return <div>
       <div style={{ margin: '16px' }}>
 
-        <Button raised onClick={() => {
+        <Button variant='raised' onClick={() => {
           dispatch(updateFeature(originalFeature))
         }}>
           <ResetIcon />
           Reset
         </Button>
 
-        <Button raised onClick={() => {
+        <Button variant='raised' onClick={() => {
           dispatch(removeFeature(feature.id))
           dispatch(openBrowseMode()) // TODO show similar features in search results instead
         }}>
@@ -55,7 +55,7 @@ class EditorAny extends React.Component {
           Delete
         </Button>
 
-        <Button raised onClick={() => {
+        <Button variant='raised' onClick={() => {
           dispatch(openFeatureDetail(feature.id))
         }}>
           <CheckIcon />
@@ -66,13 +66,13 @@ class EditorAny extends React.Component {
       <div style={{ margin: '16px' }}>
         {
           feature.polygon !== undefined ?
-            <Button raised onClick={() => {
+            <Button variant='raised' onClick={() => {
               const f = { ...feature, line: feature.polygon }
               delete f.polygon
               dispatch(updateFeature(f))
             }}><LineIcon />Convert to line</Button>
             : feature.line !== undefined ?
-              <Button raised onClick={() => {
+              <Button variant='raised' onClick={() => {
                 const f = { ...feature, polygon: feature.line }
                 delete f.line
                 dispatch(updateFeature(f))
@@ -81,7 +81,7 @@ class EditorAny extends React.Component {
         }
         {/* TODO button to add new subshape */}
         {feature.line === undefined && feature.polygon === undefined ? null :
-          <Button raised onClick={() => {
+          <Button variant='raised' onClick={() => {
             const featureNew = { ...feature }
             if (feature.polygon) featureNew.polygon = reversePolyPositions(feature.polygon)
             if (feature.line) featureNew.line = reversePolyPositions(feature.line)
@@ -131,10 +131,10 @@ class _FeatureProps extends React.PureComponent {
     const setStartOrEnd = (startOrEnd, value) => dispatch(updateFeature({ ...feature, [startOrEnd]: value }))
 
     return <div>
-      {closestStopIdStart && (closestStopIdStart !== feature.rail_start) && <Button raised
+      {closestStopIdStart && (closestStopIdStart !== feature.rail_start) && <Button variant='raised'
         onClick={() => setStartOrEnd('rail_start', closestStopIdStart)}
       >Start at {closestStopIdStart}</Button>}
-      {closestStopIdEnd && (closestStopIdEnd !== feature.rail_end) && <Button raised
+      {closestStopIdEnd && (closestStopIdEnd !== feature.rail_end) && <Button variant='raised'
         onClick={() => setStartOrEnd('rail_end', closestStopIdEnd)}
       >End at {closestStopIdEnd}</Button>}
     </div>
