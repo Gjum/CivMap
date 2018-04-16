@@ -88,11 +88,19 @@ const FeatureInfo = ({
   setViewport,
 }) => {
   const circleBounds = circleBoundsFromFeature(feature)
+
+  // the [] blow up the url size when encoded, and mostly cause no issues
+  const shareableLink = '#feature=' + encodeURI(JSON.stringify(feature))
+    .replace(/%5B/g, '[').replace(/%5D/g, ']')
+
   return <div>
     <FeatureProps featureProps={feature} />
 
     <p style={{ margin: '16px' }}>
       at {circleBounds.x} {circleBounds.z}
+      {' • '}
+      <a href={shareableLink}>
+        Shareable link</a>
     </p>
 
     <div style={{ margin: '16px' }}>

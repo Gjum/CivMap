@@ -31,10 +31,6 @@ const AppBarFeature = ({
       <SearchIcon />
     </IconButton>
 
-    <IconButton disabled onClick={openShare}>
-      <ShareIcon />
-    </IconButton>
-
     <IconButton onClick={openBrowseMode}>
       <CloseIcon />
     </IconButton>
