@@ -57,7 +57,7 @@ const FeatureProps = ({ featureProps }) => {
     } else if (key === 'id') { // don't show id
     } else if (key === 'line' || key === 'polygon') {
       const plural = val.length !== 1 ? 's' : ''
-      otherProps.push({ key, val: `${val.length} point` + plural })
+      otherProps.push({ key, val: `${val.length} part` + plural })
     } else if (key === 'name') {
       title = <h2 className='feature-props-title'>{val}</h2>
     } else {
