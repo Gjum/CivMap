@@ -24,8 +24,14 @@ store.dispatch(appLoad(defaultAppState))
 
 store.dispatch(appLoad(getAppStateFromLocalStorage()))
 
-const urlData = parseUrlHash(location.hash)
-loadAppStateFromUrlData(urlData, store)
+if (location.hash) {
+  const urlData = parseUrlHash(location.hash)
+  loadAppStateFromUrlData(urlData, store)
+  // prevent page reloading from messing up changes by re-importing the old data
+  if (urlData.feature || urlData.collection) {
+    location.hash = ""
+  }
+}
 
 store.subscribe(throttle(
   () => saveAppStateToLocalStorage(store.getState()),
