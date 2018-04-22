@@ -24,7 +24,11 @@ const AppBarBrowse = ({
       <SearchIcon />
     </IconButton>
 
-    <IconButton disabled onClick={() => dispatch(openShare())}>
+    <IconButton onClick={() => {
+      const { x, z, radius } = viewport
+      location.hash = `c=${x},${z},r${radius}`
+      // TODO better location sharing
+    }}>
       <ShareIcon />
     </IconButton>
 
