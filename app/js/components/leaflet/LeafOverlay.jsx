@@ -7,6 +7,7 @@ import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
 import { applyFilterOverrides, checkFilterCondition } from '../../utils/filters'
+import { deepFlip } from '../../utils/math'
 import PassiveLabel from './PassiveLabel'
 import { openFeatureDetail } from '../../store'
 
@@ -28,9 +29,11 @@ export function getFeatureComponent(feature, zoom) {
 
 function FeatureOverlayImage({ feature, dispatch }) {
   const { id, map_image, style = {} } = feature
+  const { url, bounds } = map_image
   return <RL.ImageOverlay
     onclick={() => dispatch(openFeatureDetail(id))}
-    {...map_image}
+    url={url}
+    bounds={deepFlip(bounds)}
     {...style}
   />
 }

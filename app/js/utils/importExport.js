@@ -1,4 +1,4 @@
-import { circleBoundsFromFeature, circleToBounds } from './math'
+import { circleBoundsFromFeature, circleToBounds, deepFlip } from './math'
 import { getJSON } from './net'
 import { openFeatureDetail, setActiveBasemap, setViewport, loadFeatures, addFeature } from '../store'
 
@@ -103,20 +103,20 @@ export function convertFeatureFrom2(f) {
     case 'line': {
       return {
         ...f.properties, style: f.style, id: f.id,
-        line: f.geometry.positions,
+        line: deepFlip(f.geometry.positions),
       }
     }
     case 'polygon': {
       return {
         ...f.properties, style: f.style, id: f.id,
-        polygon: f.geometry.positions,
+        polygon: deepFlip(f.geometry.positions),
       }
     }
     case 'image': {
       const { bounds, url } = f.geometry
       return {
         ...f.properties, style: f.style, id: f.id,
-        map_image: { bounds, url },
+        map_image: { url, bounds: deepFlip(bounds) },
       }
     }
     default: {
@@ -201,7 +201,7 @@ export function processJourneyTileFile(file, dispatch) {
       id: fid,
       map_image: {
         url: imgUrl,
-        bounds: [[n, w], [s, e]],
+        bounds: [[w, n], [e, s]],
       },
       name: name,
       is_journeymap_tile: true,
@@ -286,7 +286,7 @@ export function processSnitchMasterFile(file, dispatch) {
 
         return {
           id: fid,
-          polygon: [[z - 11, x - 11], [z + 12, x - 11], [z + 12, x + 12], [z - 11, x + 12]],
+          polygon: [[x - 11, z - 11], [x + 12, z - 11], [x + 12, z + 12], [x - 11, z + 12]],
           name, x, y, z, world, source, group, cull,
           is_snitch: true,
           from_snitchmaster: true,

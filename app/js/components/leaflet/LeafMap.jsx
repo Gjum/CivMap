@@ -9,7 +9,7 @@ import LeafBaseMap from './LeafBaseMap'
 import LeafOverlay from './LeafOverlay'
 
 import { setViewport } from '../../store'
-import { boundsToContainedCircle, circleToBounds } from '../../utils/math'
+import { boundsToContainedCircle, circleToBounds, deepFlip } from '../../utils/math'
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
 
@@ -41,7 +41,7 @@ class LeafMap extends React.Component {
     if (!this.map) return
     if (!view) return
     if (!this.waitingForView) {
-      this.map.fitBounds(circleToBounds(view), { animate: false })
+      this.map.fitBounds(deepFlip(circleToBounds(view)), { animate: false })
     }
   }
 

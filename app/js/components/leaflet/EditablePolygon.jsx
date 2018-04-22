@@ -3,7 +3,7 @@ import React from 'react'
 import * as RL from 'react-leaflet'
 
 import { applyFilterOverrides } from '../../utils/filters'
-import { centered, deepLatLngToArr } from '../../utils/math'
+import { centered, deepFlip, deepLatLngToArr } from '../../utils/math'
 import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
 
 // TODO deduplicate polygon/polyline code
@@ -69,7 +69,7 @@ export default class EditablePolygon extends React.PureComponent {
       ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
-      positions={!polygon ? [] : centered(polygon)}
+      positions={!polygon ? [] : deepFlip(polygon)}
     />
   }
 }

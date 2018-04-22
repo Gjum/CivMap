@@ -1,11 +1,11 @@
 import * as L from 'leaflet'
 
 export function intCoords(point) {
-  var z = parseInt(point.lat)
   var x = parseInt(point.lng)
-  if (point.lat < 0) z -= 1
-  if (point.lng < 0) x -= 1
-  return [z, x]
+  var z = parseInt(point.lat)
+  if (x !== point.lng && point.lng < 0) x -= 1
+  if (z !== point.lat && point.lat < 0) z -= 1
+  return [x, z]
 }
 
 export function intCoord(c) {
@@ -15,41 +15,41 @@ export function intCoord(c) {
 }
 
 export function boundsToContainedCircle(bounds) {
-  const [z, x] = intCoords(bounds.getCenter())
-  const [n, e] = intCoords(bounds.getNorthEast())
-  const [s, w] = intCoords(bounds.getSouthWest())
+  const [x, z] = intCoords(bounds.getCenter())
+  const [e, n] = intCoords(bounds.getNorthEast())
+  const [w, s] = intCoords(bounds.getSouthWest())
   const radius = Math.round(Math.min(Math.abs(e - w), Math.abs(s - n)) / 2)
   return { x, z, radius }
 }
 
 export function boundsToEnclosingCircle(bounds) {
-  const [z, x] = intCoords(bounds.getCenter())
-  const [n, e] = intCoords(bounds.getNorthEast())
-  const [s, w] = intCoords(bounds.getSouthWest())
+  const [x, z] = intCoords(bounds.getCenter())
+  const [e, n] = intCoords(bounds.getNorthEast())
+  const [w, s] = intCoords(bounds.getSouthWest())
   const radius = Math.round(Math.max(Math.abs(e - w), Math.abs(s - n)) / 2)
   return { x, z, radius }
 }
 
 export function circleToBounds({ x, z, radius }) {
-  return [[z - radius, x - radius], [z + radius, x + radius]]
+  return [[x - radius, z - radius], [x + radius, z + radius]]
 }
 
-export function deepLatLngToArr(o) {
-  if (Array.isArray(o))
-    return o.map(e => deepLatLngToArr(e))
-  return intCoords(o)
-}
-
-export function flatLatLngs(o) {
-  if (Array.isArray(o[0]))
-    return o.map(e => flatLatLngs(e))
-  return o
+export function deepLatLngToArr(positions) {
+  if (Array.isArray(positions))
+    return positions.map(e => deepLatLngToArr(e))
+  return intCoords(positions)
 }
 
 export function centered(positions) {
   if (Array.isArray(positions[0]))
     return positions.map(e => centered(e))
   return [positions[0] + .5, positions[1] + .5]
+}
+
+export function deepFlip(positions) {
+  if (Array.isArray(positions[0]))
+    return positions.map(e => deepFlip(e))
+  return [positions[1], positions[0]]
 }
 
 export function reversePolyPositions(positions) {
@@ -67,10 +67,10 @@ export function reversePolyPositions(positions) {
 
 export function circleBoundsFromFeature(feature) {
   const has = (k) => feature[k] !== undefined
-  // TODO select largest
-  if (has('map_image')) return boundsToEnclosingCircle(L.latLngBounds(feature.map_image.bounds))
-  if (has('polygon')) return boundsToEnclosingCircle(L.latLngBounds(flatLatLngs(feature.polygon)))
-  if (has('line')) return boundsToEnclosingCircle(L.latLngBounds(flatLatLngs(feature.line)))
+  // TODO select largest/according to zoom level
+  if (has('map_image')) return boundsToEnclosingCircle(L.latLngBounds(deepFlip(feature.map_image.bounds)))
+  if (has('polygon')) return boundsToEnclosingCircle(L.latLngBounds(deepFlip(feature.polygon)))
+  if (has('line')) return boundsToEnclosingCircle(L.latLngBounds(deepFlip(feature.line)))
   if (has('x') && has('z')) {
     return { x: feature.x, z: feature.z, radius: feature.radius || 100 } // TODO arbitrary radius
   }

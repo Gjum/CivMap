@@ -2,7 +2,7 @@ import React from 'react'
 import * as RL from 'react-leaflet'
 
 import { applyFilterOverrides } from '../../utils/filters'
-import { centered, deepLatLngToArr } from '../../utils/math'
+import { centered, deepFlip, deepLatLngToArr, getStyleAttrs } from '../../utils/math'
 import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
 
 export default class EditableLine extends React.PureComponent {
@@ -66,7 +66,7 @@ export default class EditableLine extends React.PureComponent {
       ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
       {...style}
-      positions={!line ? [] : centered(line)}
+      positions={!line ? [] : centered(deepFlip(line))}
     />
   }
 }
