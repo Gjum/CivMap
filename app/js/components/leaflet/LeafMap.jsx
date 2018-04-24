@@ -9,7 +9,7 @@ import LeafBaseMap from './LeafBaseMap'
 import LeafOverlay from './LeafOverlay'
 
 import { setViewport } from '../../store'
-import { boundsToContainedCircle, circleToBounds, deepFlip } from '../../utils/math'
+import { boundsToContainedCircle, circleToBounds, deepFlip, intCoord } from '../../utils/math'
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
 
@@ -68,7 +68,7 @@ class LeafMap extends React.Component {
   onMouseMove(e) {
     if (!this.coordsRef) return
     const { lat: z, lng: x } = e.latlng
-    this.coordsRef.innerText = `X ${parseInt(x)} ${parseInt(z)} Z`
+    this.coordsRef.innerText = `X ${intCoord(x)} ${intCoord(z)} Z`
   }
 
   render() {

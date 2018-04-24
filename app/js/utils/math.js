@@ -10,7 +10,7 @@ export function intCoords(point) {
 
 export function intCoord(c) {
   let r = parseInt(c)
-  if (c < 0) r -= 1
+  if (r !== c && c < 0) r -= 1
   return r
 }
 
