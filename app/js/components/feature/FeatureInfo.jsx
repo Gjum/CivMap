@@ -89,9 +89,8 @@ const FeatureInfo = ({
 }) => {
   const circleBounds = circleBoundsFromFeature(feature)
 
-  // the [] blow up the url size when encoded, and mostly cause no issues
+  // TODO the [#,#] blow up the url size when encoded -> represent number arrays in binary+base64 format
   const shareableLink = '#feature=' + encodeURI(JSON.stringify(feature))
-    .replace(/%5B/g, '[').replace(/%5D/g, ']')
 
   return <div>
     <FeatureProps featureProps={feature} />
