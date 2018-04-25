@@ -6,7 +6,7 @@ import EditableCircle from './EditableCircle'
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
-import { applyFilterOverrides, checkFilterCondition } from '../../utils/filters'
+import { applyFilterOverrides, checkFilterCondition, doesFeatureHaveLabel } from '../../utils/filters'
 import { deepFlip } from '../../utils/math'
 import PassiveLabel from './PassiveLabel'
 import { openFeatureDetail } from '../../store'
@@ -91,14 +91,13 @@ const LeafOverlay = ({
         return <FeatureComponent key={feature.id || i} {...props} />
       })
     )}
-    {/* TODO show labels for any kind of feature */}
-    {/* {prepareListForFeatureGroup(
-      Object.values(visibleFeatures)
-        .filter(feature => feature.label) // TODO should be controlled by filter, not feature
-        .map((feature, i) => {
-          return <PassiveLabel key={(feature.id || i) + '_label'} feature={feature} />
+    {prepareListForFeatureGroup(
+      Object.values(filteredFeatures)
+        .filter(({ feature, filter }) => doesFeatureHaveLabel({ feature, filter }))
+        .map(({ feature, filter }, i) => {
+          return <PassiveLabel key={(feature.id || i) + '_label'} feature={feature} filter={filter} />
         })
-    )} */}
+    )}
   </RL.FeatureGroup>
 }
 

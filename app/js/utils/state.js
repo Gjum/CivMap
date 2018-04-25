@@ -22,10 +22,12 @@ export const defaultAppState = {
         { type: 'has_key', key: 'is_waypoint' },
       ],
       overrides: '{"label":${name},"style":{${...style}, "circle_marker":{"fillOpacity":0.5},"label":{"align":"bottom-left","offset":[6,5]}}}',
+      showLabels: true,
     },
     {
       conditions: [], // catch-all
       overrides: '{"style":{${...style}, "label":{"align":"bottom-left","offset":[6,5]}}}',
+      showLabels: true,
     },
   ],
 }

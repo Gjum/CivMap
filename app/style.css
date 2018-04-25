@@ -57,11 +57,7 @@ div {
 
 .leaflabel {
   pointer-events: none !important;
-  position:relative;
-}
-
-.leaflabel-text {
-  position:absolute;
+  text-align: center;
   font-size: 12px;
   line-height: 1em;
   font-weight: bold;

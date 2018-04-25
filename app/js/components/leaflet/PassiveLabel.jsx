@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
+import { applyFilterOverrides } from '../../utils/filters'
 import { intCoords } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
@@ -12,39 +13,40 @@ export default class PassiveLabel extends React.PureComponent {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.feature.properties.label
-      !== this.props.feature.properties.label
-      || nextProps.feature.style.label
-      !== this.props.feature.style.label) {
+    // TODO also check if label placement is different
+    if (nextProps.feature.label !== this.props.feature.label
+      || nextProps.feature.name !== this.props.feature.name) {
       this.icon = null
     }
   }
 
-  recreateLabel(props) {
+  recreateLabel({ feature, filter: { overrides } }) {
     this.icon = null
 
-    const { properties, style } = props.feature
+    feature = applyFilterOverrides({ feature, overrides })
 
-    if (properties.label && style.label) {
-      // TODO label font size, width/height,
-      const { align = 'bottom-left', offset = [0, 0] } = style.label
-      const [alignY, alignX] = align.split('-')
-      const [offsetX, offsetY] = offset
-      const htmlStyle = `${alignX}: ${offsetX}px; ${alignY}: ${offsetY}px;`
-      const html = `<span class="leaflabel-text" style="${htmlStyle}">${properties.label}</span>`
-      this.icon = L.divIcon({
-        className: 'leaflabel',
-        html,
-        iconSize: [0, 0],
-      })
-    }
+    if (!feature.label && !feature.name) return
+
+    const labelText = feature.label || feature.name
+    // TODO configurable label font size, color, positioning, rotation, ...
+    // TODO get offset from marker size
+    this.icon = L.divIcon({
+      className: 'leaflabel',
+      html: labelText,
+      iconSize: [200, 100],
+      iconAnchor: [100, -10],
+    })
   }
 
   render() {
-    const { geometry, properties, style } = this.props.feature
     if (!this.icon) this.recreateLabel(this.props)
+    if (!this.icon) {
+      console.error(`Could not render label for ${this.props.feature.name} (${this.props.feature.id})`)
+      return null
+    }
 
-    const [z, x] = geometry.position // TODO get from feature: fixed/relative/auto
+    const { feature, filter: { overrides } } = this.props
+    const { x, z } = applyFilterOverrides({ feature, overrides })
 
     return <RL.Marker
       position={[z + .5, x + .5]}

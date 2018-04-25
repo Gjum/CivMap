@@ -15,6 +15,7 @@ export function checkFilterCondition({ condition, feature }) {
 }
 
 export function applyFilterOverrides({ feature, overrides }) {
+  // TODO this is called quite often during map updates, make sure this performs well enough
   // XXX HACK make this usable through a gui
   const overridesReplaced = overrides
     .replace(/\$\{\.\.\.([^}]+)\}/g, (_fullMatch, path) => {
@@ -45,4 +46,11 @@ export function applyFilterOverrides({ feature, overrides }) {
     console.error(`[applyFilterOverrides] Could not replace "${overrides}" with`, feature, e)
     return feature
   }
+}
+
+export function doesFeatureHaveLabel({ feature, filter }) {
+  if (!filter.showLabels) return false
+  const fwo = applyFilterOverrides({ feature, overrides: filter.overrides })
+  return (fwo.name !== undefined || fwo.label !== undefined)
+    && fwo.x !== undefined && fwo.z !== undefined
 }
