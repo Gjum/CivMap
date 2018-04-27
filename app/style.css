@@ -37,7 +37,7 @@ div {
 .leaflet-container {
   background: none;
 }
-.leaflet-tile {
+.leaflet-tile, .leaflet-image-layer {
   image-rendering: pixelated !important;
   image-rendering: crisp-edges !important;
   image-rendering: -moz-crisp-edges !important;
