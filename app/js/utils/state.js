@@ -16,19 +16,25 @@ export const defaultAppState = {
     basemapId: 'terrain',
   },
 
-  filters: [
-    {
+  filters: {
+    "Waypoints": {
+      name: "Waypoints",
       conditions: [
         { type: 'has_key', key: 'is_waypoint' },
       ],
       overrides: '{"label":${name},"style":{${...style}, "circle_marker":{"fillOpacity":0.5},"label":{"align":"bottom-left","offset":[6,5]}}}',
       showLabels: true,
     },
-    {
-      conditions: [], // catch-all
+    "Everything else": {
+      name: "Everything else",
+      conditions: [],
       overrides: '{"style":{${...style}, "label":{"align":"bottom-left","offset":[6,5]}}}',
       showLabels: true,
     },
+  },
+  activeFilters: [
+    "Waypoints",
+    "Everything else",
   ],
 }
 

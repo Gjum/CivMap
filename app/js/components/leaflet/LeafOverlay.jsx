@@ -6,7 +6,7 @@ import EditableCircle from './EditableCircle'
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
-import { applyFilterOverrides, checkFilterCondition, doesFeatureHaveLabel } from '../../utils/filters'
+import { applyFilterOverrides, checkFilterConditions, doesFeatureHaveLabel } from '../../utils/filters'
 import { deepFlip } from '../../utils/math'
 import PassiveLabel from './PassiveLabel'
 import { openFeatureDetail } from '../../store'
@@ -50,21 +50,14 @@ const LeafOverlay = ({
   editFeatureId,
   features,
   filters,
+  activeFilters,
   dispatch,
 }) => {
 
-  // TODO use active filters
   const filteredFeatures = {}
   Object.values(features).forEach(feature => {
-    for (let filter of filters) {
-      let matches = true
-      for (let condition of filter.conditions) {
-        if (!checkFilterCondition({ condition, feature })) {
-          matches = false
-          break
-        }
-      }
-      if (matches) {
+    for (let filter of activeFilters.map(id => filters[id]).filter(f => !!f)) {
+      if (checkFilterConditions({ conditions: filter.conditions, feature })) {
         filteredFeatures[feature.id] = { feature, filter }
         break
       }
@@ -101,12 +94,13 @@ const LeafOverlay = ({
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ control, features, filters }) => {
+const mapStateToProps = ({ control, features, filters, activeFilters }) => {
   return {
     detailFeatureId: control.appMode === 'FEATURE' ? control.featureId : null,
     editFeatureId: control.appMode === 'EDIT' ? control.editFeatureId : null,
     features,
     filters,
+    activeFilters,
   }
 }
 

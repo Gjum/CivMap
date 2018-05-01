@@ -1,4 +1,16 @@
+export function checkFilterConditions({ conditions, feature }) {
+  for (let condition of conditions) {
+    if (!checkFilterCondition({ condition, feature })) {
+      return false
+    }
+  }
+  return true
+}
+
 export function checkFilterCondition({ condition, feature }) {
+  if (condition.type === 'key_equals') {
+    return feature[condition.key] === condition.value
+  }
   if (condition.type === 'has_key') {
     return feature[condition.key] !== undefined
   }

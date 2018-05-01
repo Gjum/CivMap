@@ -171,16 +171,39 @@ export const removeFeature = (id) => ({ type: 'REMOVE_FEATURE', id })
 
 export const clearFeatures = () => ({ type: 'CLEAR_FEATURES' })
 
-const filters = (state = [], action) => {
+const filters = (state = {}, action) => {
   switch (action.type) {
     case 'APP_LOAD':
+      if (action.state.filters && Array.isArray(action.state.filters)) {
+        const newState = {}
+        action.state.filters.forEach(f => { newState[f.name] = f })
+        return newState
+      }
       return action.state.filters || state
 
-    // TODO two filters lists: available, active
+    case 'ADD_FILTER': {
+      return { ...state, [action.filter.name]: action.filter }
+    }
+
+    case 'LOAD_FILTERS': {
+      if (Array.isArray(action.filters)) {
+        const newState = { ...state }
+        action.filters.forEach(f => { newState[f.name] = f })
+        return newState
+      }
+      return { ...state, ...action.filters }
+    }
 
     case 'UPDATE_FILTER': {
-      const newState = [...state]
-      newState[action.filterId] = action.filter
+      const newState = { ...state }
+      delete newState[action.id]
+      newState[action.filter.name] = action.filter
+      return newState
+    }
+
+    case 'REMOVE_FILTER': {
+      const newState = { ...state }
+      delete newState[action.id]
       return newState
     }
 
@@ -189,7 +212,71 @@ const filters = (state = [], action) => {
   }
 }
 
-export const updateFilter = ({filterId, filter}) => ({ type: 'UPDATE_FILTER', filterId, filter })
+export const loadFilters = (filters) => ({ type: 'LOAD_FILTERS', filters })
+
+export const addFilter = (filter) => ({ type: 'ADD_FILTER', filter })
+
+export const updateFilter = (filter, id) => ({ type: 'UPDATE_FILTER', filter, id: (id || filter.name) })
+
+export const removeFilter = (id) => ({ type: 'REMOVE_FILTER', id })
+
+function uniqeArray(a) {
+  const seen = {}
+  return a.filter(item =>
+    seen.hasOwnProperty(item)
+      ? false
+      : (seen[item] = true)
+  )
+}
+
+const activeFilters = (state = [], action) => {
+  switch (action.type) {
+    case 'APP_LOAD':
+      return uniqeArray(action.state.activeFilters) || state
+
+    case 'ACTIVATE_FILTERS': {
+      const seen = {}
+      return uniqeArray([
+        ...action.ids,
+        ...state,
+      ])
+    }
+
+    case 'DEACTIVATE_FILTER': {
+      return state.filter(id => id != action.id)
+    }
+
+    case 'MOVE_FILTER_UP': {
+      const newState = [...state]
+      const i = newState.indexOf(action.id)
+      if (i <= 0 || !i) {
+        // cannot move further up, gui prevents this but api doesn't
+        return state
+      }
+      const tmp = newState[i - 1]
+      newState[i - 1] = newState[i]
+      newState[i] = tmp
+      return newState
+    }
+
+    case 'UPDATE_FILTER': {
+      return state.map(n => n === action.id ? action.filter.name : n)
+    }
+
+    case 'REMOVE_FILTER': {
+      return state.filter(id => id !== action.id)
+    }
+
+    default:
+      return state
+  }
+}
+
+export const activateFilters = (ids) => ({ type: 'ACTIVATE_FILTERS', ids })
+
+export const deactivateFilter = (id) => ({ type: 'DEACTIVATE_FILTER', id })
+
+export const moveFilterUp = (id) => ({ type: 'MOVE_FILTER_UP', id })
 
 export const combinedReducers = combineReducers({
   control,
@@ -197,6 +284,7 @@ export const combinedReducers = combineReducers({
   mapConfig,
   features,
   filters,
+  activeFilters,
 })
 
 export const appLoad = (state) => ({ type: 'APP_LOAD', state })

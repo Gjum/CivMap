@@ -1,10 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import List, { ListItem, ListItemText, ListSubheader } from 'material-ui/List'
+import Button from 'material-ui/Button'
+import IconButton from 'material-ui/IconButton'
+import List, { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader } from 'material-ui/List'
 import TextField from 'material-ui/TextField'
 
-import { openFilters, updateFilter } from '../../store'
+import DeleteIcon from 'material-ui-icons/Delete'
+import InvisibleIcon from 'material-ui-icons/VisibilityOff'
+import MoveUpIcon from 'material-ui-icons/ArrowUpward'
+import VisibleIcon from 'material-ui-icons/Visibility'
+
+import { activateFilters, moveFilterUp, openFilters, updateFilter, removeFilter, deactivateFilter } from '../../store'
 
 // TODO reuse in feature edit
 class JsonEditor extends React.PureComponent {
@@ -27,13 +34,14 @@ class JsonEditor extends React.PureComponent {
         error={!!this.state.parseErrorText}
         helperText={this.state.parseErrorText}
         onChange={e => {
+          let newData
           try {
-            const newData = JSON.parse(e.target.value)
+            newData = JSON.parse(e.target.value)
             this.setState({ parseErrorText: undefined })
-            onChange(newData)
           } catch (err) {
             this.setState({ parseErrorText: '' + err })
           }
+          if (newData) onChange(newData)
         }}
       />
     </div>
@@ -44,35 +52,97 @@ const FiltersControl = ({
   dispatch,
   editFilterId,
   filters,
+  activeFilters,
 }) => {
-  const filter = filters[editFilterId]
+  const editFilter = filters[editFilterId]
+  const inactiveFilters = Object.keys(filters).filter(id => !activeFilters.includes(id))
   return <div>
-    {!filter ? <div>Select a filter to edit</div> :
+    {!editFilter ? <div style={{ margin: '16px' }}>Select a filter to edit</div> :
       <div style={{ margin: '16px' }}>
         <JsonEditor
-          data={filter}
-          onChange={(newFilter) => dispatch(updateFilter({ filterId: editFilterId, filter: newFilter }))}
+          data={editFilter}
+          onChange={(newFilter) => dispatch(updateFilter(newFilter, editFilterId))}
         />
+
+        {activeFilters.includes(editFilterId) ?
+          <Button variant='raised' onClick={() => {
+            dispatch(deactivateFilter(editFilterId))
+          }}>
+            <InvisibleIcon />
+            Deactivate
+          </Button>
+          :
+          <Button variant='raised' onClick={() => {
+            dispatch(activateFilters([editFilterId]))
+          }}>
+            <VisibleIcon />
+            Activate
+          </Button>
+        }
+
+        <Button variant='raised' onClick={() => {
+          dispatch(openFilters(null))
+          dispatch(removeFilter(editFilterId))
+        }}>
+          <DeleteIcon />
+          Delete
+        </Button>
       </div>
     }
+
     <List disablePadding
-      subheader={<ListSubheader>Filters</ListSubheader>}
+      subheader={<ListSubheader>Active Filters</ListSubheader>}
     >
-      {filters.map(({ name = 'unnamed filter', conditions = [], overrides = '{}' }, i) =>
-        <ListItem button key={i}
-          onClick={() => dispatch(openFilters(i))}
+      {activeFilters.filter(id => filters[id]).map((name, i) => {
+        const { conditions = [], overrides = '{}' } = filters[name]
+        return <ListItem button key={name}
+          onClick={() => dispatch(openFilters(name))}
         >
           <ListItemText primary={name} />
+          {(i === 0) ? null :
+            <ListItemSecondaryAction>
+              <IconButton
+                onClick={() => {
+                  dispatch(moveFilterUp(name))
+                }}
+              >
+                <MoveUpIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
+          }
         </ListItem>
-      )}
-    </List >
+      })}
+    </List>
+
+    <List disablePadding
+      subheader={<ListSubheader>Inactive Filters</ListSubheader>}
+    >
+      {inactiveFilters.map((name) => {
+        const { conditions = [], overrides = '{}' } = filters[name]
+        return <ListItem button key={name}
+          onClick={() => dispatch(openFilters(name))}
+        >
+          <ListItemText primary={name} />
+          <ListItemSecondaryAction>
+            <IconButton
+              onClick={() => {
+                dispatch(activateFilters([name]))
+              }}
+            >
+              <VisibleIcon />
+            </IconButton>
+          </ListItemSecondaryAction>
+        </ListItem>
+      })}
+    </List>
   </div>
 }
 
-const mapStateToProps = ({ control: { editFilterId }, filters }) => {
+const mapStateToProps = ({ control: { editFilterId }, filters, activeFilters }) => {
   return {
     editFilterId,
     filters,
+    activeFilters,
   }
 }
 

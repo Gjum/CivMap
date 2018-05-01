@@ -12,7 +12,6 @@ import CreateFeatureMenuButton from '../edit/CreateFeatureMenuButton'
 import { openBrowseMode, openEditMode, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarFilters = ({
-  filters,
   dispatch,
 }) => {
   return <div className='appbar custom-appbar'>
@@ -38,9 +37,8 @@ const AppBarFilters = ({
   </div>
 }
 
-const mapStateToProps = ({ features, control }) => {
+const mapStateToProps = ({ }) => {
   return {
-    feature: features[control.featureId],
   }
 }
 

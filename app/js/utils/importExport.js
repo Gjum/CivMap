@@ -1,6 +1,6 @@
 import { circleBoundsFromFeature, circleToBounds, deepFlip } from './math'
 import { getJSON } from './net'
-import { openFeatureDetail, setActiveBasemap, setViewport, loadFeatures, addFeature } from '../store'
+import { activateFilters, addFeature, loadFeatures, loadFilters, openFeatureDetail, setActiveBasemap, setViewport } from '../store'
 
 export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {
@@ -60,9 +60,12 @@ export function loadCollectionJsonAsync(url, dispatch, cb) {
 }
 
 export function loadCollectionJson(data, dispatch, source) {
-  data = { info: {}, ...data }
-  if (!data.features) data.features = []
-  if (!data.filters) data.filters = []
+  data = {
+    info: {},
+    features: [],
+    filters: [],
+    ...data,
+  }
 
   if (data.info.version === '0.3.0') {
     // current version, nothing to convert
@@ -72,16 +75,15 @@ export function loadCollectionJson(data, dispatch, source) {
     // } else if (data.info.version === '1.0.0') {
     // TODO convert from 1.0.0: layers
   } else {
-    alert(`Can't read Collection version ${data.info.version}, use 0.3.0 please`)
+    alert(`Can't read Collection version "${data.info.version}", use 0.3.0 please`)
     return
   }
 
   dispatch(loadFeatures(data.features))
-  // dispatch(addFilters(data.filters))
-  // dispatch(enableFilters(data.enabledFilters))
+  dispatch(loadFilters(data.filters))
+  dispatch(activateFilters(data.active_filters || data.filters.map(f => f.name)))
 
-  console.log('Loaded collection with', data.features.length, 'features and',
-    data.filters.length, 'filters from', source)
+  console.log(`Loaded collection with ${data.features.length} features and ${data.filters.length} filters at version "${data.info.version}" from ${source}`)
 }
 
 export function convertFeatureFrom2(f) {
