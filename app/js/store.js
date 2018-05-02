@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
-import { v4 } from 'node-uuid'
+
+import murmurhash3 from './utils/murmurhash3_gc';
 
 // this is session-local only, doesn't get persisted/shared
 // TODO some of this causes the map to resize, some does not
@@ -120,7 +121,7 @@ const feature = (state, action) => {
     case 'ADD_FEATURE':
       return {
         ...action.feature,
-        id: action.feature.id || v4(),
+        id: action.feature.id || murmurhash3(JSON.stringify(action.feature), 1),
       }
     case 'UPDATE_FEATURE': {
       if (action.feature.id != state.id) return state
