@@ -133,7 +133,7 @@ const feature = (state, action) => {
         id: action.feature.id || murmurhash3(JSON.stringify(action.feature), 1),
       }
     case 'UPDATE_FEATURE': {
-      if (action.feature.id != state.id) return state
+      if (action.id != state.id) return state
       return action.feature
     }
     default:
@@ -155,8 +155,11 @@ const features = (state = {}, action) => {
     }
     case 'ADD_FEATURE':
     case 'UPDATE_FEATURE': {
-      const newFeature = feature(state[action.feature.id], action)
-      return { ...state, [newFeature.id]: newFeature }
+      const newFeature = feature(state[action.id], action)
+      const newState = { ...state }
+      delete newState[action.id]
+      newState[newFeature.id] = newFeature
+      return newState
     }
     case 'REMOVE_FEATURE': {
       const newState = { ...state }
@@ -175,7 +178,7 @@ export const loadFeatures = (features) => ({ type: 'LOAD_FEATURES', features })
 
 export const addFeature = (feature) => ({ type: 'ADD_FEATURE', feature })
 
-export const updateFeature = (feature) => ({ type: 'UPDATE_FEATURE', feature })
+export const updateFeature = (feature, id) => ({ type: 'UPDATE_FEATURE', feature, id: (id || feature.id) })
 
 export const removeFeature = (id) => ({ type: 'REMOVE_FEATURE', id })
 

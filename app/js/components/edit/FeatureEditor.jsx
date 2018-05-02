@@ -35,7 +35,8 @@ class FeatureEditor extends React.Component {
       <div style={{ margin: '16px' }}>
 
         <Button variant='raised' onClick={() => {
-          dispatch(updateFeature(originalFeature))
+          dispatch(updateFeature(originalFeature, feature.id))
+          dispatch(openEditMode(originalFeature.id))
         }}>
           <ResetIcon />
           Reset
@@ -152,7 +153,8 @@ class _FeatureProps extends React.PureComponent {
           try {
             const newFeature = JSON.parse(e.target.value)
             // TODO validate feature
-            dispatch(updateFeature(newFeature))
+            dispatch(updateFeature(newFeature, feature.id))
+            dispatch(openEditMode(newFeature.id))
             this.setState({ parseErrorText: undefined })
           } catch (err) {
             this.setState({ parseErrorText: '' + err })
