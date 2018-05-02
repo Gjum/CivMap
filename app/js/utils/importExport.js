@@ -224,46 +224,46 @@ export function processCollectionFile(file, dispatch) {
 
 export function processVoxelWaypointsFile(file, dispatch) {
   const reader = new FileReader()
-  reader.onload = (eventRead) => {
-    const text = eventRead.target.result
-
-    // name, x, z, y, enabled, red, green, blue, suffix, world, dimensions
-    const features = text.split('\n')
-      .filter(line => line.includes('x:'))
-      .map(line => {
-        const p = {}
-        line.split(',').map(entry => {
-          const [key, val] = entry.split(':')
-          p[key] = val
-        })
-        p.x = parseInt(p.x)
-        p.y = parseInt(p.y)
-        p.z = parseInt(p.z)
-        p.red = parseFloat(p.red)
-        p.green = parseFloat(p.green)
-        p.blue = parseFloat(p.blue)
-        p.enabled = p.enabled == 'true'
-
-        const [r, g, b] = [p.red, p.green, p.blue].map(c => Math.round(255 * c))
-
-        const fid = `ccmap/dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
-        const color = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
-
-        return {
-          ...p,
-          id: fid,
-          color,
-          is_voxelmap_waypoint: true,
-          is_waypoint: true,
-        }
-      })
-
-    dispatch(loadFeatures(features))
-    console.log('Loaded', features.length, 'waypoints from', file.name)
-
-    // TODO create+enable preconfigured waypoints filter
-  }
+  reader.onload = (eventRead) => { processVoxelWaypointsText(eventRead.target.result, dispatch, file.name) }
   reader.readAsText(file)
+}
+
+export function processVoxelWaypointsText(text, dispatch, source) {
+  // name, x, z, y, enabled, red, green, blue, suffix, world, dimensions
+  const features = text.split('\n')
+    .filter(line => line.includes('x:'))
+    .map(line => {
+      const p = {}
+      line.split(',').map(entry => {
+        const [key, val] = entry.split(':')
+        p[key] = val
+      })
+      p.x = parseInt(p.x)
+      p.y = parseInt(p.y)
+      p.z = parseInt(p.z)
+      p.red = parseFloat(p.red)
+      p.green = parseFloat(p.green)
+      p.blue = parseFloat(p.blue)
+      p.enabled = p.enabled == 'true'
+
+      const [r, g, b] = [p.red, p.green, p.blue].map(c => Math.round(255 * c))
+
+      const fid = `ccmap/dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
+      const color = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
+
+      return {
+        ...p,
+        id: fid,
+        color,
+        is_voxelmap_waypoint: true,
+        is_waypoint: true,
+      }
+    })
+
+  dispatch(loadFeatures(features))
+  console.log('Loaded', features.length, 'waypoints from', source)
+
+  // TODO create+enable preconfigured waypoints filter
 }
 
 export function processSnitchMasterFile(file, dispatch) {
