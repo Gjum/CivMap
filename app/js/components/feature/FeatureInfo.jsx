@@ -27,7 +27,7 @@ function linkify(val) {
   val = '' + val // make string
   val.split(' ').forEach((word, i) => {
     elements.push(' ')
-    if (/^[ru]\/[^ \/]+$/.test(word)) {
+    if (/^\/?[ru]\/[^ \/]+$/.test(word)) {
       elements.push(<a key={i} href={`https://reddit.com/${word}`} target='_blank' rel='noopener'>{word}</a>)
     } else {
       elements.push(word)
