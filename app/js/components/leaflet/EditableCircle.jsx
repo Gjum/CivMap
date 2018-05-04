@@ -36,7 +36,7 @@ export default class EditableCircle extends React.PureComponent {
 
   updatePositions = (e) => {
     const { feature } = this.props
-    const [z, x] = intCoords(this.featureRef.getLatLng())
+    const [x, z] = intCoords(this.featureRef.getLatLng())
     const radius = Math.round(this.featureRef.getRadius())
     this.props.dispatch(updateFeature({ ...feature, x, z, radius }))
   }

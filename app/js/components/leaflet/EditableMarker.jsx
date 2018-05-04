@@ -70,7 +70,7 @@ export default class EditableMarker extends React.PureComponent {
   }
 
   updatePositions = (e) => {
-    const [z, x] = intCoords(this.featureRef.getLatLng())
+    const [x, z] = intCoords(this.featureRef.getLatLng())
     const { feature } = this.props
     this.props.dispatch(updateFeature({ ...feature, x, z }))
   }
@@ -92,7 +92,7 @@ export default class EditableMarker extends React.PureComponent {
     if (x === null || z === null) {
       const tempMarker = this.context.leafMap.editTools.startMarker()
       tempMarker.on('editable:drawing:clicked', e => {
-        const [z, x] = intCoords(tempMarker.getLatLng())
+        const [x, z] = intCoords(tempMarker.getLatLng())
         tempMarker.remove()
         this.props.dispatch(updateFeature({ ...this.props.feature, x, z }))
       })

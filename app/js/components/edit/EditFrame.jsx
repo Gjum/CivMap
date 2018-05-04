@@ -180,7 +180,7 @@ function closestStop(position, features) {
   let minDist = 200 // won't search further than this
   features.filter(f => f.rail_stop_id)
     .forEach(f => {
-      const [az, ax] = [f.z, f.x]
+      const [ax, z] = [f.x, f.z]
       const da = Math.abs(az - fz) + Math.abs(ax - fx)
       if (minDist > da) {
         minDist = da

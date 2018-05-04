@@ -56,11 +56,11 @@ export function reversePolyPositions(positions) {
   if (!positions || !Array.isArray(positions) || !Array.isArray(positions[0]))
     return positions
   if (!Array.isArray(positions[0][0]))
-    return positions.reverse() // line: [[z,x],p2,...]
+    return positions.reverse() // line: [[x,z],p2,...]
   if (!Array.isArray(positions[0][0][0]))
-    return positions.map(l => l.reverse()) // polyline: [[[z,x],p2,...],l2,...]
+    return positions.map(l => l.reverse()) // polyline: [[[x,z],p2,...],l2,...]
   if (!Array.isArray(positions[0][0][0][0]))
-    return positions.map(s => s.map(l => l.reverse())) // multipolygon: [[[[z,x],p2,...],l2,...],s2,...]
+    return positions.map(s => s.map(l => l.reverse())) // multipolygon: [[[[x,z],p2,...],l2,...],s2,...]
   console.error('cannot reverse too deeply nested positions:', positions)
   return positions
 }
