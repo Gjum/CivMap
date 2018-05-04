@@ -26,7 +26,7 @@ const AppBarFilters = ({
     <div className='appbar-stretch'>Search</div>
 
     <IconButton onClick={() => {
-      location.hash = `q=${encodeURI(searchQuery)}`
+      location.hash = `q=${encodeURIComponent(searchQuery)}`
       // TODO better search sharing
     }}>
       <ShareIcon />

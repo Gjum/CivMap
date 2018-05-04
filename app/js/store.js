@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import { circleBoundsFromFeature } from './utils/math';
+import { circleBoundsFromFeature, importPositions } from './utils/math';
 import murmurhash3 from './utils/murmurhash3_gc';
 
 // this is session-local only, doesn't get persisted/shared
@@ -128,10 +128,13 @@ const mapConfig = (state = defaultMapConfig, action) => {
 const feature = (state, action) => {
   switch (action.type) {
     case 'ADD_FEATURE':
-      return {
+      const f = {
         ...action.feature,
         id: action.feature.id || murmurhash3(JSON.stringify(action.feature), 1),
       }
+      if (f.line && !Array.isArray(f.line)) f.line = importPositions(f.line)
+      if (f.polygon && !Array.isArray(f.polygon)) f.polygon = importPositions(f.polygon)
+      return f
     case 'UPDATE_FEATURE': {
       if (action.id != state.id) return state
       return action.feature

@@ -10,7 +10,7 @@ import FilterIcon from 'material-ui-icons/FilterList'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
 
 import { openBrowseMode, openEditMode, removeFeature, setViewport } from '../../store'
-import { circleBoundsFromFeature } from '../../utils/math'
+import { circleBoundsFromFeature, exportStringFromFeature } from '../../utils/math'
 
 export function isImageUrl(value) {
   return /^https?:\/\/[^\/ ]+\/[^ ]+\.(png|jpe?g|gif|bmp|ico|tif?f)$/i.test(value)
@@ -89,8 +89,7 @@ const FeatureInfo = ({
 }) => {
   const circleBounds = circleBoundsFromFeature(feature)
 
-  // TODO the [#,#] blow up the url size when encoded -> represent number arrays in binary+base64 format
-  const shareableLink = '#feature=' + encodeURI(JSON.stringify(feature))
+  const shareableLink = '#feature=' + exportStringFromFeature(feature)
 
   return <div>
     <FeatureProps featureProps={feature} />

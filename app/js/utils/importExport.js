@@ -158,7 +158,7 @@ export function parseUrlHash(hash) {
   }
 
   hash.slice(1).split('#').map(part => {
-    const [key, val] = decodeURI(part).split('=', 2)
+    const [key, val] = decodeURIComponent(part).split('=', 2)
     if (key == 'c') {
       let [x, z, radius] = val.split(/[,r]+/, 3).map(parseFloat)
       if (!radius) urlData.marker = true
