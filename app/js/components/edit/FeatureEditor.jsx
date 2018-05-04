@@ -4,29 +4,23 @@ import { v4 } from 'node-uuid'
 
 import Button from 'material-ui/Button'
 import IconButton from 'material-ui/IconButton'
-import { MenuItem } from 'material-ui/Menu'
+import { ListItemIcon } from 'material-ui/List'
+import Menu, { MenuItem } from 'material-ui/Menu'
 import Select from 'material-ui/Select'
 import TextField from 'material-ui/TextField'
 
 import CheckIcon from 'material-ui-icons/Check'
 import DeleteIcon from 'material-ui-icons/Delete'
+import EditIcon from 'material-ui-icons/Edit'
+import LineIcon from 'material-ui-icons/Timeline'
+import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
 import ResetIcon from 'material-ui-icons/Undo'
 import SwapIcon from 'material-ui-icons/SwapCalls'
-
-import CircleIcon from 'material-ui-icons/AddCircle'
-import ImageIcon from 'material-ui-icons/InsertPhoto'
-import LineIcon from 'material-ui-icons/Timeline'
-import MarkerIcon from 'material-ui-icons/AddLocation'
-import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
 
 import { addFeature, openBrowseMode, openEditMode, openFeatureDetail, removeFeature, updateFeature } from '../../store'
 import { reversePolyPositions } from '../../utils/math'
 
-function makeId() {
-  return v4()
-}
-
-class EditorAny extends React.Component {
+class FeatureEditor extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -123,6 +117,7 @@ class _FeatureProps extends React.PureComponent {
     const { feature, dispatch } = this.props
     if (!feature.is_rail_connection) return
 
+    // TODO why is this broken?
     const posStart = feature.line[0][0]
     const posEnd = feature.line[0][feature.line[0].length - 1]
     const closestStopIdStart = closestStop(posStart, this.props.features)
@@ -190,55 +185,10 @@ function closestStop(position, features) {
   return stopId
 }
 
-
-class FeatureCreator extends React.Component {
-  render() {
-    const makeNewAndEdit = (defaultProps) => {
-      const { dispatch } = this.props
-      const feature = { ...defaultProps, id: makeId() }
-      dispatch(addFeature(feature))
-      dispatch(openEditMode(feature.id))
-    }
-
-    return <div>
-      <Button onClick={() => {
-        makeNewAndEdit({ x: null, z: null })
-      }}><MarkerIcon />Create marker</Button>
-      <br />
-      <Button onClick={() => {
-        makeNewAndEdit({ line: null })
-      }}><LineIcon />Create line</Button>
-      <br />
-      <Button disabled onClick={() => {
-        makeNewAndEdit({ polygon: null })
-      }}><PolygonIcon />Create area</Button>
-      <br />
-      <Button disabled onClick={() => {
-        makeNewAndEdit({ x: null, z: null, radius: null })
-      }}><CircleIcon />Create circle</Button>
-      <br />
-      <Button disabled onClick={() => {
-        makeNewAndEdit({ map_image: null })
-      }}><ImageIcon />Create image</Button>
-    </div>
-  }
-}
-
-class EditFrame extends React.Component {
-  render() {
-    const { feature, dispatch } = this.props
-    if (feature) {
-      return <EditorAny {...{ feature, dispatch }} />
-    } else {
-      return <FeatureCreator dispatch={dispatch} />
-    }
-  }
-}
-
 const mapStateToProps = ({ features, control }) => {
   return {
     feature: features[control.editFeatureId],
   }
 }
 
-export default connect(mapStateToProps)(EditFrame)
+export default connect(mapStateToProps)(FeatureEditor)

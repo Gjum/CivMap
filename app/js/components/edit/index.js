@@ -1,5 +1,5 @@
 import AppBarEdit from './AppBarEdit'
-import EditFrame from './EditFrame'
+import FeatureEditor from './FeatureEditor'
 
 export const Appbar = AppBarEdit
-export const Detail = EditFrame
+export const Detail = FeatureEditor

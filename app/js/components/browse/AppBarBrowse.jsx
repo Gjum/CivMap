@@ -1,13 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import IconButton from 'material-ui/IconButton'
+
 import EditIcon from 'material-ui-icons/Edit'
 import FilterIcon from 'material-ui-icons/FilterList'
-import IconButton from 'material-ui/IconButton'
 import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 import ShareIcon from 'material-ui-icons/Share'
 
+import CreateFeatureMenuButton from '../edit/CreateFeatureMenuButton'
 import { openEditMode, openFilters, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarBrowse = ({
@@ -36,9 +38,7 @@ const AppBarBrowse = ({
       <FilterIcon />
     </IconButton>
 
-    <IconButton onClick={() => dispatch(openEditMode())}>
-      <EditIcon />
-    </IconButton>
+    <CreateFeatureMenuButton dispatch={dispatch} />
 
     <div className='appbar-stretch'>
       CivMap

@@ -8,6 +8,7 @@ import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 import ShareIcon from 'material-ui-icons/Share'
 
+import CreateFeatureMenuButton from '../edit/CreateFeatureMenuButton'
 import { openBrowseMode, openEditMode, openSearch, openShare, setDrawerOpen } from '../../store'
 
 const AppBarFilters = ({
@@ -29,9 +30,7 @@ const AppBarFilters = ({
       <ShareIcon />
     </IconButton>
 
-    <IconButton onClick={() => dispatch(openEditMode())}>
-      <EditIcon />
-    </IconButton>
+    <CreateFeatureMenuButton dispatch={dispatch} />
 
     <IconButton onClick={() => dispatch(openBrowseMode())}>
       <CloseIcon />
