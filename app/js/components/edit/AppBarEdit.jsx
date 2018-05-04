@@ -30,7 +30,7 @@ const AppBarFeature = ({
       : 'Create new Feature'
     }</div>
 
-    <IconButton disabled onClick={openSearch}>
+    <IconButton onClick={() => openSearch(feature.name)}>
       <SearchIcon />
     </IconButton>
 

@@ -27,11 +27,11 @@ const AppBarFeature = ({
 
     <div className='appbar-stretch'>{feature.name || 'Some Feature'}</div>
 
-    <IconButton disabled onClick={openSearch}>
+    <IconButton onClick={() => openSearch(feature.name)}>
       <SearchIcon />
     </IconButton>
 
-    <IconButton onClick={openBrowseMode}>
+    <IconButton onClick={() => openBrowseMode()}>
       <CloseIcon />
     </IconButton>
   </div>

@@ -3,26 +3,30 @@ import { connect } from 'react-redux'
 
 import CloseIcon from 'material-ui-icons/Close'
 import EditIcon from 'material-ui-icons/Edit'
+import FiltersIcon from 'material-ui-icons/FilterList'
 import IconButton from 'material-ui/IconButton'
 import MenuIcon from 'material-ui-icons/Menu'
-import SearchIcon from 'material-ui-icons/Search'
 import ShareIcon from 'material-ui-icons/Share'
 
 import CreateFeatureMenuButton from '../edit/CreateFeatureMenuButton'
-import { openBrowseMode, openEditMode, openSearch, openShare, setDrawerOpen } from '../../store'
+import { openBrowseMode, openEditMode, openFilters, openShare, setDrawerOpen } from '../../store'
+
+// TODO search field in appbar instead of sidebar
+// so it doesn't disappear when scrolling through the results
 
 const AppBarFilters = ({
   dispatch,
+  searchQuery,
 }) => {
   return <div className='appbar custom-appbar'>
     <IconButton onClick={() => dispatch(setDrawerOpen())}>
       <MenuIcon />
     </IconButton>
 
-    <div className='appbar-stretch'>Filters</div>
+    <div className='appbar-stretch'>Search</div>
 
-    <IconButton onClick={() => dispatch(openSearch())}>
-      <SearchIcon />
+    <IconButton onClick={() => dispatch(openFilters())}>
+      <FiltersIcon />
     </IconButton>
 
     <IconButton disabled onClick={() => dispatch(openShare())}>
@@ -37,8 +41,9 @@ const AppBarFilters = ({
   </div>
 }
 
-const mapStateToProps = ({ }) => {
+const mapStateToProps = ({ control: { searchQuery } }) => {
   return {
+    searchQuery,
   }
 }
 

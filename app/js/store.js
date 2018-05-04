@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 
+import { circleBoundsFromFeature } from './utils/math';
 import murmurhash3 from './utils/murmurhash3_gc';
 
 // this is session-local only, doesn't get persisted/shared
@@ -22,6 +23,9 @@ const control = (state = defaultControlState, action) => {
     case 'SET_DRAWER_CLOSED':
       return { ...state, drawerOpen: false }
 
+    case 'HIGHLIGHT_FEATURE':
+      return { ...state, featureId: action.feature.id }
+
     case 'OPEN_BROWSE_MODE':
       return { ...state, drawerOpen: false, appMode: 'BROWSE' }
     case 'OPEN_EDIT_MODE':
@@ -40,6 +44,8 @@ const control = (state = defaultControlState, action) => {
       return state
   }
 }
+
+export const highlightFeature = (feature) => ({ type: 'HIGHLIGHT_FEATURE', feature })
 
 export const openBrowseMode = () => ({ type: 'OPEN_BROWSE_MODE' })
 
@@ -79,6 +85,9 @@ const mapView = (state = defaultMapView, action) => {
       return { ...state, basemapId: action.basemapId }
     case 'SET_VIEWPORT':
       return { ...state, viewport: action.viewport }
+    case 'HIGHLIGHT_FEATURE':
+      return { ...state, viewport: circleBoundsFromFeature(action.feature) }
+
     default:
       return state
   }

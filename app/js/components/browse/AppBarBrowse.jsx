@@ -22,7 +22,7 @@ const AppBarBrowse = ({
       <MenuIcon />
     </IconButton>
 
-    <IconButton disabled onClick={() => dispatch(openSearch())}>
+    <IconButton onClick={() => dispatch(openSearch())}>
       <SearchIcon />
     </IconButton>
 

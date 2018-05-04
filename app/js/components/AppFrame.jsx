@@ -5,6 +5,7 @@ import * as BROWSE from './browse'
 import * as EDIT from './edit'
 import * as FEATURE from './feature'
 import * as FILTERS from './filters'
+import * as SEARCH from './search'
 
 import AppDrawer from './drawer/AppDrawer'
 import DragDrop from './DragDrop'
@@ -15,6 +16,7 @@ const modes = {
   EDIT,
   FEATURE,
   FILTERS,
+  SEARCH,
 }
 
 const AppFrame = ({

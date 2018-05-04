@@ -96,7 +96,7 @@ const LeafOverlay = ({
 
 const mapStateToProps = ({ control, features, filters, activeFilters }) => {
   return {
-    detailFeatureId: control.appMode === 'FEATURE' ? control.featureId : null,
+    detailFeatureId: ['FEATURE', 'SEARCH'].includes(control.appMode) ? control.featureId : null,
     editFeatureId: control.appMode === 'EDIT' ? control.editFeatureId : null,
     features,
     filters,
