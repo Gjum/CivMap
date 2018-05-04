@@ -25,11 +25,10 @@ const AppBarFilters = ({
 
     <div className='appbar-stretch'>Search</div>
 
-    <IconButton onClick={() => dispatch(openFilters())}>
-      <FiltersIcon />
-    </IconButton>
-
-    <IconButton disabled onClick={() => dispatch(openShare())}>
+    <IconButton onClick={() => {
+      location.hash = `q=${encodeURI(searchQuery)}`
+      // TODO better search sharing
+    }}>
       <ShareIcon />
     </IconButton>
 

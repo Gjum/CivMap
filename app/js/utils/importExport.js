@@ -1,10 +1,13 @@
 import { circleBoundsFromFeature, circleToBounds, deepFlip } from './math'
 import { getJSON } from './net'
-import { activateFilters, addFeature, loadFeatures, loadFilters, openFeatureDetail, setActiveBasemap, setViewport } from '../store'
+import { activateFilters, addFeature, loadFeatures, loadFilters, openFeatureDetail, openSearch, setActiveBasemap, setViewport } from '../store'
 
 export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {
     store.dispatch(setActiveBasemap(urlData.basemap))
+  }
+  if (urlData.searchQuery) {
+    store.dispatch(openSearch(urlData.searchQuery))
   }
   if (urlData.collectionUrl) {
     loadCollectionJsonAsync(urlData.collectionUrl, store.dispatch, loadDependentThings)
@@ -141,6 +144,7 @@ export function parseUrlHash(hash) {
     featureId: undefined,
     feature: undefined,
     collection: undefined,
+    searchQuery: undefined,
   }
   if (!hash) return urlData
 
@@ -154,7 +158,7 @@ export function parseUrlHash(hash) {
   }
 
   hash.slice(1).split('#').map(part => {
-    const [key, val] = part.split('=', 2)
+    const [key, val] = decodeURI(part).split('=', 2)
     if (key == 'c') {
       let [x, z, radius] = val.split(/[,r]+/, 3).map(parseFloat)
       if (!radius) urlData.marker = true
@@ -164,8 +168,9 @@ export function parseUrlHash(hash) {
     else if (key == 'b') urlData.basemap = val
     else if (key == 't') urlData.basemap = val
     else if (key == 'f') urlData.featureId = val
-    else if (key == 'feature') urlData.feature = JSON.parse(decodeURI(val))
-    else if (key == 'collection') urlData.collection = JSON.parse(decodeURI(val))
+    else if (key == 'feature') urlData.feature = JSON.parse(val)
+    else if (key == 'collection') urlData.collection = JSON.parse(val)
+    else if (key == 'q') urlData.searchQuery = val
     else if (key == 'u') urlData.collectionUrl = val
     else console.error("Unknown url hash entry", part)
   })
