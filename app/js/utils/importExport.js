@@ -293,7 +293,7 @@ export function processSnitchMasterFile(file, dispatch) {
 
         return {
           id: fid,
-          polygon: [[x - 11, z - 11], [x + 12, z - 11], [x + 12, z + 12], [x - 11, z + 12]],
+          polygon: [[[x - 11, z - 11], [x + 12, z - 11], [x + 12, z + 12], [x - 11, z + 12]]],
           name, x, y, z, world, source, group, cull,
           is_snitch: true,
           from_snitchmaster: true,
