@@ -248,7 +248,7 @@ function uniqeArray(a) {
 const activeFilters = (state = [], action) => {
   switch (action.type) {
     case 'APP_LOAD':
-      return uniqeArray(action.state.activeFilters) || state
+      return uniqeArray(action.state.activeFilters || state)
 
     case 'ACTIVATE_FILTERS': {
       const seen = {}
