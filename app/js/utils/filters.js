@@ -8,7 +8,7 @@ export function checkFilterConditions({ conditions, feature }) {
 }
 
 export function checkFilterCondition({ condition, feature }) {
-  if (condition.type === 'key_equals') {
+  if (condition.type === 'equals') {
     return feature[condition.key] === condition.value
   }
   if (condition.type === 'has_key') {
