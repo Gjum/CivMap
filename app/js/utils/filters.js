@@ -22,6 +22,14 @@ export function checkFilterCondition({ condition, feature }) {
     }
     return false
   }
+  if (condition.type === 'not_one_of') {
+    for (let val of condition.vals) {
+      if (feature[condition.key] === val) {
+        return false
+      }
+    }
+    return true
+  }
   console.warn('ignoring unknown filter condition', condition)
   return true
 }
