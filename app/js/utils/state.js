@@ -16,26 +16,10 @@ export const defaultAppState = {
     basemapId: 'terrain',
   },
 
-  filters: {
-    "Waypoints": {
-      name: "Waypoints",
-      conditions: [
-        { type: 'has_key', key: 'is_waypoint' },
-      ],
-      overrides: '{"label":${name},"style":{${...style}, "circle_marker":{"fillOpacity":0.5},"label":{"align":"bottom-left","offset":[6,5]}}}',
-      showLabels: true,
-    },
-    "Everything else": {
-      name: "Everything else",
-      conditions: [],
-      overrides: '{"style":{${...style}, "label":{"align":"bottom-left","offset":[6,5]}}}',
-      showLabels: true,
-    },
+  collections: {
+    "https://ccmap.github.io/data/settlements.civmap.json": { auto_update: true },
+    "https://ccmap.github.io/data/mta_plots.civmap.json": { auto_update: true },
   },
-  activeFilters: [
-    "Waypoints",
-    "Everything else",
-  ],
 }
 
 const defaultBasemap = Object.values(defaultAppState.mapConfig.basemaps).find(b => b.isDefault) || {}
@@ -43,4 +27,24 @@ defaultAppState.mapView.basemapId = defaultBasemap.id
 defaultAppState.mapView.viewport = {
   x: 0, z: 0,
   radius: defaultAppState.mapConfig.borderApothem,
+}
+
+/**
+ * Returns a map `{ type -> { id -> presentation } }`
+ * to quickly look up all presentations concerning a certain type.
+ */
+export function groupPresentationsByType(presentations) {
+  const typeGroups = {}
+  Object.entries(presentations).forEach(([id, p]) => {
+    let typeGroup = typeGroups[p.type]
+    if (!typeGroup) {
+      typeGroups[p.type] = typeGroup = {}
+    }
+    typeGroup[id] = p
+  })
+  return typeGroups
+}
+
+export function makePresentationId({ name, source }) {
+  return name + '\n' + source
 }

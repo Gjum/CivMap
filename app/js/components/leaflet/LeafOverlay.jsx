@@ -1,14 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
+import { inspect } from 'util'
 
 import EditableCircle from './EditableCircle'
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
-import { applyFilterOverrides, checkFilterConditions, doesFeatureHaveLabel } from '../../utils/filters'
 import { deepFlip } from '../../utils/math'
 import PassiveLabel from './PassiveLabel'
+import { defaultPresentation, getZoomStyle, lookupStyle } from '../../utils/presentation'
+import { groupPresentationsByType } from '../../utils/state';
 import { openFeatureDetail } from '../../store'
 
 export function getFeatureComponent(feature, zoom) {
@@ -38,6 +40,14 @@ function FeatureOverlayImage({ feature, dispatch }) {
   />
 }
 
+function doesFeatureHaveLabel(featureWithStyles) {
+  const { feature } = featureWithStyles
+  const label = lookupStyle("label", featureWithStyles, feature.name)
+
+  const hasXZ = feature.x !== undefined && feature.z !== undefined
+  return label && (hasXZ || feature.polygon !== undefined)
+}
+
 // RL.FeatureGroup has weird expectations about its children...
 function prepareListForFeatureGroup(list) {
   if (!list || list.length > 1) return list
@@ -46,36 +56,51 @@ function prepareListForFeatureGroup(list) {
 }
 
 const LeafOverlay = ({
-  detailFeatureId,
-  editFeatureId,
-  features,
-  filters,
-  activeFilters,
+  activeFeatureId,
+  appMode,
+  featuresMerged,
+  presentationsEnabled,
+  presentationsMerged,
+  zoom,
   dispatch,
 }) => {
+  const featuresPresentations = {}
+  Object.values(featuresMerged).forEach(feature => {
+    const presentation = presentationsMerged[presentationsEnabled[feature.type]]
+    const presentationsThisType = Object.values(groupPresentationsByType(presentationsMerged)[feature.type] || {})
 
-  const filteredFeatures = {}
-  Object.values(features).forEach(feature => {
-    for (let filter of activeFilters.map(id => filters[id]).filter(f => !!f)) {
-      if (checkFilterConditions({ conditions: filter.conditions, feature })) {
-        filteredFeatures[feature.id] = { feature, filter }
-        break
+    if (activeFeatureId === feature.id) {
+      const presentationHl = presentation || presentationsThisType[0] || defaultPresentation
+      featuresPresentations[feature.id] = {
+        feature,
+        baseStyle: presentationHl.style_base,
+        zoomStyle: presentationHl.style_highlight,
       }
+    } else if (presentation) {
+      const baseStyle = presentation.style_base
+      const zoomStyle = getZoomStyle(presentation, zoom) // TODO we can calculate this once for all enabled presentations before looping the features
+      const featureWithStyles = { feature, baseStyle, zoomStyle }
+      const opacity = lookupStyle("opacity", featureWithStyles, 1)
+      if (opacity > 0) {
+        featuresPresentations[feature.id] = featureWithStyles
+      }
+    } else if (presentationsThisType.length <= 0) {
+      // unknown type, always show with default style
+      featuresPresentations[feature.id] = {
+        feature,
+        baseStyle: defaultPresentation.style_base,
+        zoomStyle: getZoomStyle(defaultPresentation, zoom),
+      }
+    } else {
+      // all presentations disabled for this type, nor highlighted: do not show feature
     }
   })
 
-  if (features[editFeatureId] && !filteredFeatures[editFeatureId]) {
-    filteredFeatures[editFeatureId] = { feature: features[editFeatureId], filter: { overrides: '{}' } }
-  }
-  if (features[detailFeatureId] && !filteredFeatures[detailFeatureId]) {
-    filteredFeatures[detailFeatureId] = { feature: features[detailFeatureId], filter: { overrides: '{}' } }
-  }
-
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
-      Object.values(filteredFeatures).map(({ feature, filter }, i) => {
-        const editable = editFeatureId === feature.id
-        const props = { dispatch, editable, feature, filter }
+      Object.values(featuresPresentations).map(({ feature, baseStyle, zoomStyle }, i) => {
+        const editable = appMode === 'EDIT' && activeFeatureId === feature.id
+        const props = { dispatch, editable, feature, baseStyle, zoomStyle }
         const FeatureComponent = getFeatureComponent(feature)
         if (!FeatureComponent) {
           console.error("[FeaturesOverlay] Don't know how to display feature", feature)
@@ -85,22 +110,24 @@ const LeafOverlay = ({
       })
     )}
     {prepareListForFeatureGroup(
-      Object.values(filteredFeatures)
-        .filter(({ feature, filter }) => doesFeatureHaveLabel({ feature, filter }))
-        .map(({ feature, filter }, i) => {
-          return <PassiveLabel key={(feature.id || i) + '_label'} feature={feature} filter={filter} />
+      Object.values(featuresPresentations)
+        .filter((featureWithStyles) => doesFeatureHaveLabel(featureWithStyles))
+        .map((featureWithStyles, i) => {
+          return <PassiveLabel key={(featureWithStyles.feature.id || i) + '_label'} {...featureWithStyles} />
         })
     )}
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ control, features, filters, activeFilters }) => {
+const mapStateToProps = ({ control, features, presentations }, { zoom }) => {
+  const { presentationsEnabled, presentationsMerged } = presentations
   return {
-    detailFeatureId: ['FEATURE', 'SEARCH'].includes(control.appMode) ? control.featureId : null,
-    editFeatureId: control.appMode === 'EDIT' ? control.editFeatureId : null,
-    features,
-    filters,
-    activeFilters,
+    activeFeatureId: ['EDIT', 'FEATURE', 'SEARCH'].includes(control.appMode) ? control.activeFeatureId : null,
+    appMode: control.appMode,
+    featuresMerged: features.featuresMerged,
+    presentationsEnabled,
+    presentationsMerged,
+    zoom,
   }
 }
 

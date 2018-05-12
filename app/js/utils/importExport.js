@@ -1,6 +1,14 @@
 import { circleBoundsFromFeature, circleToBounds, deepFlip } from './math'
 import { getJSON } from './net'
-import { activateFilters, addFeature, loadFeatures, loadFilters, openFeatureDetail, openSearch, setActiveBasemap, setViewport } from '../store'
+import { makePresentationId } from './state';
+import { cacheFeatures, cachePresentations, importCollection, openFeatureDetail, openSearch, setActiveBasemap, setEnabledPresentations, setViewport, updateFeature } from '../store'
+
+export function autoImportCollectionsOnStartup(store) {
+  Object.entries(store.getState().collections).forEach(([url, { auto_update }]) => {
+    if (!auto_update) return
+    loadCollectionJsonAsync(url, store.dispatch)
+  })
+}
 
 export function loadAppStateFromUrlData(urlData, store) {
   if (urlData.basemap) {
@@ -26,9 +34,9 @@ export function loadAppStateFromUrlData(urlData, store) {
     if (urlData.feature) {
       if (urlData.feature.geometry && urlData.feature.properties) {
         // probably a v2.0.0 feature
-        urlData.feature = convertFeatureFrom2(urlData.feature)
+        urlData.feature = convertFeatureFrom200(urlData.feature)
       }
-      store.dispatch(addFeature(urlData.feature))
+      store.dispatch(updateFeature(urlData.feature))
       urlData.featureId = urlData.feature.id
     }
     if (urlData.featureId) {
@@ -66,30 +74,50 @@ export function loadCollectionJson(data, dispatch, source) {
   data = {
     info: {},
     features: [],
-    filters: [],
+    presentations: [],
     ...data,
   }
 
-  if (data.info.version === '0.3.0') {
-    // current version, nothing to convert
-  } else if (data.info.version === '2.0.0') {
-    data = convertCollectionFrom2(data)
+  const currentVersion = '0.3.1'
 
+  if (data.info.version === currentVersion) {
+    // current version, nothing to convert
+  } else if (data.info.version === '0.3.0') {
+    data = convertCollectionFrom030(data)
+  } else if (data.info.version === '2.0.0') {
+    data = convertCollectionFrom200(data)
     // } else if (data.info.version === '1.0.0') {
     // TODO convert from 1.0.0: layers
   } else {
-    alert(`Can't read Collection version "${data.info.version}", use 0.3.0 please`)
+    alert(`Can't read Collection version "${data.info.version}", use ${currentVersion} please`)
     return
   }
 
-  dispatch(loadFeatures(data.features))
-  dispatch(loadFilters(data.filters))
-  dispatch(activateFilters(data.active_filters || data.filters.map(f => f.name)))
+  data.presentations.forEach(p => {
+    if (!p.source) p.source = source
+    if (!p.id) p.id = makePresentationId(p)
+  })
 
-  console.log(`Loaded collection with ${data.features.length} features and ${data.filters.length} filters at version "${data.info.version}" from ${source}`)
+  dispatch(importCollection(data))
+  dispatch(setEnabledPresentations(data.enabled_presentations || data.presentations))
+
+  console.log(`Loaded collection with ${data.features.length} features and ${data.presentations.length} presentations at version "${data.info.version}" from ${source}`)
 }
 
-export function convertFeatureFrom2(f) {
+export function convertCollectionFrom030(data) {
+  const features = data.features.map(convertFeatureFrom030)
+  // TODO convert filters to presentations
+  return { ...data, features }
+}
+
+export function convertFeatureFrom030(f) {
+  Object.keys(f).forEach(k => {
+    if (k.startsWith('is_')) f = { ...f, type: k.slice(3) }
+  })
+  return f
+}
+
+export function convertFeatureFrom200(f) {
   switch (f.geometry.type) {
     case 'marker': {
       const [z, x] = f.geometry.position
@@ -125,14 +153,14 @@ export function convertFeatureFrom2(f) {
       }
     }
     default: {
-      console.error('[convertCollectionFrom2] unknown feature geometry', f.geometry.type)
+      console.error('[convertCollectionFrom200] unknown feature geometry', f.geometry.type)
       return f
     }
   }
 }
 
-export function convertCollectionFrom2(data) {
-  const features = data.features.map(convertFeatureFrom2)
+export function convertCollectionFrom200(data) {
+  const features = data.features.map(convertFeatureFrom200)
   return { ...data, features }
 }
 
@@ -201,10 +229,10 @@ export function processJourneyTileFile(file, dispatch) {
     const s = n + 512
     const e = w + 512
 
-    const fid = `ccmap/dragdrop/tile/journeymap/${ix}-${iz}`
+    const fid = `civmap/dragdrop/tile/journeymap/${ix}-${iz}`
     const name = `JourneyMap tile ${ix},${iz}`
 
-    dispatch(addFeature({
+    dispatch(updateFeature({
       id: fid,
       map_image: {
         url: imgUrl,
@@ -253,7 +281,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
 
       const [r, g, b] = [p.red, p.green, p.blue].map(c => Math.round(255 * c))
 
-      const fid = `ccmap/dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
+      const fid = `civmap/dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
       const color = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 
       return {
@@ -265,7 +293,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
       }
     })
 
-  dispatch(loadFeatures(features))
+  dispatch(importCollection({ features }))
   console.log('Loaded', features.length, 'waypoints from', source)
 
   // TODO create+enable preconfigured waypoints filter
@@ -287,7 +315,7 @@ export function processSnitchMasterFile(file, dispatch) {
 
         name = name || `Snitch at ${x},${y},${z} on [${group}]`
 
-        const fid = `ccmap/dragdrop/snitchmaster/${x},${y},${z},${group}`
+        const fid = `civmap/dragdrop/snitchmaster/${x},${y},${z},${group}`
 
         // TODO colorize groups
 
@@ -300,7 +328,7 @@ export function processSnitchMasterFile(file, dispatch) {
         }
       })
 
-    dispatch(loadFeatures(features))
+    dispatch(importCollection({ features }))
     console.log('Loaded', features.length, 'snitches from', file.name)
 
     // TODO create+enable preconfigured snitchmaster filter

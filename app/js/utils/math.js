@@ -30,6 +30,10 @@ export function boundsToEnclosingCircle(bounds) {
   return { x, z, radius }
 }
 
+export function boundsToRect(bounds) {
+  return [intCoords(bounds.getNorthEast()), intCoords(bounds.getSouthWest())]
+}
+
 export function circleToBounds({ x, z, radius }) {
   return [[x - radius, z - radius], [x + radius, z + radius]]
 }
@@ -83,6 +87,21 @@ export function reversePolyPositions(positions) {
   return positions
 }
 
+export function rectBoundsFromFeature(feature) {
+  const has = (k) => feature[k] !== undefined
+  // TODO select largest/according to zoom level
+  if (has('map_image')) return boundsToRect(L.latLngBounds(deepFlip(feature.map_image.bounds)))
+  if (has('polygon')) return boundsToRect(L.latLngBounds(deepFlip(feature.polygon)))
+  if (has('line')) return boundsToRect(L.latLngBounds(deepFlip(feature.line)))
+  if (has('x') && has('z')) {
+    const { x, z, radius = 100 } = feature // TODO arbitrary radius
+    return [[x - radius, z - radius], [x + radius, z + radius]]
+  }
+
+  console.error("[rectBoundsFromFeature] Unknown feature geometry", feature)
+  return [[-9000, -9000], [9000, 9000]]
+}
+
 export function circleBoundsFromFeature(feature) {
   const has = (k) => feature[k] !== undefined
   // TODO select largest/according to zoom level
@@ -94,5 +113,5 @@ export function circleBoundsFromFeature(feature) {
   }
 
   console.error("[circleBoundsFromFeature] Unknown feature geometry", feature)
-  return { x: 0, z: 0, radius: 0 }
+  return { x: 0, z: 0, radius: 9000 }
 }

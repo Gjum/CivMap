@@ -4,12 +4,13 @@ import { connect } from 'react-redux'
 import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List'
 import RestorePageIcon from 'material-ui-icons/RestorePage'
 
-import { appLoad, setDrawerClosed } from '../../store'
+import { appLoad, openBrowseMode, setDrawerClosed } from '../../store'
 import { defaultAppState } from '../../utils/state'
 
 const ResetMenuItem = ({ dispatch }) => {
   return <ListItem button
     onClick={() => {
+      dispatch(openBrowseMode())
       dispatch(appLoad(defaultAppState))
       dispatch(setDrawerClosed())
     }}

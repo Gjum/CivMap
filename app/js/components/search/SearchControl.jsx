@@ -9,7 +9,7 @@ import TextField from 'material-ui/TextField'
 import CloseIcon from 'material-ui-icons/Close'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
 
-import { circleBoundsFromFeature } from '../../utils/math'
+import { rectBoundsFromFeature } from '../../utils/math'
 import { highlightFeature, openFeatureDetail, openSearch, setViewport } from '../../store'
 
 function fuzzyMatch(query, str) {
@@ -29,14 +29,22 @@ class SearchControl extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, features, searchQuery } = this.props
+    const {
+      dispatch,
+      featuresMerged,
+      searchQuery,
+    } = this.props
     const searchQueryLower = String(searchQuery).toLowerCase()
 
-    const searchResults = Object.values(features).filter(f =>
+    let searchResults = Object.values(featuresMerged).filter(f =>
       !searchQuery
       || f.name && fuzzyMatch(searchQueryLower, f.name)
-      || f.label && fuzzyMatch(searchQueryLower, f.label)
+      || f.nation && fuzzyMatch(searchQueryLower, f.nation)
+      || f.contact && fuzzyMatch(searchQueryLower, f.contact)
+      || f.notes && fuzzyMatch(searchQueryLower, f.notes)
     )
+
+    // TODO sort search results
 
     const numResults = searchResults.length
     const topResults = searchResults.slice(0, 50)
@@ -64,12 +72,15 @@ class SearchControl extends React.PureComponent {
           return <ListItem button key={feature.id}
             onClick={() => {
               dispatch(openFeatureDetail(feature.id))
-              dispatch(setViewport(circleBoundsFromFeature(feature)))
+              dispatch(setViewport(rectBoundsFromFeature(feature)))
             }}
           >
             <ListItemText primary={feature.name || feature.label || feature.id || '(unnamed feature)'} />
             <ListItemSecondaryAction>
-              <IconButton onClick={() => dispatch(highlightFeature(feature))}>
+              <IconButton onClick={() => {
+                dispatch(highlightFeature(feature.id))
+                dispatch(setViewport(rectBoundsFromFeature(feature)))
+              }}>
                 <ShowOnMapIcon />
               </IconButton>
             </ListItemSecondaryAction>
@@ -80,10 +91,10 @@ class SearchControl extends React.PureComponent {
   }
 }
 
-const mapStateToProps = ({ control: { searchQuery }, features }) => {
+const mapStateToProps = ({ control: { searchQuery }, features: { featuresMerged } }) => {
   return {
+    featuresMerged,
     searchQuery,
-    features,
   }
 }
 

@@ -2,25 +2,33 @@ let lastLocalStorageError = {}
 
 export function saveAppStateToLocalStorage(state) {
   try {
+    // TODO noop if unchanged
+
     const {
+      features: {
+        featuresCached,
+        featuresUser,
+      },
       mapView,
-      features,
-      filters,
-      activeFilters,
+      presentations: {
+        presentationsCached,
+        presentationsEnabled,
+        presentationsUser,
+      },
     } = state
 
-    // TODO skip if unchanged
-    const data = {
-      features,
-      filters,
-      activeFilters,
-    }
-    window.localStorage.setItem('CivMap.data', JSON.stringify(data))
-
-    const view = {
+    window.localStorage.setItem('CivMap.features.0.3.1', JSON.stringify({
+      featuresCached,
+      featuresUser,
+    }))
+    window.localStorage.setItem('CivMap.presentations.0.3.1', JSON.stringify({
+      presentationsCached,
+      presentationsUser,
+    }))
+    window.localStorage.setItem('CivMap.view.0.3.1', JSON.stringify({
       mapView,
-    }
-    window.localStorage.setItem('CivMap.view', JSON.stringify(view))
+      presentationsEnabled,
+    }))
 
   } catch (e) {
     if (lastLocalStorageError.code != e.code) {
@@ -32,19 +40,27 @@ export function saveAppStateToLocalStorage(state) {
 
 export function getAppStateFromLocalStorage() {
   try {
-    let appState = {}
+    // TODO check if older states exist (e.g. `CivMap.data`)
 
-    const dataJson = window.localStorage.getItem('CivMap.data')
-    if (dataJson) {
-      appState = { ...appState, ...JSON.parse(dataJson) }
+    let state = {}
+
+    const featuresJson = window.localStorage.getItem('CivMap.features.0.3.1')
+    if (featuresJson) {
+      state = { ...state, features: JSON.parse(featuresJson) }
     }
 
-    const viewJson = window.localStorage.getItem('CivMap.view')
+    const presentationsJson = window.localStorage.getItem('CivMap.presentations.0.3.1')
+    if (presentationsJson) {
+      state = { ...state, presentations: JSON.parse(presentationsJson) }
+    }
+
+    const viewJson = window.localStorage.getItem('CivMap.view.0.3.1')
     if (viewJson) {
-      appState = { ...appState, ...JSON.parse(viewJson) }
+      const { presentationsEnabled, ...view } = JSON.parse(viewJson)
+      state = { ...state, ...view, presentations: { ...state.presentations, presentationsEnabled } }
     }
 
-    return appState
+    return state
 
   } catch (e) {
     console.error('Loading from localStorage failed', e)

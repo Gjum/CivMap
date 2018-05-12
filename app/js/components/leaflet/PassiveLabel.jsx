@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
-import { applyFilterOverrides } from '../../utils/filters'
-import { intCoords } from '../../utils/math'
-import { openFeatureDetail, updateFeature } from '../../store'
+import { lookupStyle } from '../../utils/presentation'
 
 function firstCenter(positions) {
   while (Array.isArray(positions[0][0])) {
@@ -25,22 +23,22 @@ export default class PassiveLabel extends React.PureComponent {
 
   componentWillUpdate(nextProps, nextState) {
     // TODO also check if label placement is different
-    if (nextProps.feature.label !== this.props.feature.label
-      || nextProps.feature.name !== this.props.feature.name) {
+    if (nextProps.feature !== this.props.feature
+      || nextProps.baseStyle !== this.props.baseStyle
+      || nextProps.zoomStyle !== this.props.zoomStyle) {
       this.icon = null
     }
   }
 
-  recreateLabel({ feature, filter: { overrides } }) {
+  recreateLabel({ feature, baseStyle, zoomStyle }) {
     this.icon = null
 
-    feature = applyFilterOverrides({ feature, overrides })
-
-    if (!feature.label && !feature.name) return
-
-    const labelText = feature.label || feature.name
     // TODO configurable label font size, color, positioning, rotation, ...
     // TODO get offset from marker size
+
+    const labelText = lookupStyle("label", { feature, baseStyle, zoomStyle }, feature.name)
+    if (!labelText) return
+
     this.icon = L.divIcon({
       className: 'leaflabel',
       html: labelText,
@@ -56,11 +54,11 @@ export default class PassiveLabel extends React.PureComponent {
       return null
     }
 
-    const { feature, filter: { overrides } } = this.props
-    const filterWithOverrides = applyFilterOverrides({ feature, overrides })
-    let { x, z } = filterWithOverrides
-    if (filterWithOverrides.polygon) {
-      [x, z] = firstCenter(filterWithOverrides.polygon)
+    const { feature } = this.props
+
+    let { x, z } = feature
+    if (feature.polygon && x === undefined && z === undefined) {
+      [x, z] = firstCenter(feature.polygon)
     }
 
     return <RL.Marker

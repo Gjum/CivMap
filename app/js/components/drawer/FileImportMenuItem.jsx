@@ -34,8 +34,10 @@ export class ImportDialog extends React.Component {
       <DialogTitle>Import anything</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          <p>VoxelMap's waypoints are stored in <code>(.minecraft location)\mods\VoxelMods\voxelMap\(server address).points</code></p>
-          <p>SnitchMaster's snitches are stored in <code>(.minecraft location)\mods\Snitch-Master\(server address)\Snitches.csv</code></p>
+          VoxelMap's waypoints are stored in <code>(.minecraft location)\mods\VoxelMods\voxelMap\(server address).points</code>
+        </DialogContentText>
+        <DialogContentText>
+          SnitchMaster's snitches are stored in <code>(.minecraft location)\mods\Snitch-Master\(server address)\Snitches.csv</code>
         </DialogContentText>
         <TextField
           autoFocus

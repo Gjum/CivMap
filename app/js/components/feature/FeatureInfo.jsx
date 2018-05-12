@@ -9,8 +9,8 @@ import EditIcon from 'material-ui-icons/Edit'
 import FilterIcon from 'material-ui-icons/FilterList'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
 
+import { circleBoundsFromFeature, exportStringFromFeature, rectBoundsFromFeature } from '../../utils/math'
 import { openBrowseMode, openEditMode, removeFeature, setViewport } from '../../store'
-import { circleBoundsFromFeature, exportStringFromFeature } from '../../utils/math'
 
 export function isImageUrl(value) {
   return /^https?:\/\/[^\/ ]+\/[^ ]+\.(png|jpe?g|gif|bmp|ico|tif?f)$/i.test(value)
@@ -53,6 +53,9 @@ const FeatureProps = ({ featureProps }) => {
       // TODO prefer `image` but also preview `mapImage.url`
     } else if (key === 'style') {
       // TODO show compact style (color etc)
+    } else if (key === 'source') {
+      // TODO show collection name
+    } else if (key === 'type') { // already shown
     } else if ('XxZz'.includes(key)) { // don't show x/z in props
     } else if (key === 'id') { // don't show id
     } else if (key === 'line' || key === 'polygon') {
@@ -82,11 +85,14 @@ const FeatureProps = ({ featureProps }) => {
 
 const FeatureInfo = ({
   feature,
-  openBrowseMode,
-  openEditMode,
-  removeFeature,
-  setViewport,
+  dispatch,
 }) => {
+  if (!feature) {
+    dispatch(openBrowseMode()) // TODO find clean solution
+    return null
+  }
+
+  const rectBounds = rectBoundsFromFeature(feature)
   const circleBounds = circleBoundsFromFeature(feature)
 
   const shareableLink = '#feature=' + exportStringFromFeature(feature)
@@ -95,14 +101,14 @@ const FeatureInfo = ({
     <FeatureProps featureProps={feature} />
 
     <p style={{ margin: '16px' }}>
-      at {circleBounds.x} {circleBounds.z}
+      {feature.type} at {circleBounds.x} {circleBounds.z}
       {' • '}
       <a href={shareableLink}>
         Shareable link</a>
     </p>
 
     <div style={{ margin: '16px' }}>
-      <Button variant='raised' onClick={() => setViewport(circleBounds)}>
+      <Button variant='raised' onClick={() => dispatch(setViewport(rectBounds))}>
         <ShowOnMapIcon />
         Show on map
       </Button>
@@ -114,15 +120,15 @@ const FeatureInfo = ({
     </div>
     <div style={{ margin: '16px' }}>
       <Button variant='raised' onClick={() => {
-        openEditMode(feature.id)
+        dispatch(openEditMode(feature.id))
       }}>
         <EditIcon />
         Edit
       </Button>
 
       <Button variant='raised' onClick={() => {
-        removeFeature(feature.id)
-        openBrowseMode() // TODO show similar features in search results instead
+        dispatch(removeFeature(feature.id))
+        dispatch(openBrowseMode()) // TODO show similar features in search results instead
       }}>
         <DeleteIcon />
         Delete
@@ -131,17 +137,10 @@ const FeatureInfo = ({
   </div>
 }
 
-const mapStateToProps = ({ features, control }) => {
+const mapStateToProps = ({ control, features: { featuresMerged } }) => {
   return {
-    feature: features[control.featureId],
+    feature: featuresMerged[control.activeFeatureId],
   }
 }
 
-const mapDispatchToProps = {
-  openBrowseMode,
-  openEditMode,
-  removeFeature,
-  setViewport,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(FeatureInfo)
+export default connect(mapStateToProps)(FeatureInfo)

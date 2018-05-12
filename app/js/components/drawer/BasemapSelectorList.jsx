@@ -19,9 +19,7 @@ const BasemapSelectorList = ({
   basemapPreview,
   basemaps,
   tilesRoot,
-
-  setDrawerClosed,
-  setActiveBasemap,
+  dispatch,
 }) => {
   const getClassName = id => id == activeBasemapId ? ' basemap-selector-current' : null
   return <List disablePadding
@@ -32,8 +30,8 @@ const BasemapSelectorList = ({
         button
         className={getClassName(id)}
         onClick={() => {
-          setActiveBasemap(id)
-          setDrawerClosed()
+          dispatch(setActiveBasemap(id))
+          dispatch(setDrawerClosed())
         }}
       >
         <BasemapIcon basemapId={id} basemapPreview={basemapPreview} tilesRoot={tilesRoot} />
@@ -50,9 +48,4 @@ const mapStateToProps = ({ mapConfig, mapView }, ownProps) => {
   }
 }
 
-const mapDispatchToProps = {
-  setDrawerClosed,
-  setActiveBasemap,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(BasemapSelectorList)
+export default connect(mapStateToProps)(BasemapSelectorList)

@@ -2,6 +2,7 @@ html,
 body,
 #app-root,
 .full,
+.mapContainer,
 .map {
   width: 100%;
   height: 100%;
@@ -44,7 +45,7 @@ div {
 }
 
 .leafmap-coords {
-  z-index: 800;
+  z-index: 401;
   position: absolute;
   bottom: 0;
   right: 0;
@@ -111,18 +112,32 @@ div {
 
 /***** app layout *****/
 
+.appbar {
+  width: 100%;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: white;
+}
+
+/* .appbar > button {
+  border-radius: 100%;
+} */
+
+/* .appbar > button:hover {
+  background-color: #cccccc;
+} */
+
 .container {
   display: grid;
   height: 100%;
 }
 
-.appbar {
-  grid-area: appbar;
-}
-
 .mainlist {
   grid-area: mainlist;
   overflow-y: auto;
+  margin-top: 48px;
 }
 
 .mapContainer {
@@ -137,52 +152,53 @@ div {
 /* mobile */
 .container.split {
   grid-template:
-      "appbar" auto
-      "mainlist" 284px
+      "mainlist" 1fr
       "map" 1fr;
 }
 .container.full-map {
   grid-template:
-      "appbar" auto
       "map" 1fr;
 }
 .container.full-list {
   grid-template:
-      "appbar" auto
       "mainlist" 1fr;
 }
 
 /* landscape on medium-size devices */
 @media all and (orientation: landscape) and (min-width: 600px) and (max-width: 719px) {
   .container.split {
-      grid-template: "appbar map" auto
-      "mainlist map" 1fr
+      grid-template: "mainlist map"
       / 284px auto;
   }
   .container.full-map {
-      grid-template:
-          "appbar" auto
-          "map" 1fr;
+      grid-template: "map";
   }
   .container.full-list {
-      grid-template:
-          "appbar" auto
-          "mainlist" 1fr;
+      grid-template: "mainlist";
+  }
+
+  .appbar {
+    max-width: 284px;
+    width: auto;
   }
 }
 
 /* large devices */
 @media all and (min-width: 720px) {
   .container.split {
-      grid-template: "appbar map" auto
-      "mainlist map" 1fr
+      grid-template: "mainlist map"
       / 360px auto;
+  }
+
+  .appbar {
+    max-width: 360px;
+    width: auto;
   }
 }
 
 /***** custom appbar *****/
 
-.custom-appbar {
+.appbar {
   height: 48px; /* resizing is done through padding alone */
   display: flex;
   flex-direction: row;
@@ -191,20 +207,20 @@ div {
 }
 
 /* portrait under 600px height */
-.custom-appbar {
+.appbar {
   padding: 4px;
 }
 
 /* landscape on small/medium devices */
 @media all and (orientation: landscape) and (max-height: 599px) {
-  .custom-appbar {
+  .appbar {
     padding: 0px;
   }
 }
 
 /* large devices, or medium on portrait */
 @media all and (min-height: 600px) {
-  .custom-appbar {
+  .appbar {
     padding: 8px;
   }
 }

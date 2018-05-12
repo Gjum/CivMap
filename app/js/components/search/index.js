@@ -1,5 +1,8 @@
-import AppBarSearch from './AppBarSearch'
 import SearchControl from './SearchControl'
+import ShareSearchButton from './ShareSearchButton'
 
-export const Appbar = AppBarSearch
-export const Detail = SearchControl
+// TODO search field in appbar instead of sidebar
+// so it's still visible when scrolling through the results
+
+export const Share = ShareSearchButton
+export const SideContent = SearchControl

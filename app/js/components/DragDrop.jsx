@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { addFeature, loadFeatures } from '../store'
 import { getFileProcessor } from '../utils/importExport'
 
 class DragDrop extends React.PureComponent {
@@ -72,7 +71,7 @@ class DragDrop extends React.PureComponent {
   }
 
   setOverlayStatus(enabled) {
-    const modal = document.querySelector('#dragDropModal') // TODO use ref instead
+    const modal = document.querySelector('#dragDropModal') // TODO use ref/state instead
     modal.style.display = enabled ? 'block' : 'none'
   }
 
@@ -106,9 +105,9 @@ class DragDrop extends React.PureComponent {
           {/* TODO show current dragged files' names and recognized types */}
           Drop files anywhere to import...
         <ul>
-            <li>waypoint files (VoxelMap, Xaero, SnitchMaster)</li>
+            <li>Waypoint files (VoxelMap, Xaero, SnitchMaster)</li>
             <li>CivMap collections (.civmap.json)</li>
-            <li>map data files (JourneyMap, <b>use sparingly! the images are bigger than just an url</b>)</li>
+            <li>Map data files (JourneyMap - <b>use sparingly! the images are bigger than just an url</b>)</li>
           </ul>
         </div>
       </div>
@@ -116,9 +115,4 @@ class DragDrop extends React.PureComponent {
   }
 }
 
-const mapStateToProps = ({ }) => {
-  return {
-  }
-}
-
-export default connect(mapStateToProps)(DragDrop)
+export default connect()(DragDrop)

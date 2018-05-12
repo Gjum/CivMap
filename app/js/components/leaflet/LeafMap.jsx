@@ -22,6 +22,10 @@ class LeafMap extends React.Component {
     leafMap: PropTypes.object,
   }
 
+  state = {
+    zoom: -6,
+  }
+
   getChildContext() {
     // TODO this might not fire early enough because we use this.map and not this.state.map
     return { leafMap: this.map }
@@ -64,7 +68,8 @@ class LeafMap extends React.Component {
   onViewChange(e) {
     const newView = boundsToContainedCircle(e.target.getBounds())
     this.waitingForView = newView
-    this.props.setViewport(newView)
+    this.props.dispatch(setViewport(newView))
+    this.setState({ zoom: e.target.getZoom() })
   }
 
   onCoordsRef(ref) {
@@ -83,7 +88,7 @@ class LeafMap extends React.Component {
       mapBgColor,
     } = this.props
 
-    return <div className="mapContainer"
+    return <div className="mapContainer full"
       style={{ backgroundColor: mapBgColor }}
     >
       <RL.Map
@@ -106,23 +111,18 @@ class LeafMap extends React.Component {
           ref={this.onCoordsRef.bind(this)}
         >X 0 0 Z</div>
         <LeafBaseMap />
-        <LeafOverlay />
+        <LeafOverlay zoom={this.state.zoom} />
       </RL.Map>
     </div>
   }
 }
 
-const mapStateToProps = ({ control, mapConfig, mapView }, ownProps) => {
+const mapStateToProps = ({ control, mapConfig, mapView }) => {
   return {
     mapBgColor: mapConfig.basemaps[mapView.basemapId].bgColor,
     viewport: mapView.viewport,
-    _windowWidth: control.windowWidth, // dummy, only to trigger a re-render
     _appMode: control.appMode, // dummy, only to trigger a re-render
   }
 }
 
-const mapDispatchToProps = {
-  setViewport,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(LeafMap)
+export default connect(mapStateToProps)(LeafMap)

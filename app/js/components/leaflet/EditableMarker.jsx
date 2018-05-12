@@ -3,39 +3,38 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
-import { applyFilterOverrides } from '../../utils/filters'
 import { intCoords } from '../../utils/math'
+import { calculateFeatureStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeature } from '../../store'
 
-function createIcon(props) {
-  let { feature, filter: { overrides } } = props
-  feature = applyFilterOverrides({ feature, overrides })
+function createIcon({ feature, style }) {
+  const { icon } = style
 
-  const { circle_marker, icon_url } = feature.style || {}
-
-  if (icon_url) {
+  if (icon && icon.startsWith('http')) {
+    // TODO icons from url
     return L.icon({
-      iconUrl: icon_url,
+      iconUrl: icon,
       iconSize: [16, 16], // TODO from style
       // iconAnchor: [0, 0], // TODO from style
     })
-  } else if (circle_marker) {
+  } else {
     // TODO implement all other Path styles
-    let { color, fillColor, radius = 5, weight = 0, fillOpacity = .5 } = circle_marker
-    if (!color) color = feature.color
-    if (!color) color = '#000000'
-    if (!fillColor) fillColor = color
+    let { color, fill_opacity = 1, icon_size = 14, opacity, stroke_color, stroke_width = 1 } = style
+    if (!stroke_color) stroke_color = style.color
+    if (!stroke_color) stroke_color = '#000000'
+    if (!color) color = '#aaaaaa'
 
-    const width = 2 * radius
-    let htmlStyle = `width:${width}px;height:${width}px;`
-    htmlStyle += `border:${weight}px solid ${color};background-color:${fillColor};`
+    // TODO stroke/fill opacity
+    if (fill_opacity <= 0) color = 'none'
+
+    let htmlStyle = `width:${icon_size}px;height:${icon_size}px;`
+    htmlStyle += `border:${stroke_width}px solid ${stroke_color};background-color:${color};`
     return L.divIcon({
       className: 'leafmarker-circleicon',
       html: `<div class="leafmarker-circleicon-circle" style="${htmlStyle}" />`,
-      iconSize: [width, width],
+      iconSize: [icon_size, icon_size],
     })
   }
-  else return null
 }
 
 export default class EditableMarker extends React.PureComponent {
@@ -44,8 +43,9 @@ export default class EditableMarker extends React.PureComponent {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.feature.style
-      !== this.props.feature.style) {
+    if (nextProps.feature !== this.props.feature
+      || nextProps.baseStyle !== this.props.baseStyle
+      || nextProps.zoomStyle !== this.props.zoomStyle) {
       this.icon = null
     }
   }
@@ -85,9 +85,9 @@ export default class EditableMarker extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, editable, feature, filter } = this.props
-    const { overrides } = filter
-    const { id, x, z, style = {} } = applyFilterOverrides({ feature, overrides })
+    const { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
+    const { id, x, z } = feature
+    const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     if (x === null || z === null) {
       const tempMarker = this.context.leafMap.editTools.startMarker()
@@ -103,19 +103,17 @@ export default class EditableMarker extends React.PureComponent {
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
 
-    if (!this.icon) this.icon = createIcon(this.props)
+    if (!this.icon) this.icon = createIcon({ feature, style })
 
     if (this.icon) return <RL.Marker
       ref={this.onRef.bind(this)}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
-      {...style}
       position={[z + .5, x + .5]}
       icon={this.icon}
     />
     return <RL.Marker
       ref={this.onRef.bind(this)}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
-      {...style}
       position={[z + .5, x + .5]}
     />
   }

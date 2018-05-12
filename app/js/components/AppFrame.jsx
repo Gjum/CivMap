@@ -4,9 +4,10 @@ import { connect } from 'react-redux'
 import * as BROWSE from './browse'
 import * as EDIT from './edit'
 import * as FEATURE from './feature'
-import * as FILTERS from './filters'
+import * as LAYERS from './layers'
 import * as SEARCH from './search'
 
+import AppBar from './AppBar'
 import AppDrawer from './drawer/AppDrawer'
 import DragDrop from './DragDrop'
 import LeafMap from './leaflet/LeafMap'
@@ -15,22 +16,23 @@ const modes = {
   BROWSE,
   EDIT,
   FEATURE,
-  FILTERS,
+  LAYERS,
   SEARCH,
 }
 
 const AppFrame = ({
   appMode,
 }) => {
-  const { Appbar, Detail } = modes[appMode]
+  const { SideContent } = modes[appMode]
+
+  const containerModeClass = SideContent ? "split" : "full-map"
+
   return <div className='full'>
     <AppDrawer />
-    <div className={"container " + (
-      Detail ? "split" : "full-map"
-    )}>
-      <Appbar />
+    <AppBar />
+    <div className={"container " + containerModeClass}>
       <LeafMap />
-      {Detail && <div className="mainlist"><Detail /></div>}
+      {SideContent && <div className="mainlist"><SideContent /></div>}
     </div>
     <DragDrop />
   </div>

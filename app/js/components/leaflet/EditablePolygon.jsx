@@ -2,11 +2,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
-import { applyFilterOverrides } from '../../utils/filters'
 import { centered, deepFlip, deepLatLngToArr } from '../../utils/math'
+import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openEditMode, openFeatureDetail, updateFeature } from '../../store'
-
-// TODO deduplicate polygon/polyline code
 
 export default class EditablePolygon extends React.PureComponent {
   static contextTypes = {
@@ -59,8 +57,9 @@ export default class EditablePolygon extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, editable, feature, filter: { overrides } } = this.props
-    const { id, polygon, style = {} } = applyFilterOverrides({ feature, overrides })
+    const { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
+    const { id, polygon } = feature
+    const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
@@ -68,7 +67,7 @@ export default class EditablePolygon extends React.PureComponent {
     return <RL.Polygon
       ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id))}
-      {...style}
+      {...convertStyle(style)}
       positions={!polygon ? [] : deepFlip(polygon)}
     />
   }
