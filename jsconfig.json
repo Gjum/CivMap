@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "module": "commonjs",
+        "jsx": "react",
+        "checkJs": true
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
