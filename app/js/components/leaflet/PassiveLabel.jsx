@@ -7,6 +7,17 @@ import { applyFilterOverrides } from '../../utils/filters'
 import { intCoords } from '../../utils/math'
 import { openFeatureDetail, updateFeature } from '../../store'
 
+function firstCenter(positions) {
+  while (Array.isArray(positions[0][0])) {
+    positions = positions[0]
+  }
+  const xmin = positions.map(a => a[0]).reduce((a, b) => Math.min(a, b))
+  const xmax = positions.map(a => a[0]).reduce((a, b) => Math.max(a, b))
+  const zmin = positions.map(a => a[1]).reduce((a, b) => Math.min(a, b))
+  const zmax = positions.map(a => a[1]).reduce((a, b) => Math.max(a, b))
+  return [(xmax + xmin) / 2, (zmax + zmin) / 2]
+}
+
 export default class PassiveLabel extends React.PureComponent {
   static contextTypes = {
     leafMap: PropTypes.object,
@@ -34,7 +45,7 @@ export default class PassiveLabel extends React.PureComponent {
       className: 'leaflabel',
       html: labelText,
       iconSize: [200, 100],
-      iconAnchor: [100, -10],
+      iconAnchor: [100, (feature.polygon || (feature.radius !== undefined)) ? 0 : -10],
     })
   }
 
@@ -46,7 +57,11 @@ export default class PassiveLabel extends React.PureComponent {
     }
 
     const { feature, filter: { overrides } } = this.props
-    const { x, z } = applyFilterOverrides({ feature, overrides })
+    const filterWithOverrides = applyFilterOverrides({ feature, overrides })
+    let { x, z } = filterWithOverrides
+    if (filterWithOverrides.polygon) {
+      [x, z] = firstCenter(filterWithOverrides.polygon)
+    }
 
     return <RL.Marker
       position={[z + .5, x + .5]}
