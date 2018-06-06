@@ -12,8 +12,6 @@ export const defaultControlState = {
   editFilterId: null,
   featureId: null,
   searchQuery: null,
-  windowHeight: NaN, // TODO move window size to its own substate?
-  windowWidth: NaN,
 }
 
 const control = (state = defaultControlState, action) => {
@@ -37,9 +35,6 @@ const control = (state = defaultControlState, action) => {
     case 'OPEN_SEARCH':
       return { ...state, drawerOpen: false, appMode: 'SEARCH', searchQuery: action.query }
 
-    case 'TRACK_WINDOW_SIZE':
-      return { ...state, windowHeight: action.height, windowWidth: action.width }
-
     default:
       return state
   }
@@ -62,8 +57,6 @@ export const openShare = () => ({ type: 'OPEN_SHARE' })
 export const setDrawerClosed = () => ({ type: 'SET_DRAWER_CLOSED' })
 
 export const setDrawerOpen = () => ({ type: 'SET_DRAWER_OPEN' })
-
-export const trackWindowSize = ({ width, height }) => ({ type: 'TRACK_WINDOW_SIZE', width, height })
 
 // should be session-local, but we persist it anyway for convenience
 export const defaultMapView = {

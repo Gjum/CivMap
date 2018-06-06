@@ -27,6 +27,13 @@ class LeafMap extends React.Component {
     return { leafMap: this.map }
   }
 
+  componentWillMount() {
+    window.onresize = e => {
+      // e.target.innerHeight
+      if (this.map) this.map.invalidateSize()
+    }
+  }
+
   componentWillReceiveProps(newProps) {
     const { viewport } = newProps
     if (viewport !== this.props.viewport) {

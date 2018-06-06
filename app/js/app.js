@@ -9,7 +9,6 @@ import { appLoad, combinedReducers } from './store'
 import { getAppStateFromLocalStorage, saveAppStateToLocalStorage } from './utils/localStorage'
 import { defaultAppState } from './utils/state'
 import { loadAppStateFromUrlData, parseUrlHash } from './utils/importExport'
-import { listenToWindowResize } from './utils/windowSize'
 
 const preloadedState = {} // TODO unused
 const store = createStore(combinedReducers, preloadedState,
@@ -17,8 +16,6 @@ const store = createStore(combinedReducers, preloadedState,
 
 export default store // TODO this is our "api" for now
 // TODO encapsulate in init() function, pass branding options (defaults, texts, links etc.)
-
-listenToWindowResize(store)
 
 store.dispatch(appLoad(defaultAppState))
 
@@ -28,9 +25,9 @@ if (location.hash) {
   const urlData = parseUrlHash(location.hash)
   loadAppStateFromUrlData(urlData, store)
   // prevent page reloading from messing up changes by re-importing the old data
-  if (urlData.feature || urlData.collection) {
-    location.hash = ""
-  }
+  // if (urlData.feature || urlData.collection) {
+  location.hash = ""
+  // }
 }
 
 store.subscribe(throttle(
