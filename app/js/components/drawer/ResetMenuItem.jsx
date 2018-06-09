@@ -2,21 +2,20 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List'
-import DeleteForeverIcon from 'material-ui-icons/DeleteForever'
+import RestorePageIcon from 'material-ui-icons/RestorePage'
 
-import { appLoad, clearFeatures, setDrawerClosed } from '../../store'
+import { appLoad, setDrawerClosed } from '../../store'
 import { defaultAppState } from '../../utils/state'
 
 const ResetMenuItem = ({ dispatch }) => {
   return <ListItem button
     onClick={() => {
-      dispatch(clearFeatures())
       dispatch(appLoad(defaultAppState))
       dispatch(setDrawerClosed())
     }}
   >
-    <ListItemIcon><DeleteForeverIcon /></ListItemIcon>
-    <ListItemText primary='Reset all data' />
+    <ListItemIcon><RestorePageIcon /></ListItemIcon>
+    <ListItemText primary='Reset view' />
   </ListItem>
 }
 
