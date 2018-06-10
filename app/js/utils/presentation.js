@@ -9,8 +9,9 @@
  * @param {StyleProp} styleProp
  */
 export function calculateFeatureStyleProp(feature, styleProp) {
-  if ((typeof(styleProp) === 'string' || styleProp instanceof String) && styleProp.startsWith('\$')) {
-    return feature[styleProp.substr(1)]
+  if ((typeof (styleProp) === 'string' || styleProp instanceof String) && styleProp.startsWith('\$')) {
+    const [key, fallback] = styleProp.substr(1).split('\|')
+    return feature[key] || fallback
   }
   if (!(styleProp instanceof Object)) {
     return styleProp
@@ -33,7 +34,7 @@ export function calculateFeatureStyleProp(feature, styleProp) {
     const part = (featureVal - min_in) / (max_in - min_in)
     return min_out + part * (max_out - min_out)
   }
-  console.error('Malformed feature style ' + inspect(styleProp))
+  console.error('Malformed feature style ' + JSON.stringify(styleProp))
 }
 
 /**
@@ -94,7 +95,7 @@ export function convertStyle(styleIn) {
 
 export const defaultPresentation = {
   style_base: {
-    color: '#ff8800',
+    color: '$color|#ff8800',
     label: '$name',
     opacity: 1,
   },
