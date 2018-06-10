@@ -232,14 +232,16 @@ export function processJourneyTileFile(file, dispatch) {
     const fid = `civmap/dragdrop/tile/journeymap/${ix}-${iz}`
     const name = `JourneyMap tile ${ix},${iz}`
 
-    dispatch(updateFeature({
-      id: fid,
-      map_image: {
-        url: imgUrl,
-        bounds: [[w, n], [e, s]],
-      },
-      name: name,
-      is_journeymap_tile: true,
+    dispatch(importCollection({
+      features: [{
+        id: fid,
+        map_image: {
+          url: imgUrl,
+          bounds: [[w, n], [e, s]],
+        },
+        name: name,
+        type: "map_image",
+      }]
     }))
   }
   reader.readAsDataURL(file)
@@ -288,8 +290,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
         ...p,
         id: fid,
         color,
-        is_voxelmap_waypoint: true,
-        is_waypoint: true,
+        type: "waypoint",
       }
     })
 
@@ -323,7 +324,7 @@ export function processSnitchMasterFile(file, dispatch) {
           id: fid,
           polygon: [[[x - 11, z - 11], [x + 12, z - 11], [x + 12, z + 12], [x - 11, z + 12]]],
           name, x, y, z, world, source, group, cull,
-          is_snitch: true,
+          type: "snitch",
           from_snitchmaster: true,
         }
       })
