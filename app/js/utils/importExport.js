@@ -40,7 +40,7 @@ export function loadAppStateFromUrlData(urlData, store) {
       urlData.featureId = urlData.feature.id
     }
     if (urlData.featureId) {
-      const feature = store.getState().features[urlData.featureId]
+      const feature = store.getState().features.featuresMerged[urlData.featureId]
       if (feature) {
         store.dispatch(openFeatureDetail(urlData.featureId))
         if (!urlData.viewport) {
@@ -199,7 +199,7 @@ export function parseUrlHash(hash) {
     else if (key == 'feature') urlData.feature = JSON.parse(val)
     else if (key == 'collection') urlData.collection = JSON.parse(val)
     else if (key == 'q') urlData.searchQuery = val
-    else if (key == 'u') urlData.collectionUrl = val
+    else if (key == 'u' || key == 'url') urlData.collectionUrl = val
     else console.error("Unknown url hash entry", part)
   })
 

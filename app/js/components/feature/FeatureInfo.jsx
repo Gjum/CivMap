@@ -95,7 +95,7 @@ const FeatureInfo = ({
   const rectBounds = rectBoundsFromFeature(feature)
   const circleBounds = circleBoundsFromFeature(feature)
 
-  const shareableLink = '#feature=' + exportStringFromFeature(feature)
+  const dataLink = '#feature=' + exportStringFromFeature(feature)
 
   return <div>
     <FeatureProps featureProps={feature} />
@@ -103,8 +103,7 @@ const FeatureInfo = ({
     <p style={{ margin: '16px' }}>
       {feature.type} at {circleBounds.x} {circleBounds.z}
       {' • '}
-      <a href={shareableLink}>
-        Shareable link</a>
+      <a href={dataLink}>Export</a>
     </p>
 
     <div style={{ margin: '16px' }}>
