@@ -25,28 +25,31 @@ const AppBar = ({
       <MenuIcon />
     </IconButton>
 
-    {appMode === 'SEARCH' ||
-      <IconButton onClick={() => dispatch(openSearch())}>
-        <SearchIcon />
-      </IconButton>
-    }
-
     {appMode === 'LAYERS' ||
       <IconButton onClick={() => dispatch(openLayers())}>
         <LayersIcon />
       </IconButton>
     }
 
+    {appMode === 'SEARCH' ||
+      <IconButton onClick={() => {
+        // TODO search close/similar to active feature
+        dispatch(openSearch())
+      }}>
+        <SearchIcon />
+      </IconButton>
+    }
+
     <IconButton onClick={() => {
       if (appMode === 'FEATURE' && feature && feature.source) {
-        const name = encodeURIComponent(feature.name || '').replace('%20', '_')
+        const name = encodeURIComponent(feature.name || '')//.replace('%20', '_')
         location.hash = `#q=${name}#f=${encodeURIComponent(feature.id)}#url=${encodeURIComponent(feature.source)}`
       } else  if (appMode === 'SEARCH' && searchQuery) {
         location.hash = `#q=${encodeURIComponent(searchQuery)}`
       } else {
         const { x, z, radius } = viewport
         location.hash = `c=${x},${z},r${radius}`
-        // TODO better location sharing
+        // TODO better location sharing: create marker with name prompt, add query for close-by features, etc.
       }
     }}>
       <LaunchIcon />
@@ -66,7 +69,7 @@ const AppBar = ({
       {/* CivMap */}
     </div>
 
-    {appMode === 'BROWSE' ||
+    {appMode !== 'BROWSE' &&
       <IconButton onClick={() => dispatch(openBrowseMode())}>
         <CloseIcon />
       </IconButton>

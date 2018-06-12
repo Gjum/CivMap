@@ -93,8 +93,15 @@ const FeatureInfo = ({
   dispatch,
 }) => {
   if (!feature) {
-    dispatch(openBrowseMode()) // TODO find clean solution
-    return null
+    // TODO find clean solution
+    // show "Loading" if we're still waiting on collections to load
+    return <div style={{ margin: '16px' }}>
+      <h2>There might have been an error.</h2>
+      <p>Sorry about that.</p>
+      <Button variant='raised' onClick={() => dispatch(openBrowseMode())}>
+        Close
+      </Button>
+    </div>
   }
 
   const rectBounds = rectBoundsFromFeature(feature)

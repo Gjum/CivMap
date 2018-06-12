@@ -47,7 +47,8 @@ class SearchControl extends React.PureComponent {
     // TODO sort search results
 
     const numResults = searchResults.length
-    const topResults = searchResults.slice(0, 50)
+    const numTop = 50
+    const topResults = searchResults.slice(0, numTop)
 
     return <div>
       <div style={{ margin: '8px 24px' }}>
@@ -57,6 +58,7 @@ class SearchControl extends React.PureComponent {
           onChange={e => dispatch(openSearch(e.target.value))}
         />
         <p>Found {numResults} matching features</p>
+        {numResults > numTop && <p>showing top {numTop}</p>}
       </div>
       <List>
         {topResults.map((feature, i) => {
