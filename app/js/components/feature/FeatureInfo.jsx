@@ -55,7 +55,7 @@ const FeatureProps = ({ feature }) => {
       // TODO show compact style (color etc)
     } else if (key === 'source') {
       // TODO show collection name
-    } else if (key === 'type') { // already shown
+    } else if (key === 'category') { // already shown
     } else if ('XxZz'.includes(key)) { // don't show x/z in props
     } else if (key === 'id') { // don't show id
     } else if (key === 'line' || key === 'polygon') {
@@ -74,7 +74,7 @@ const FeatureProps = ({ feature }) => {
     {image}
     {title}
     <p style={{ margin: '16px' }}>
-      {feature.type} at {circleBounds.x} {circleBounds.z}
+      {feature.category} at {circleBounds.x} {circleBounds.z}
     </p>
     <ul className='feature-props-list'>
       {otherProps.map(({ key, val }) =>

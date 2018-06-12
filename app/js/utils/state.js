@@ -30,19 +30,19 @@ defaultAppState.mapView.viewport = {
 }
 
 /**
- * Returns a map `{ type -> { id -> presentation } }`
- * to quickly look up all presentations concerning a certain type.
+ * Returns a map `{ category -> { id -> presentation } }`
+ * to quickly look up all presentations concerning a certain category.
  */
-export function groupPresentationsByType(presentations) {
-  const typeGroups = {}
+export function groupPresentationsByCategory(presentations) {
+  const categoryGroups = {}
   Object.entries(presentations).forEach(([id, p]) => {
-    let typeGroup = typeGroups[p.type]
-    if (!typeGroup) {
-      typeGroups[p.type] = typeGroup = {}
+    let categoryGroup = categoryGroups[p.category]
+    if (!categoryGroup) {
+      categoryGroups[p.category] = categoryGroup = {}
     }
-    typeGroup[id] = p
+    categoryGroup[id] = p
   })
-  return typeGroups
+  return categoryGroups
 }
 
 export function makePresentationId({ name, source }) {

@@ -257,16 +257,16 @@ const presentations = (state = defaultPresentationsState, action) => {
     case 'CACHE_PRESENTATIONS': {
       newState.presentationsTemp = { ...state.presentationsTemp }
       newState.presentationsCached = { ...state.presentationsCached }
-      action.presentationIds.forEach(fid => {
-        newState.presentationsCached[fid] = state.presentationsTemp[fid]
-        delete newState.presentationsTemp[fid]
+      action.presentationIds.forEach(pid => {
+        newState.presentationsCached[pid] = state.presentationsTemp[pid]
+        delete newState.presentationsTemp[pid]
       })
       break
     }
     case 'IMPORT_COLLECTION': {
       if (!action.presentations) return state
       newState.presentationsTemp = { ...state.presentationsTemp }
-      action.presentations.forEach(p => {
+      action.presentations.filter(p => p.category).forEach(p => {
         newState.presentationsTemp[makePresentationId(p)] = p
       })
       break
@@ -274,17 +274,20 @@ const presentations = (state = defaultPresentationsState, action) => {
 
     case 'DISABLE_PRESENTATION': {
       const presentationsEnabled = { ...state.presentationsEnabled }
-      delete presentationsEnabled[action.presentation.type]
+      delete presentationsEnabled[action.presentation.category]
       return { ...state, presentationsEnabled }
     }
     case 'ENABLE_PRESENTATION': {
+      if (!action.presentation.category) return state
       const presentationsEnabled = { ...state.presentationsEnabled }
-      presentationsEnabled[action.presentation.type] = makePresentationId(action.presentation)
+      presentationsEnabled[action.presentation.category] = makePresentationId(action.presentation)
       return { ...state, presentationsEnabled }
     }
     case 'SET_ENABLED_PRESENTATIONS': {
       const presentationsEnabled = { ...state.presentationsEnabled }
-      action.presentations.forEach(p => presentationsEnabled[p.type] = makePresentationId(p))
+      action.presentations.filter(p => p.category).forEach(p =>
+        presentationsEnabled[p.category] = makePresentationId(p)
+      )
       return { ...state, presentationsEnabled }
     }
 

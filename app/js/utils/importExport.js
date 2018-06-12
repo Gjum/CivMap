@@ -78,10 +78,12 @@ export function loadCollectionJson(data, dispatch, source) {
     ...data,
   }
 
-  const currentVersion = '0.3.1'
+  const currentVersion = '0.3.2'
 
   if (data.info.version === currentVersion) {
     // current version, nothing to convert
+  } else if (data.info.version === '0.3.1') {
+    data = convertCollectionFrom031(data)
   } else if (data.info.version === '0.3.0') {
     data = convertCollectionFrom030(data)
   } else if (data.info.version === '2.0.0') {
@@ -104,6 +106,16 @@ export function loadCollectionJson(data, dispatch, source) {
   console.log(`Loaded collection with ${data.features.length} features and ${data.presentations.length} presentations at version "${data.info.version}" from ${source}`)
 }
 
+export function convertCollectionFrom031(data) {
+  function transformTypeToCategory(e) {
+    if (e.type && !e.category) return { ...e, category: e.type }
+    return e
+  }
+  const features = data.features.map(transformTypeToCategory)
+  const presentations = data.presentations.map(transformTypeToCategory)
+  return { ...data, features, presentations }
+}
+
 export function convertCollectionFrom030(data) {
   const features = data.features.map(convertFeatureFrom030)
   // TODO convert filters to presentations
@@ -112,7 +124,7 @@ export function convertCollectionFrom030(data) {
 
 export function convertFeatureFrom030(f) {
   Object.keys(f).forEach(k => {
-    if (k.startsWith('is_')) f = { ...f, type: k.slice(3) }
+    if (k.startsWith('is_')) f = { ...f, category: k.slice(3) }
   })
   return f
 }
@@ -240,7 +252,7 @@ export function processJourneyTileFile(file, dispatch) {
           bounds: [[w, n], [e, s]],
         },
         name: name,
-        type: "map_image",
+        category: "map_image",
       }]
     }))
   }
@@ -290,7 +302,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
         ...p,
         id: fid,
         color,
-        type: "waypoint",
+        category: "waypoint",
       }
     })
 
@@ -324,7 +336,7 @@ export function processSnitchMasterFile(file, dispatch) {
           id: fid,
           polygon: [[[x - 11, z - 11], [x + 12, z - 11], [x + 12, z + 12], [x - 11, z + 12]]],
           name, x, y, z, world, source, group, cull,
-          type: "snitch",
+          category: "snitch",
           from_snitchmaster: true,
         }
       })

@@ -10,7 +10,7 @@ import EditablePolygon from './EditablePolygon'
 import { deepFlip } from '../../utils/math'
 import PassiveLabel from './PassiveLabel'
 import { defaultPresentation, getZoomStyle, lookupStyle } from '../../utils/presentation'
-import { groupPresentationsByType } from '../../utils/state';
+import { groupPresentationsByCategory } from '../../utils/state';
 import { openFeatureDetail } from '../../store'
 
 export function getFeatureComponent(feature, zoom) {
@@ -66,11 +66,11 @@ const LeafOverlay = ({
 }) => {
   const featuresPresentations = {}
   Object.values(featuresMerged).forEach(feature => {
-    const presentation = presentationsMerged[presentationsEnabled[feature.type]]
-    const presentationsThisType = Object.values(groupPresentationsByType(presentationsMerged)[feature.type] || {})
+    const presentation = presentationsMerged[presentationsEnabled[feature.category]]
+    const presentationsThisCategory = Object.values(groupPresentationsByCategory(presentationsMerged)[feature.category] || {})
 
     if (activeFeatureId === feature.id) {
-      const presentationHl = presentation || presentationsThisType[0] || defaultPresentation
+      const presentationHl = presentation || presentationsThisCategory[0] || defaultPresentation
       featuresPresentations[feature.id] = {
         feature,
         baseStyle: presentationHl.style_base,
@@ -84,15 +84,15 @@ const LeafOverlay = ({
       if (opacity > 0) {
         featuresPresentations[feature.id] = featureWithStyles
       }
-    } else if (presentationsThisType.length <= 0) {
-      // unknown type, always show with default style
+    } else if (presentationsThisCategory.length <= 0) {
+      // unknown category, always show with default style
       featuresPresentations[feature.id] = {
         feature,
         baseStyle: defaultPresentation.style_base,
         zoomStyle: getZoomStyle(defaultPresentation, zoom),
       }
     } else {
-      // all presentations disabled for this type, nor highlighted: do not show feature
+      // all presentations disabled for this category, nor highlighted: do not show feature
     }
   })
 

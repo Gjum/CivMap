@@ -11,7 +11,7 @@ import InvisibleIcon from 'material-ui-icons/VisibilityOff'
 import VisibleIcon from 'material-ui-icons/Visibility'
 
 import JsonEditor from '../edit/JsonEditor'
-import { groupPresentationsByType, makePresentationId } from '../../utils/state';
+import { groupPresentationsByCategory, makePresentationId } from '../../utils/state';
 import { disablePresentation, enablePresentation, openPresentationEdit } from '../../store'
 
 function pluralize(str) {
@@ -28,7 +28,7 @@ const Layer = ({ dispatch, presentation, presentationsEnabled }) => {
   if (!presentation) return null
 
   const presentationId = makePresentationId(presentation)
-  const isEnabled = presentationsEnabled[presentation.type] === presentationId
+  const isEnabled = presentationsEnabled[presentation.category] === presentationId
 
   return <ListItem button onClick={() => {
     if (isEnabled) dispatch(disablePresentation(presentation))
@@ -44,23 +44,23 @@ const Layer = ({ dispatch, presentation, presentationsEnabled }) => {
   </ListItem>
 }
 
-const LayersForType = ({ dispatch, presentationsByType, presentationsEnabled, type }) => {
-  const presentationsOfThisType = Object.values(presentationsByType[type] || {})
+const LayersForCategory = ({ dispatch, presentationsByCategory, presentationsEnabled, category }) => {
+  const presentationsOfThisCategory = Object.values(presentationsByCategory[category] || {})
 
-  if (presentationsOfThisType.length <= 1) {
-    const presentation = presentationsOfThisType[0]
+  if (presentationsOfThisCategory.length <= 1) {
+    const presentation = presentationsOfThisCategory[0]
     return <Layer {...{ dispatch, presentation, presentationsEnabled }} />
   }
 
-  let typeHeadText = pluralize(type[0].toUpperCase() + type.slice(1)) + ':'
+  let categoryHeadText = pluralize(category[0].toUpperCase() + category.slice(1)) + ':'
 
   return <div>
     <ListItem button onClick={() => {
     }}>
-      <ListItemText primary={typeHeadText} style={{color: '#444444'}} />
+      <ListItemText primary={categoryHeadText} style={{color: '#444444'}} />
     </ListItem>
     <List disablePadding>
-      {presentationsOfThisType.map((presentation) =>
+      {presentationsOfThisCategory.map((presentation) =>
         <Layer {...{ dispatch, presentation, presentationsEnabled }} key={makePresentationId(presentation)} />
       )}
     </List>
@@ -72,27 +72,27 @@ const LayersControl = ({
   presentationsEnabled,
   dispatch,
 }) => {
-  const presentationsByType = groupPresentationsByType(presentationsMerged)
+  const presentationsByCategory = groupPresentationsByCategory(presentationsMerged)
 
-  const enabledTypes = Object.keys(presentationsEnabled)
-  const disabledTypes = Object.keys(presentationsByType).filter(pid => !presentationsEnabled[pid])
+  const enabledCategories = Object.keys(presentationsEnabled).filter(category => presentationsByCategory[category])
+  const disabledCategories = Object.keys(presentationsByCategory).filter(category => !presentationsEnabled[category])
 
-  enabledTypes.sort((a, b) => Object.keys(presentationsByType[a]).length - Object.keys(presentationsByType[b]).length)
-  disabledTypes.sort((a, b) => Object.keys(presentationsByType[a]).length - Object.keys(presentationsByType[b]).length)
+  enabledCategories.sort((a, b) => Object.keys(presentationsByCategory[a]).length - Object.keys(presentationsByCategory[b]).length)
+  disabledCategories.sort((a, b) => Object.keys(presentationsByCategory[a]).length - Object.keys(presentationsByCategory[b]).length)
 
   const commonProps = {
     dispatch,
-    presentationsByType,
+    presentationsByCategory,
     presentationsEnabled,
   }
 
   return <div>
     <List disablePadding subheader={<ListSubheader>Visible Layers</ListSubheader>}>
-      {enabledTypes.map((type) => <LayersForType {...commonProps} type={type} key={type} />)}
+      {enabledCategories.map((category) => <LayersForCategory {...commonProps} category={category} key={category} />)}
     </List>
 
     <List disablePadding subheader={<ListSubheader>Invisible Layers</ListSubheader>}>
-      {disabledTypes.map((type) => <LayersForType {...commonProps} type={type} key={type} />)}
+      {disabledCategories.map((category) => <LayersForCategory {...commonProps} category={category} key={category} />)}
     </List>
   </div>
 }
