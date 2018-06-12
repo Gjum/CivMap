@@ -36,12 +36,12 @@ function linkify(val) {
   return elements.slice(1)
 }
 
-const FeatureProps = ({ featureProps }) => {
+const FeatureProps = ({ feature }) => {
   let image = null
   let title = null
   let otherProps = []
 
-  Object.entries(featureProps).forEach(([key, val]) => {
+  Object.entries(feature).forEach(([key, val]) => {
     if (key === 'image' && isImageUrl(val)) {
       image = <div>
         <a href={val} target='_blank' rel='noopener'>
@@ -68,9 +68,14 @@ const FeatureProps = ({ featureProps }) => {
     }
   })
 
+  const circleBounds = circleBoundsFromFeature(feature)
+
   return <div>
     {image}
     {title}
+    <p style={{ margin: '16px' }}>
+      {feature.type} at {circleBounds.x} {circleBounds.z}
+    </p>
     <ul className='feature-props-list'>
       {otherProps.map(({ key, val }) =>
         <li key={key} className='feature-props-entry'>
@@ -93,18 +98,9 @@ const FeatureInfo = ({
   }
 
   const rectBounds = rectBoundsFromFeature(feature)
-  const circleBounds = circleBoundsFromFeature(feature)
-
-  const dataLink = '#feature=' + exportStringFromFeature(feature)
 
   return <div>
-    <FeatureProps featureProps={feature} />
-
-    <p style={{ margin: '16px' }}>
-      {feature.type} at {circleBounds.x} {circleBounds.z}
-      {' • '}
-      <a href={dataLink}>Export</a>
-    </p>
+    <FeatureProps feature={feature} />
 
     <div style={{ margin: '16px' }}>
       <Button variant='raised' onClick={() => dispatch(setViewport(rectBounds))}>

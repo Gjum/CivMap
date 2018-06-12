@@ -41,7 +41,7 @@ class SearchControl extends React.PureComponent {
       || f.name && fuzzyMatch(searchQueryLower, f.name)
       || f.nation && fuzzyMatch(searchQueryLower, f.nation)
       || f.contact && fuzzyMatch(searchQueryLower, f.contact)
-      || f.notes && fuzzyMatch(searchQueryLower, f.notes)
+      || f.notes && fuzzyMatch(searchQueryLower, f.notes.slice(0, 200))
     )
 
     // TODO sort search results
@@ -51,23 +51,14 @@ class SearchControl extends React.PureComponent {
 
     return <div>
       <div style={{ margin: '8px 24px' }}>
-        <TextField autoFocus
+        <TextField autoFocus fullWidth
           label="Search"
           value={String(searchQuery || '')}
           onChange={e => dispatch(openSearch(e.target.value))}
         />
-        <IconButton
-          onClick={() => {
-            dispatch(openSearch(null))
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        <p>Found {numResults} matching features</p>
       </div>
-
-      <List
-        subheader={<ListSubheader>{numResults} matching features:</ListSubheader>}
-      >
+      <List>
         {topResults.map((feature, i) => {
           return <ListItem button key={feature.id}
             onClick={() => {

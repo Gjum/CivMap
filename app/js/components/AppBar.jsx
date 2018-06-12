@@ -16,6 +16,7 @@ import { openBrowseMode, openLayers, openSearch, setDrawerOpen } from '../store'
 const AppBar = ({
   appMode,
   feature,
+  searchQuery,
   viewport,
   dispatch,
 }) => {
@@ -37,9 +38,11 @@ const AppBar = ({
     }
 
     <IconButton onClick={() => {
-      if (feature && feature.source) {
-        const name = (feature.name || '').replace(' ', '_')
-        location.hash = `#q=${name}#f=${feature.id}#url=${feature.source}`
+      if (appMode === 'FEATURE' && feature && feature.source) {
+        const name = encodeURIComponent(feature.name || '').replace('%20', '_')
+        location.hash = `#q=${name}#f=${encodeURIComponent(feature.id)}#url=${encodeURIComponent(feature.source)}`
+      } else  if (appMode === 'SEARCH' && searchQuery) {
+        location.hash = `#q=${encodeURIComponent(searchQuery)}`
       } else {
         const { x, z, radius } = viewport
         location.hash = `c=${x},${z},r${radius}`
@@ -69,6 +72,7 @@ const mapStateToProps = ({ control, features, mapView }) => {
   return {
     appMode: control.appMode,
     feature: features.featuresMerged[control.activeFeatureId],
+    searchQuery: control.searchQuery,
     viewport: mapView.viewport,
   }
 }
