@@ -108,19 +108,6 @@ const FeatureInfo = ({
         Show on map
       </Button>
 
-      <Button variant='raised' onClick={() => alert('"Filter similar" is not implemented')} >
-        <FilterIcon />
-        Filter similar
-      </Button>
-    </div>
-    <div style={{ margin: '16px' }}>
-      <Button variant='raised' onClick={() => {
-        dispatch(openEditMode(feature.id))
-      }}>
-        <EditIcon />
-        Edit
-      </Button>
-
       <Button variant='raised' onClick={() => {
         dispatch(removeFeature(feature.id))
         dispatch(openBrowseMode()) // TODO show similar features in search results instead

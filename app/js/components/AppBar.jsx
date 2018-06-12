@@ -11,7 +11,7 @@ import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 
 import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
-import { openBrowseMode, openLayers, openSearch, setDrawerOpen } from '../store'
+import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen } from '../store'
 
 const AppBar = ({
   appMode,
@@ -52,7 +52,13 @@ const AppBar = ({
       <LaunchIcon />
     </IconButton>
 
-    {appMode === 'EDIT' ||
+    {appMode === 'FEATURE' ?
+      <IconButton onClick={() => {
+        dispatch(openEditMode(feature.id))
+      }}>
+        <EditIcon />
+      </IconButton>
+      :
       <CreateFeatureMenuButton dispatch={dispatch} />
     }
 

@@ -13,7 +13,7 @@ import ResetIcon from 'material-ui-icons/Undo'
 import SwapIcon from 'material-ui-icons/SwapCalls'
 
 import JsonEditor from '../edit/JsonEditor'
-import { reversePolyPositions } from '../../utils/math'
+import { exportStringFromFeature, reversePolyPositions } from '../../utils/math'
 import { openBrowseMode, openEditMode, openFeatureDetail, removeFeature, updateFeature } from '../../store'
 
 class FeatureEditor extends React.Component {
@@ -27,6 +27,9 @@ class FeatureEditor extends React.Component {
   render() {
     const { feature, dispatch } = this.props
     const { originalFeature } = this.state
+
+    const dataLink = '#feature=' + exportStringFromFeature(feature)
+
     return <div>
       <div style={{ margin: '16px' }}>
 
@@ -82,14 +85,20 @@ class FeatureEditor extends React.Component {
           label="Name"
           value={String(feature.name || '')}
           onChange={e => dispatch(updateFeature({ ...feature, name: e.target.value }))}
-          style={{margin: '16px 0px'}}
+          style={{ margin: '16px 0px' }}
         />
 
-        <JsonEditor data={feature} onChange={(newFeature) => {
-          // TODO validate feature
-          dispatch(updateFeature(newFeature, feature.id))
-          dispatch(openEditMode(newFeature.id))
-        }} />
+        <a style={{ margin: '16px 0px' }} href={dataLink}>Export data as link</a>
+
+        <JsonEditor
+          style={{ margin: '16px 0px' }}
+          data={feature}
+          onChange={(newFeature) => {
+            // TODO validate feature
+            dispatch(updateFeature(newFeature, feature.id))
+            dispatch(openEditMode(newFeature.id))
+          }}
+        />
       </div>
     </div>
   }
