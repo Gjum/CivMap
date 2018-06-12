@@ -102,7 +102,7 @@ div {
 }
 
 .mainlist,
-.custom-appbar {
+.appbar {
   z-index: 1000;
   box-shadow:
     0px 0px 4px -1px rgba(0, 0, 0, 0.2),
@@ -196,7 +196,7 @@ div {
   }
 }
 
-/***** custom appbar *****/
+/***** appbar *****/
 
 .appbar {
   height: 48px; /* resizing is done through padding alone */
