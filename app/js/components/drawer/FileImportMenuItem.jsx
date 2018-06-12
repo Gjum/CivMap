@@ -39,6 +39,9 @@ export class ImportDialog extends React.Component {
         <DialogContentText>
           SnitchMaster's snitches are stored in <code>(.minecraft location)\mods\Snitch-Master\(server address)\Snitches.csv</code>
         </DialogContentText>
+        <DialogContentText>
+          You can also drag and drop files onto the map to load them.
+        </DialogContentText>
         <TextField
           autoFocus
           fullWidth margin="dense"
