@@ -147,6 +147,7 @@ const feature = (state, action) => {
       }
       if (f.line && !Array.isArray(f.line)) f.line = importPositions(f.line)
       if (f.polygon && !Array.isArray(f.polygon)) f.polygon = importPositions(f.polygon)
+      if (f.type && !f.category) f.category = f.type
       return f
     default:
       return state
