@@ -95,6 +95,10 @@ export function loadCollectionJson(data, dispatch, source) {
     return
   }
 
+  data.features.forEach(f => {
+    if (!f.source) f.source = source
+  })
+
   data.presentations.forEach(p => {
     if (!p.source) p.source = source
     if (!p.id) p.id = makePresentationId(p)
