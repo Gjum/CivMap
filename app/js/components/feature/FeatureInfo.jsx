@@ -12,10 +12,6 @@ import ShowOnMapIcon from 'material-ui-icons/Explore'
 import { circleBoundsFromFeature, exportStringFromFeature, rectBoundsFromFeature } from '../../utils/math'
 import { openBrowseMode, openEditMode, removeFeature, setViewport } from '../../store'
 
-export function isImageUrl(value) {
-  return /^https?:\/\/[^\/ ]+\/[^ ]+\.(png|jpe?g|gif|bmp|ico|tif?f)$/i.test(value)
-}
-
 export function isUrl(value) {
   return /^https?:\/\/[^\/ ]+\.[a-z]{2,}(\/|$)/i.test(value)
 }
@@ -42,7 +38,7 @@ const FeatureProps = ({ feature }) => {
   let otherProps = []
 
   Object.entries(feature).forEach(([key, val]) => {
-    if (key === 'image' && isImageUrl(val)) {
+    if (key === 'image') {
       image = <div>
         <a href={val} target='_blank' rel='noopener'>
           {/* <img className='feature-props-image' src={val} alt={key} /> */}
