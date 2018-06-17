@@ -8,21 +8,21 @@ import { calculateFeatureStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeature } from '../../store'
 
 function createIcon({ feature, style }) {
-  const { icon } = style
+  let { color, fill_opacity = 1, icon, icon_size, opacity, stroke_color, stroke_width = 1 } = style
+  icon = icon || feature.icon
 
-  if (icon && icon.startsWith('http')) {
-    // TODO icons from url
+  if ((icon + '').startsWith('http') || (icon + '').startsWith('/')) {
+    if (!icon_size) icon_size = 32
     return L.icon({
       iconUrl: icon,
-      iconSize: [16, 16], // TODO from style
-      // iconAnchor: [0, 0], // TODO from style
+      iconSize: [icon_size, icon_size],
+      // iconAnchor: [icon_anchor_x, icon_anchor_y], // TODO from style, only if both are set
     })
   } else {
-    // TODO implement all other Path styles
-    let { color, fill_opacity = 1, icon_size = 14, opacity, stroke_color, stroke_width = 1 } = style
     if (!stroke_color) stroke_color = style.color
     if (!stroke_color) stroke_color = '#000000'
     if (!color) color = '#aaaaaa'
+    if (!icon_size) icon_size = 14
 
     // TODO stroke/fill opacity
     if (fill_opacity <= 0) color = 'none'
