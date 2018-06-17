@@ -39,10 +39,10 @@ export function saveAppStateToLocalStorage(state) {
 }
 
 export function getAppStateFromLocalStorage() {
+  let state = {}
+
   try {
     // TODO check if older states exist (e.g. `CivMap.data`)
-
-    let state = {}
 
     const featuresJson = window.localStorage.getItem('CivMap.features.0.3.1')
     if (featuresJson) {
@@ -60,9 +60,9 @@ export function getAppStateFromLocalStorage() {
       state = { ...state, ...view, presentations: { ...state.presentations, presentationsEnabled } }
     }
 
-    return state
-
   } catch (e) {
     console.error('Loading from localStorage failed', e)
   }
+
+  return state
 }
