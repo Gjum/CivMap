@@ -5,29 +5,15 @@ export function saveAppStateToLocalStorage(state) {
     // TODO noop if unchanged
 
     const {
-      features: {
-        featuresCached,
-        featuresUser,
-      },
+      collections,
       mapView,
-      presentations: {
-        presentationsCached,
-        presentationsEnabled,
-        presentationsUser,
-      },
     } = state
 
-    window.localStorage.setItem('CivMap.features.0.3.1', JSON.stringify({
-      featuresCached,
-      featuresUser,
+    window.localStorage.setItem('CivMap.data.0.3.3', JSON.stringify({
+      collections,
     }))
-    window.localStorage.setItem('CivMap.presentations.0.3.1', JSON.stringify({
-      presentationsCached,
-      presentationsUser,
-    }))
-    window.localStorage.setItem('CivMap.view.0.3.1', JSON.stringify({
+    window.localStorage.setItem('CivMap.view.0.3.3', JSON.stringify({
       mapView,
-      presentationsEnabled,
     }))
 
   } catch (e) {
@@ -44,20 +30,14 @@ export function getAppStateFromLocalStorage() {
   try {
     // TODO check if older states exist (e.g. `CivMap.data`)
 
-    const featuresJson = window.localStorage.getItem('CivMap.features.0.3.1')
-    if (featuresJson) {
-      state = { ...state, features: JSON.parse(featuresJson) }
+    const dataJson = window.localStorage.getItem('CivMap.data.0.3.3')
+    if (dataJson) {
+      state = { ...state, ...JSON.parse(dataJson) }
     }
 
-    const presentationsJson = window.localStorage.getItem('CivMap.presentations.0.3.1')
-    if (presentationsJson) {
-      state = { ...state, presentations: JSON.parse(presentationsJson) }
-    }
-
-    const viewJson = window.localStorage.getItem('CivMap.view.0.3.1')
+    const viewJson = window.localStorage.getItem('CivMap.view.0.3.3')
     if (viewJson) {
-      const { presentationsEnabled, ...view } = JSON.parse(viewJson)
-      state = { ...state, ...view, presentations: { ...state.presentations, presentationsEnabled } }
+      state = { ...state, ...JSON.parse(viewJson) }
     }
 
   } catch (e) {

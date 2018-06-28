@@ -9,8 +9,8 @@ import EditIcon from 'material-ui-icons/Edit'
 import FilterIcon from 'material-ui-icons/FilterList'
 import ShowOnMapIcon from 'material-ui-icons/Explore'
 
-import { circleBoundsFromFeature, exportStringFromFeature, rectBoundsFromFeature } from '../../utils/math'
-import { openBrowseMode, openEditMode, removeFeature, setViewport } from '../../store'
+import { circleBoundsFromFeature, rectBoundsFromFeature } from '../../utils/math'
+import { openBrowseMode, removeFeatureInCollection, setViewport, lookupFeature } from '../../store'
 
 export function isUrl(value) {
   return /^https?:\/\/[^\/ ]+\.[a-z]{2,}(\/|$)/i.test(value)
@@ -112,7 +112,7 @@ const FeatureInfo = ({
       </Button>
 
       <Button variant='raised' onClick={() => {
-        dispatch(removeFeature(feature.id))
+        dispatch(removeFeatureInCollection(feature.source, feature.id))
         dispatch(openBrowseMode()) // TODO show similar features in search results instead
       }}>
         <DeleteIcon />
@@ -122,9 +122,10 @@ const FeatureInfo = ({
   </div>
 }
 
-const mapStateToProps = ({ control, features: { featuresMerged } }) => {
+const mapStateToProps = (state) => {
+  const { control } = state
   return {
-    feature: featuresMerged[control.activeFeatureId],
+    feature: lookupFeature(state, control.activeFeatureId, control.activeFeatureCollection),
   }
 }
 

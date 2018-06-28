@@ -11,7 +11,7 @@ import MenuIcon from 'material-ui-icons/Menu'
 import SearchIcon from 'material-ui-icons/Search'
 
 import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
-import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen } from '../store'
+import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature } from '../store'
 
 const AppBar = ({
   appMode,
@@ -44,7 +44,7 @@ const AppBar = ({
       if (appMode === 'FEATURE' && feature && feature.source) {
         const name = encodeURIComponent(feature.name || '')//.replace('%20', '_')
         location.hash = `#q=${name}#f=${encodeURIComponent(feature.id)}#url=${encodeURIComponent(feature.source)}`
-      } else  if (appMode === 'SEARCH' && searchQuery) {
+      } else if (appMode === 'SEARCH' && searchQuery) {
         location.hash = `#q=${encodeURIComponent(searchQuery)}`
       } else {
         const { x, z, radius } = viewport
@@ -57,7 +57,7 @@ const AppBar = ({
 
     {appMode === 'FEATURE' ?
       <IconButton onClick={() => {
-        dispatch(openEditMode(feature.id))
+        dispatch(openEditMode(feature.id, feature.source))
       }}>
         <EditIcon />
       </IconButton>
@@ -77,10 +77,11 @@ const AppBar = ({
   </div>
 }
 
-const mapStateToProps = ({ control, features, mapView }) => {
+const mapStateToProps = (state) => {
+  const { control, mapView } = state
   return {
     appMode: control.appMode,
-    feature: features.featuresMerged[control.activeFeatureId],
+    feature: lookupFeature(state, control.activeFeatureId, control.activeFeatureCollection),
     searchQuery: control.searchQuery,
     viewport: mapView.viewport,
   }

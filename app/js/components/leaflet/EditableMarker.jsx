@@ -5,7 +5,7 @@ import * as RL from 'react-leaflet'
 
 import { intCoords } from '../../utils/math'
 import { calculateFeatureStyle } from '../../utils/presentation'
-import { openFeatureDetail, updateFeature } from '../../store'
+import { openFeatureDetail, updateFeatureInCollection } from '../../store'
 
 function createIcon({ feature, style }) {
   let { color, fill_opacity = 1, icon, icon_size, opacity, stroke_color, stroke_width = 1 } = style
@@ -72,7 +72,7 @@ export default class EditableMarker extends React.PureComponent {
   updatePositions = (e) => {
     const [x, z] = intCoords(this.featureRef.getLatLng())
     const { feature } = this.props
-    this.props.dispatch(updateFeature({ ...feature, x, z }))
+    this.props.dispatch(updateFeatureInCollection(feature.source, { ...feature, x, z }))
   }
 
   onRef(ref) {
@@ -86,15 +86,16 @@ export default class EditableMarker extends React.PureComponent {
 
   render() {
     const { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
-    const { id, x, z } = feature
+    const { id, source, x, z } = feature
     const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     if (x === null || z === null) {
       const tempMarker = this.context.leafMap.editTools.startMarker()
+      // XXX on react unmount, disable editor and unregister handler
       tempMarker.on('editable:drawing:clicked', e => {
         const [x, z] = intCoords(tempMarker.getLatLng())
         tempMarker.remove()
-        this.props.dispatch(updateFeature({ ...this.props.feature, x, z }))
+        this.props.dispatch(updateFeatureInCollection(this.props.feature.source, { ...this.props.feature, x, z }))
       })
 
       return null
@@ -107,13 +108,13 @@ export default class EditableMarker extends React.PureComponent {
 
     if (this.icon) return <RL.Marker
       ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
       position={[z + .5, x + .5]}
       icon={this.icon}
     />
     return <RL.Marker
       ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
       position={[z + .5, x + .5]}
     />
   }

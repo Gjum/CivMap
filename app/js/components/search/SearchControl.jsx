@@ -30,18 +30,23 @@ class SearchControl extends React.PureComponent {
 
   render() {
     const {
+      collections,
       dispatch,
-      featuresMerged,
       searchQuery,
     } = this.props
     const searchQueryLower = String(searchQuery).toLowerCase()
 
-    let searchResults = Object.values(featuresMerged).filter(f =>
-      !searchQuery
-      || f.name && fuzzyMatch(searchQueryLower, f.name)
-      || f.nation && fuzzyMatch(searchQueryLower, f.nation)
-      || f.contact && fuzzyMatch(searchQueryLower, f.contact)
-      || f.notes && fuzzyMatch(searchQueryLower, f.notes.slice(0, 200))
+    let searchResults = []
+    Object.values(collections).forEach(collection =>
+      searchResults = searchResults.concat(
+        Object.values(collection.features).filter(f =>
+          !searchQuery
+          || f.name && fuzzyMatch(searchQueryLower, f.name)
+          || f.nation && fuzzyMatch(searchQueryLower, f.nation)
+          || f.contact && fuzzyMatch(searchQueryLower, f.contact)
+          || f.notes && fuzzyMatch(searchQueryLower, f.notes.slice(0, 200))
+        )
+      )
     )
 
     // TODO sort search results
@@ -64,14 +69,14 @@ class SearchControl extends React.PureComponent {
         {topResults.map((feature, i) => {
           return <ListItem button key={feature.id}
             onClick={() => {
-              dispatch(openFeatureDetail(feature.id))
+              dispatch(openFeatureDetail(feature.id, feature.source))
               dispatch(setViewport(rectBoundsFromFeature(feature)))
             }}
           >
             <ListItemText primary={feature.name || feature.label || feature.id || '(unnamed feature)'} />
             <ListItemSecondaryAction>
               <IconButton onClick={() => {
-                dispatch(highlightFeature(feature.id))
+                dispatch(highlightFeature(feature.id, feature.source))
                 dispatch(setViewport(rectBoundsFromFeature(feature)))
               }}>
                 <ShowOnMapIcon />
@@ -84,9 +89,9 @@ class SearchControl extends React.PureComponent {
   }
 }
 
-const mapStateToProps = ({ control: { searchQuery }, features: { featuresMerged } }) => {
+const mapStateToProps = ({ control: { searchQuery }, collections }) => {
   return {
-    featuresMerged,
+    collections,
     searchQuery,
   }
 }

@@ -56,24 +56,6 @@ export function deepFlip(positions) {
   return [positions[1], positions[0]]
 }
 
-// the [[#,#],[#,#]] blow up the url size when encoded
-// TODO represent number arrays in binary+base64 format
-export function exportPositions(positions) {
-  return JSON.stringify(positions).replace(/\],\[/g, '!').replace(/\[/g, '(').replace(/\]/g, ')')
-}
-
-export function importPositions(positionsStr) {
-  return JSON.parse(positionsStr.replace(/!/g, '],[').replace(/\(/g, '[').replace(/\)/g, ']'))
-}
-
-export function exportStringFromFeature(feature) {
-  const f = { ...feature }
-  if (f.line) f.line = exportPositions(f.line)
-  if (f.polygon) f.polygon = exportPositions(f.polygon)
-  // instead of encodeURIComponent, because here most special characters are fine
-  return encodeURI(JSON.stringify(f)).replace(/#/g, '%23')
-}
-
 export function reversePolyPositions(positions) {
   if (!positions || !Array.isArray(positions) || !Array.isArray(positions[0]))
     return positions

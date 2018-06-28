@@ -12,7 +12,7 @@ import LineIcon from 'material-ui-icons/Timeline'
 import MarkerIcon from 'material-ui-icons/AddLocation'
 import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
 
-import { openEditMode, updateFeature } from '../../store'
+import { openEditMode, updateFeatureInCollection } from '../../store'
 
 function makeId() {
   return v4()
@@ -37,9 +37,9 @@ export default class CreateFeatureMenuButton extends React.Component {
 
     const makeNewAndEdit = (defaultProps) => {
       const feature = { ...defaultProps, id: makeId() }
-      dispatch(updateFeature(feature))
+      dispatch(updateFeatureInCollection(feature.source, feature))
       this.handleClose()
-      dispatch(openEditMode(feature.id))
+      dispatch(openEditMode(feature.id, feature.source))
     }
 
     return <div>

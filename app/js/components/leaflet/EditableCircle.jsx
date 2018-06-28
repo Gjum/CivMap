@@ -4,7 +4,7 @@ import * as RL from 'react-leaflet'
 
 import { intCoords, intCoord } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
-import { openFeatureDetail, updateFeature } from '../../store'
+import { openFeatureDetail, updateFeatureInCollection } from '../../store'
 
 export default class EditableCircle extends React.PureComponent {
   static contextTypes = {
@@ -38,7 +38,7 @@ export default class EditableCircle extends React.PureComponent {
     const { feature } = this.props
     const [x, z] = intCoords(this.featureRef.getLatLng())
     const radius = Math.round(this.featureRef.getRadius())
-    this.props.dispatch(updateFeature({ ...feature, x, z, radius }))
+    this.props.dispatch(updateFeatureInCollection({ ...feature, x, z, radius }))
   }
 
   onRef(ref) {
@@ -54,16 +54,17 @@ export default class EditableCircle extends React.PureComponent {
     let { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
     editable = false // TODO fix radius marker projection
 
-    const { id, x, z, radius } = feature
+    const { id, source, x, z, radius } = feature
     const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     if (!radius) {
       const tempCircle = this.context.leafMap.editTools.startCircle()
+      // XXX on react unmount, disable editor and unregister handler
       tempCircle.on('editable:vertex:dragend', e => {
         const [zNew, xNew] = intCoords(tempCircle.getLatLng())
         const radiusNew = Math.round(tempCircle.getRadius())
         tempCircle.remove()
-        this.props.dispatch(updateFeature({ ...this.props.feature, xNew, zNew, radiusNew }))
+        this.props.dispatch(updateFeatureInCollection(this.props.feature.source, { ...this.props.feature, xNew, zNew, radiusNew }))
       })
 
       return null
@@ -74,7 +75,7 @@ export default class EditableCircle extends React.PureComponent {
 
     return <RL.Circle
       ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
       {...convertStyle(style)}
       center={[z + .5, x + .5]}
       radius={radius}

@@ -12,9 +12,10 @@ import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
 import ResetIcon from 'material-ui-icons/Undo'
 import SwapIcon from 'material-ui-icons/SwapCalls'
 
+import { exportStringFromFeature } from '../../utils/importExport'
 import JsonEditor from '../edit/JsonEditor'
-import { exportStringFromFeature, reversePolyPositions } from '../../utils/math'
-import { openBrowseMode, openEditMode, openFeatureDetail, removeFeature, updateFeature } from '../../store'
+import { reversePolyPositions } from '../../utils/math'
+import { lookupFeature, openBrowseMode, openEditMode, openFeatureDetail, removeFeatureInCollection, updateFeatureInCollection } from '../../store'
 
 class FeatureEditor extends React.Component {
   constructor(props) {
@@ -34,15 +35,15 @@ class FeatureEditor extends React.Component {
       <div style={{ margin: '16px' }}>
 
         <Button variant='raised' onClick={() => {
-          dispatch(updateFeature(originalFeature, feature.id))
-          dispatch(openEditMode(originalFeature.id))
+          dispatch(updateFeatureInCollection(feature.source, originalFeature, feature.id))
+          dispatch(openEditMode(originalFeature.id, originalFeature.source))
         }}>
           <ResetIcon />
           Reset
         </Button>
 
         <Button variant='raised' onClick={() => {
-          dispatch(removeFeature(feature.id))
+          dispatch(removeFeatureInCollection(feature.source, feature.id))
           dispatch(openBrowseMode()) // TODO show similar features in search results instead
         }}>
           <DeleteIcon />
@@ -50,7 +51,7 @@ class FeatureEditor extends React.Component {
         </Button>
 
         <Button variant='raised' onClick={() => {
-          dispatch(openFeatureDetail(feature.id))
+          dispatch(openFeatureDetail(feature.id, feature.source))
         }}>
           <CheckIcon />
           Save
@@ -61,13 +62,13 @@ class FeatureEditor extends React.Component {
             <Button variant='raised' onClick={() => {
               const f = { ...feature, line: feature.polygon }
               delete f.polygon
-              dispatch(updateFeature(f))
+              dispatch(updateFeatureInCollection(f.source, f))
             }}><LineIcon />Convert to line</Button>
             : feature.line !== undefined ?
               <Button variant='raised' onClick={() => {
                 const f = { ...feature, polygon: feature.line }
                 delete f.line
-                dispatch(updateFeature(f))
+                dispatch(updateFeatureInCollection(f.source, f))
               }}><PolygonIcon />Convert to area</Button>
               : null
         }
@@ -77,14 +78,14 @@ class FeatureEditor extends React.Component {
             const featureNew = { ...feature }
             if (feature.polygon) featureNew.polygon = reversePolyPositions(feature.polygon)
             if (feature.line) featureNew.line = reversePolyPositions(feature.line)
-            dispatch(updateFeature(featureNew))
+            dispatch(updateFeatureInCollection(feature.source, featureNew))
           }}><SwapIcon />Reverse line/area direction</Button>
         }
 
         <TextField autoFocus fullWidth
           label="Name"
           value={String(feature.name || '')}
-          onChange={e => dispatch(updateFeature({ ...feature, name: e.target.value }))}
+          onChange={e => dispatch(updateFeatureInCollection(feature.source, { ...feature, name: e.target.value }))}
           style={{ margin: '16px 0px' }}
         />
 
@@ -95,8 +96,8 @@ class FeatureEditor extends React.Component {
           data={feature}
           onChange={(newFeature) => {
             // TODO validate feature
-            dispatch(updateFeature(newFeature, feature.id))
-            dispatch(openEditMode(newFeature.id))
+            dispatch(updateFeatureInCollection(feature.source, newFeature, feature.id))
+            dispatch(openEditMode(newFeature.id, feature.source))
           }}
         />
       </div>
@@ -121,9 +122,10 @@ function closestStop(position, features) {
   return stopId
 }
 
-const mapStateToProps = ({ control, features: { featuresMerged } }) => {
+const mapStateToProps = (state) => {
+  const { control } = state
   return {
-    feature: featuresMerged[control.activeFeatureId],
+    feature: lookupFeature(state, control.activeFeatureId, control.activeFeatureCollection),
   }
 }
 

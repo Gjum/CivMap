@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux'
 
-import { importPositions } from './utils/math'
-import { makePresentationId } from './utils/state'
+import { importPositions } from './utils/importExport'
 import murmurhash3 from './utils/murmurhash3_gc' // TODO use longer hash for less collisions, or just don't accept features without id
 
 export const defaultControlState = {
   appMode: 'BROWSE',
   activeFeatureId: null,
+  activeFeatureCollection: null,
   drawerOpen: false,
   searchQuery: null,
 }
@@ -18,10 +18,11 @@ const control = (state = defaultControlState, action) => {
       const {
         appMode = state.appMode,
         activeFeatureId = state.activeFeatureId,
+        activeFeatureCollection = state.activeFeatureCollection,
         drawerOpen = state.drawerOpen,
         searchQuery = state.searchQuery,
       } = action.state.control
-      return { ...state, appMode, activeFeatureId, drawerOpen, searchQuery }
+      return { ...state, appMode, activeFeatureId, activeFeatureCollection, drawerOpen, searchQuery }
     }
 
     case 'SET_DRAWER_OPEN':
@@ -30,14 +31,14 @@ const control = (state = defaultControlState, action) => {
       return { ...state, drawerOpen: false }
 
     case 'HIGHLIGHT_FEATURE':
-      return { ...state, drawerOpen: false, activeFeatureId: action.featureId }
+      return { ...state, drawerOpen: false, activeFeatureId: action.featureId, activeFeatureCollection: action.collectionId }
 
     case 'OPEN_BROWSE_MODE':
       return { ...state, drawerOpen: false, appMode: 'BROWSE' }
     case 'OPEN_EDIT_MODE':
-      return { ...state, drawerOpen: false, appMode: 'EDIT', activeFeatureId: action.featureId }
+      return { ...state, drawerOpen: false, appMode: 'EDIT', activeFeatureId: action.featureId, activeFeatureCollection: action.collectionId }
     case 'OPEN_FEATURE_DETAIL':
-      return { ...state, drawerOpen: false, appMode: 'FEATURE', activeFeatureId: action.featureId }
+      return { ...state, drawerOpen: false, appMode: 'FEATURE', activeFeatureId: action.featureId, activeFeatureCollection: action.collectionId }
     case 'OPEN_LAYERS':
       return { ...state, drawerOpen: false, appMode: 'LAYERS' }
     case 'OPEN_SEARCH':
@@ -48,13 +49,13 @@ const control = (state = defaultControlState, action) => {
   }
 }
 
-export const highlightFeature = (featureId) => ({ type: 'HIGHLIGHT_FEATURE', featureId })
+export const highlightFeature = (featureId, collectionId) => ({ type: 'HIGHLIGHT_FEATURE', featureId, collectionId })
 
 export const openBrowseMode = () => ({ type: 'OPEN_BROWSE_MODE' })
 
-export const openEditMode = (featureId) => ({ type: 'OPEN_EDIT_MODE', featureId })
+export const openEditMode = (featureId, collectionId) => ({ type: 'OPEN_EDIT_MODE', featureId, collectionId })
 
-export const openFeatureDetail = (featureId) => ({ type: 'OPEN_FEATURE_DETAIL', featureId })
+export const openFeatureDetail = (featureId, collectionId) => ({ type: 'OPEN_FEATURE_DETAIL', featureId, collectionId })
 
 export const openLayers = () => ({ type: 'OPEN_LAYERS' })
 
@@ -139,8 +140,7 @@ const mapConfig = (state = defaultMapConfig, action) => {
 
 const feature = (state, action) => {
   switch (action.type) {
-    case 'UPDATE_FEATURE':
-      if (state && (action.id != state.id)) return state
+    case 'UPDATE_FEATURE_IN_COLLECTION':
       const f = {
         ...action.feature,
         id: action.feature.id || murmurhash3(JSON.stringify(action.feature), 1),
@@ -154,157 +154,71 @@ const feature = (state, action) => {
   }
 }
 
-/**
- * Merges the feature sets in the correct order.
- */
-function mergeFeatures({ featuresCached, featuresUser, featuresTemp }) {
-  return { ...featuresCached, ...featuresUser, ...featuresTemp }
-}
-
-const defaultFeatures = {
-  featuresCached: {},
-  featuresMerged: {},
-  featuresTemp: {},
-  featuresUser: {},
-}
-
-const features = (state = defaultFeatures, action) => {
-  const newState = {}
+const features = (state = {}, action) => {
   switch (action.type) {
-    case 'APP_LOAD': {
-      if (!action.state.features) return state
-      const { featuresCached, featuresTemp, featuresUser } = action.state.features
-      if (featuresCached) newState.featuresCached = { ...state.featuresCached, ...featuresCached }
-      if (featuresTemp) newState.featuresTemp = { ...state.featuresTemp, ...featuresTemp }
-      if (featuresUser) newState.featuresUser = { ...state.featuresUser, ...featuresUser }
-      break
+    case 'REMOVE_FEATURE_IN_COLLECTION': {
+      const newState = { ...state }
+      delete newState[action.featureId]
+      return newState
     }
-    case 'CACHE_FEATURES': {
-      newState.featuresTemp = { ...state.featuresTemp }
-      newState.featuresCached = { ...state.featuresCached }
-      action.featureIds.forEach(fid => {
-        newState.featuresCached[fid] = state.featuresTemp[fid]
-        delete newState.featuresTemp[fid]
-      })
-      break
-    }
-    case 'IMPORT_COLLECTION': {
-      if (!action.features) return state
-      newState.featuresTemp = { ...state.featuresTemp }
-      action.features.forEach(f => {
-        const newFeature = feature(null, updateFeature(f))
-        newState.featuresTemp[newFeature.id] = newFeature
-      })
-      break
-    }
-    case 'REMOVE_FEATURE': {
-      newState.featuresUser = { ...state.featuresUser }
-      delete newState.featuresUser[action.id]
-      break
-    }
-    case 'UPDATE_FEATURE': {
-      // add/update user, leave temp/cached alone
-      newState.featuresUser = { ...state.featuresUser }
-      newState.featuresTemp = { ...state.featuresTemp }
-      delete newState.featuresTemp[action.id] // to allow overriding
-      const newFeature = feature(state.featuresUser[action.id], action)
-      delete newState.featuresUser[action.id] // to allow changing id
-      newState.featuresUser[newFeature.id] = newFeature
-      break
+    case 'UPDATE_FEATURE_IN_COLLECTION': {
+      const newFeature = feature(state[action.featureId], action)
+      return { ...state, [newFeature.id]: newFeature }
     }
     default:
       return state
   }
-  return { ...state, ...newState, featuresMerged: mergeFeatures({ ...state, ...newState }) }
 }
 
-export const cacheFeatures = (featureIds) => ({ type: 'CACHE_FEATURES', featureIds })
-
-export const removeFeature = (id) => ({ type: 'REMOVE_FEATURE', id })
-
-
-export const updateFeature = (feature, id) => ({ type: 'UPDATE_FEATURE', feature, id: (id || feature.id) })
-
-/**
- * Merges the presentation sets in the correct order.
- */
-function mergePresentations({ presentationsCached, presentationsUser, presentationsTemp }) {
-  return { ...presentationsCached, ...presentationsUser, ...presentationsTemp }
+const defaultCollectionState = {
+  enabled_presentation: null,
+  features: {},
+  name: '(unnamed)',
+  presentations: {},
+  source: 'civmap:no_source',
 }
 
-const defaultPresentationsState = {
-  presentationsCached: {},
-  presentationsEnabled: {},
-  presentationsMerged: {},
-  presentationsTemp: {},
-  presentationsUser: {},
-}
-
-const presentations = (state = defaultPresentationsState, action) => {
-  const newState = {}
+const collection = (state = defaultCollectionState, action) => {
   switch (action.type) {
-    case 'APP_LOAD': {
-      if (!action.state.presentations) return state
-      const { presentationsCached, presentationsEnabled, presentationsTemp, presentationsUser } = action.state.presentations
-
-      if (presentationsCached) newState.presentationsCached = { ...state.presentationsCached, ...presentationsCached }
-      if (presentationsTemp) newState.presentationsTemp = { ...state.presentationsTemp, ...presentationsTemp }
-      if (presentationsUser) newState.presentationsUser = { ...state.presentationsUser, ...presentationsUser }
-
-      if (presentationsEnabled) newState.presentationsEnabled = presentationsEnabled
-
-      break
-    }
-    case 'CACHE_PRESENTATIONS': {
-      newState.presentationsTemp = { ...state.presentationsTemp }
-      newState.presentationsCached = { ...state.presentationsCached }
-      action.presentationIds.forEach(pid => {
-        newState.presentationsCached[pid] = state.presentationsTemp[pid]
-        delete newState.presentationsTemp[pid]
-      })
-      break
-    }
     case 'IMPORT_COLLECTION': {
-      if (!action.presentations) return state
-      newState.presentationsTemp = { ...state.presentationsTemp }
-      action.presentations.filter(p => p.category).forEach(p => {
-        newState.presentationsTemp[makePresentationId(p)] = p
+      const newState = {
+        enabled_presentation: null, // can be overridden by imported collection
+        ...action.collection,
+        source: action.collectionId || action.collection.source, // precedence
+        features: {}, // override list with object for indexing
+        presentations: {}, // override list with object for indexing
+      }
+      if (action.collection.features) action.collection.features.forEach(f => {
+        const newFeature = feature(null, updateFeatureInCollection(newState.source, f))
+        newState.features[newFeature.id] = newFeature
       })
-      break
+      if (action.collection.presentations) action.collection.presentations.forEach(p => {
+        const newPresentation = p // XXX presentation(null, updatePresentationInCollection(newState.source, p))
+        newState.presentations[newPresentation.name] = newPresentation
+      })
+      return newState
+    }
+
+    case 'REMOVE_FEATURE_IN_COLLECTION':
+    case 'UPDATE_FEATURE_IN_COLLECTION': {
+      if (state.source !== (action.collectionId || action.feature.source)) return state
+      return { ...state, features: features(state.features, action) }
+    }
+
+    case 'ENABLE_PRESENTATION': {
+      if (state.enabled_presentation === action.presentationId) return state // already enabled
+      if (!state.presentations[action.presentationId]) return state // invalid id
+      return { ...state, enabled_presentation: action.presentationId }
     }
 
     case 'DISABLE_PRESENTATION': {
-      const presentationsEnabled = { ...state.presentationsEnabled }
-      delete presentationsEnabled[action.presentation.category]
-      return { ...state, presentationsEnabled }
-    }
-    case 'ENABLE_PRESENTATION': {
-      if (!action.presentation.category) return state
-      const presentationsEnabled = { ...state.presentationsEnabled }
-      presentationsEnabled[action.presentation.category] = makePresentationId(action.presentation)
-      return { ...state, presentationsEnabled }
-    }
-    case 'SET_ENABLED_PRESENTATIONS': {
-      const presentationsEnabled = { ...state.presentationsEnabled }
-      action.presentations.filter(p => p.category).forEach(p =>
-        presentationsEnabled[p.category] = makePresentationId(p)
-      )
-      return { ...state, presentationsEnabled }
+      return { ...state, enabled_presentation: null }
     }
 
     default:
       return state
   }
-  return { ...state, ...newState, presentationsMerged: mergePresentations({ ...state, ...newState }) }
 }
-
-export const cachePresentations = (presentationIds) => ({ type: 'CACHE_PRESENTATIONS', presentationIds })
-
-export const disablePresentation = (presentation) => ({ type: 'DISABLE_PRESENTATION', presentation })
-
-export const enablePresentation = (presentation) => ({ type: 'ENABLE_PRESENTATION', presentation })
-
-export const setEnabledPresentations = (presentations) => ({ type: 'SET_ENABLED_PRESENTATIONS', presentations })
 
 const collections = (state = {}, action) => {
   switch (action.type) {
@@ -312,6 +226,16 @@ const collections = (state = {}, action) => {
       if (!action.state.collections) return state
       return { ...state, ...action.state.collections }
     }
+
+    case 'ENABLE_PRESENTATION':
+    case 'DISABLE_PRESENTATION':
+    case 'REMOVE_FEATURE_IN_COLLECTION':
+    case 'UPDATE_FEATURE_IN_COLLECTION':
+    case 'IMPORT_COLLECTION': {
+      const newCollection = collection(state[action.collectionId], action)
+      return { ...state, [newCollection.source]: newCollection }
+    }
+
     default:
       return state
   }
@@ -319,13 +243,31 @@ const collections = (state = {}, action) => {
 
 export const appLoad = (state) => ({ type: 'APP_LOAD', state })
 
-export const importCollection = ({ features = [], presentations = [] }, source = undefined) => ({ type: 'IMPORT_COLLECTION', source, features, presentations })
+export const importCollection = (collection, collectionId) => ({ type: 'IMPORT_COLLECTION', collection, collectionId })
+
+export const removeFeatureInCollection = (collectionId, featureId) => ({ type: 'REMOVE_FEATURE_IN_COLLECTION', collectionId, featureId })
+
+export const updateFeatureInCollection = (collectionId, feature, featureId = undefined) => ({ type: 'UPDATE_FEATURE_IN_COLLECTION', collectionId, feature, featureId: (featureId || feature.id) })
+
+export const disablePresentationInCollection = (collectionId, presentationId = null) => ({ type: 'DISABLE_PRESENTATION', collectionId, presentationId })
+
+export const enablePresentationInCollection = (collectionId, presentationId) => ({ type: 'ENABLE_PRESENTATION', collectionId, presentationId })
 
 export const combinedReducers = combineReducers({
   collections,
   control,
-  features,
   mapConfig,
   mapView,
-  presentations,
 })
+
+// XXX
+export function lookupFeature(state, featureId, collectionId) {
+  if (collectionId) {
+    return state.collections[collectionId].features[featureId]
+  } else {
+    Object.values(state.collections).forEach(collection => {
+      const feature = collection.features[featureId]
+      if (feature) return feature
+    })
+  }
+}

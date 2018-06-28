@@ -1,16 +1,44 @@
 import { circleBoundsFromFeature, circleToBounds, deepFlip } from './math'
 import { getJSON } from './net'
-import { makePresentationId } from './state';
-import { cacheFeatures, cachePresentations, importCollection, openFeatureDetail, openSearch, setActiveBasemap, setEnabledPresentations, setViewport, updateFeature } from '../store'
+import { enablePresentationInCollection, importCollection, openFeatureDetail, openSearch, setActiveBasemap, setViewport, updateFeatureInCollection, lookupFeature } from '../store'
+
+/**
+ * @typedef {{basemap?: String, viewport?: Object, collectionUrl?: String, featureId?: String, feature?: Object, collection?: Object, searchQuery?: String}} UrlData
+ */
+
+// the [[#,#],[#,#]] blow up the url size when encoded
+// TODO represent number arrays in binary+base64 format
+export function exportPositions(positions) {
+  return JSON.stringify(positions).replace(/\],\[/g, '!').replace(/\[/g, '(').replace(/\]/g, ')')
+}
+
+export function importPositions(positionsStr) {
+  return JSON.parse(positionsStr.replace(/!/g, '],[').replace(/\(/g, '[').replace(/\)/g, ']'))
+}
+
+export function exportStringFromFeature(feature) {
+  const f = { ...feature }
+  if (f.line) f.line = exportPositions(f.line)
+  if (f.polygon) f.polygon = exportPositions(f.polygon)
+  // instead of encodeURIComponent, because here most special characters are fine
+  return encodeURI(JSON.stringify(f)).replace(/#/g, '%23')
+}
 
 export function autoImportCollectionsOnStartup(store) {
-  Object.entries(store.getState().collections).forEach(([url, { auto_update }]) => {
-    if (!auto_update) return
+  const defaultCollections = [
+    "data/settlements.civmap.json",
+    "data/mta_plots.civmap.json",
+  ]
+  defaultCollections.forEach(url => {
     loadCollectionJsonAsync(url, store.dispatch)
   })
 }
 
+/**
+ * @param {UrlData} urlData
+ */
 export function loadAppStateFromUrlData(urlData, store) {
+  urlData = { ...urlData }
   if (urlData.basemap) {
     store.dispatch(setActiveBasemap(urlData.basemap))
   }
@@ -29,20 +57,23 @@ export function loadAppStateFromUrlData(urlData, store) {
     // TODO move into view if collectionUrl but no viewport is set
     if (urlData.collection) {
       // TODO move into view if no viewport is set
-      loadCollectionJson(urlData.collection, store, '#')
+      loadCollectionJson(urlData.collection, store, 'civmap:url_import/collection')
     }
     if (urlData.feature) {
       if (urlData.feature.geometry && urlData.feature.properties) {
         // probably a v2.0.0 feature
         urlData.feature = convertFeatureFrom200(urlData.feature)
       }
-      store.dispatch(updateFeature(urlData.feature))
+      const source = urlData.feature.source || 'civmap:url_import/feature'
+      store.dispatch(updateFeatureInCollection(source, urlData.feature))
       urlData.featureId = urlData.feature.id
+      urlData.collectionId = urlData.feature.source
     }
     if (urlData.featureId) {
-      const feature = store.getState().features.featuresMerged[urlData.featureId]
+      const collectionId = urlData.collectionUrl || urlData.collectionId
+      const feature = lookupFeature(store.getState(), urlData.featureId, collectionId)
       if (feature) {
-        store.dispatch(openFeatureDetail(urlData.featureId))
+        store.dispatch(openFeatureDetail(feature.id, feature.source))
         if (!urlData.viewport) {
           const viewport = circleBoundsFromFeature(feature)
           store.dispatch(setViewport(viewport))
@@ -76,12 +107,15 @@ export function loadCollectionJson(data, dispatch, source) {
     features: [],
     presentations: [],
     ...data,
+    source,
   }
 
-  const currentVersion = '0.3.2'
+  const currentVersion = '0.3.3'
 
   if (data.info.version === currentVersion) {
     // current version, nothing to convert
+  } else if (data.info.version === '0.3.2') {
+    data = convertCollectionFrom032(data)
   } else if (data.info.version === '0.3.1') {
     data = convertCollectionFrom031(data)
   } else if (data.info.version === '0.3.0') {
@@ -96,20 +130,28 @@ export function loadCollectionJson(data, dispatch, source) {
   }
 
   data.features.forEach(f => {
-    if (!f.source) f.source = source
+    // if (!f.source)  // XXX
+      f.source = source
   })
 
   data.presentations.forEach(p => {
-    if (!p.source) p.source = source
-    if (!p.id) p.id = makePresentationId(p)
+    // if (!p.source)  // XXX
+      p.source = source
   })
 
-  dispatch(importCollection(data))
-  dispatch(setEnabledPresentations(data.enabled_presentations || data.presentations))
+  if (!data.enabled_presentation && data.presentations) data.enabled_presentation = data.presentations[0].name
+
+  dispatch(importCollection(data, source))
 
   console.log(`Loaded collection with ${data.features.length} features and ${data.presentations.length} presentations at version "${data.info.version}" from ${source}`)
 }
 
+export function convertCollectionFrom032(data) {
+  const enabled_presentation = data.presentations[0].id
+  return { ...data, enabled_presentation }
+}
+
+// XXX update all converters to convert into 0.3.3 instead of 0.3.2
 export function convertCollectionFrom031(data) {
   function transformTypeToCategory(e) {
     if (e.type && !e.category) return { ...e, category: e.type }
@@ -180,6 +222,9 @@ export function convertCollectionFrom200(data) {
   return { ...data, features }
 }
 
+/**
+ * @returns {UrlData}
+ */
 export function parseUrlHash(hash) {
   const urlData = {
     basemap: undefined,
@@ -299,7 +344,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
 
       const [r, g, b] = [p.red, p.green, p.blue].map(c => Math.round(255 * c))
 
-      const fid = `civmap/dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
+      const fid = `civmap:dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
       const color = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 
       return {
@@ -310,7 +355,25 @@ export function processVoxelWaypointsText(text, dispatch, source) {
       }
     })
 
-  dispatch(importCollection({ features }))
+  // TODO instead, add to existing collection
+  dispatch(importCollection({
+    features,
+    name: 'My VoxelMap Waypoints',
+    source: 'civmap:User/VoxelMap/Waypoints',
+    enabled_presentation: 'Waypoints',
+    presentations: [{
+      "name": "Waypoints",
+      "style_base": {
+        "color": "$color|#ffdd77",
+        "icon": "waypoint",
+        "icon_size": 10,
+        "opacity": 0
+      },
+      "zoom_styles": {
+        "-4": { "opacity": 1 }
+      }
+    }],
+  }))
   console.log('Loaded', features.length, 'waypoints from', source)
 
   // TODO create+enable preconfigured waypoints filter
@@ -332,7 +395,7 @@ export function processSnitchMasterFile(file, dispatch) {
 
         name = name || `Snitch at ${x},${y},${z} on [${group}]`
 
-        const fid = `civmap/dragdrop/snitchmaster/${x},${y},${z},${group}`
+        const fid = `civmap:dragdrop/snitchmaster/${x},${y},${z},${group}`
 
         // TODO colorize groups
 
@@ -345,7 +408,20 @@ export function processSnitchMasterFile(file, dispatch) {
         }
       })
 
-    dispatch(importCollection({ features }))
+    // TODO instead, add to existing collection
+    dispatch(importCollection({
+      features,
+      name: 'My Snitches',
+      source: 'civmap:User/Snitches',
+      enabled_presentation: 'Snitches',
+      presentations: [
+        {
+          "name": "Snitches",
+          "style_base": { "icon": "snitch" },
+        },
+        // TODO add presentations for soon-culled etc.
+      ],
+    }))
     console.log('Loaded', features.length, 'snitches from', file.name)
 
     // TODO create+enable preconfigured snitchmaster filter

@@ -15,11 +15,6 @@ export const defaultAppState = {
     viewport: { x: 0, z: 0, radius: 13000 },
     basemapId: 'terrain',
   },
-
-  collections: {
-    "https://ccmap.github.io/data/settlements.civmap.json": { auto_update: true },
-    "https://ccmap.github.io/data/mta_plots.civmap.json": { auto_update: true },
-  },
 }
 
 const defaultBasemap = Object.values(defaultAppState.mapConfig.basemaps).find(b => b.isDefault) || {}
@@ -27,24 +22,4 @@ defaultAppState.mapView.basemapId = defaultBasemap.id
 defaultAppState.mapView.viewport = {
   x: 0, z: 0,
   radius: defaultAppState.mapConfig.borderApothem,
-}
-
-/**
- * Returns a map `{ category -> { id -> presentation } }`
- * to quickly look up all presentations concerning a certain category.
- */
-export function groupPresentationsByCategory(presentations) {
-  const categoryGroups = {}
-  Object.entries(presentations).forEach(([id, p]) => {
-    let categoryGroup = categoryGroups[p.category]
-    if (!categoryGroup) {
-      categoryGroups[p.category] = categoryGroup = {}
-    }
-    categoryGroup[id] = p
-  })
-  return categoryGroups
-}
-
-export function makePresentationId({ name, source }) {
-  return name + '\n' + source
 }

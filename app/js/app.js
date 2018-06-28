@@ -10,14 +10,16 @@ import { getAppStateFromLocalStorage, saveAppStateToLocalStorage } from './utils
 import { defaultAppState } from './utils/state'
 import { autoImportCollectionsOnStartup, loadAppStateFromUrlData, parseUrlHash } from './utils/importExport'
 
-const preloadedState = {} // TODO unused
+// TODO encapsulate in init() function, pass branding options (defaults, texts, links etc.)
+const preloadedState = {}
+
 const store = createStore(combinedReducers, preloadedState,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 export const api = store // TODO this is our "api" for now
-// TODO encapsulate in init() function, pass branding options (defaults, texts, links etc.)
 
-store.dispatch(appLoad({ ...defaultAppState, ...getAppStateFromLocalStorage() }))
+store.dispatch(appLoad(defaultAppState))
+store.dispatch(appLoad(getAppStateFromLocalStorage()))
 
 if (location.hash) {
   const urlData = parseUrlHash(location.hash)

@@ -11,96 +11,87 @@ import InvisibleIcon from 'material-ui-icons/VisibilityOff'
 import VisibleIcon from 'material-ui-icons/Visibility'
 
 import JsonEditor from '../edit/JsonEditor'
-import { groupPresentationsByCategory, makePresentationId } from '../../utils/state';
-import { disablePresentation, enablePresentation, openPresentationEdit } from '../../store'
+import { disablePresentationInCollection, enablePresentationInCollection, openPresentationEdit } from '../../store'
 
-function pluralize(str) {
-  if (str.endsWith('y')) {
-    return str.slice(0, str.length - 1) + 'ies'
-  } else if (str.endsWith('ch')) {
-    return str.slice(0, str.length - 2) + 'ches'
-  } else {
-    return str + 's'
-  }
-}
-
-const Layer = ({ dispatch, presentation, presentationsEnabled }) => {
+const Layer = ({ dispatch, presentation, enabled_presentation }) => {
   if (!presentation) return null
 
-  const presentationId = makePresentationId(presentation)
-  const isEnabled = presentationsEnabled[presentation.category] === presentationId
+  const isEnabled = enabled_presentation === presentation.name
 
   return <ListItem button onClick={() => {
-    if (isEnabled) dispatch(disablePresentation(presentation))
-    else dispatch(enablePresentation(presentation))
+    if (isEnabled) dispatch(disablePresentationInCollection(presentation.source, presentation.name))
+    else dispatch(enablePresentationInCollection(presentation.source, presentation.name))
   }}>
     <ListItemIcon>{isEnabled ? <VisibleIcon /> : <InvisibleIcon />}</ListItemIcon>
     <ListItemText primary={presentation.name} />
     <ListItemSecondaryAction>
-      <IconButton onClick={() => dispatch(openPresentationEdit(presentationId))}>
+      <IconButton onClick={() => dispatch(openPresentationEdit(presentation.name))}>
         <EditIcon />
       </IconButton>
     </ListItemSecondaryAction>
   </ListItem>
 }
 
-const LayersForCategory = ({ dispatch, presentationsByCategory, presentationsEnabled, category }) => {
-  const presentationsOfThisCategory = Object.values(presentationsByCategory[category] || {})
-
-  if (presentationsOfThisCategory.length <= 1) {
-    const presentation = presentationsOfThisCategory[0]
-    return <Layer {...{ dispatch, presentation, presentationsEnabled }} />
+const PresentationsForCollection = ({ dispatch, collection }) => {
+  const { enabled_presentation } = collection
+  let presentations = Object.values(collection.presentations || {})
+  if (enabled_presentation) {
+    presentations = [
+      collection.presentations[enabled_presentation],
+      ...presentations.filter(p => p.name !== enabled_presentation),
+    ]
   }
 
-  let categoryHeadText = pluralize(category[0].toUpperCase() + category.slice(1)) + ':'
+  if (presentations.length <= 1) {
+    const presentation = presentations[0]
+    return <Layer {...{ dispatch, presentation, enabled_presentation }} />
+  }
 
   return <div>
-    <ListItem button onClick={() => {
-    }}>
-      <ListItemText primary={categoryHeadText} style={{color: '#444444'}} />
+    <ListItem>
+      <ListItemText primary={collection.name} style={{ color: '#444444' }} />
     </ListItem>
     <List disablePadding>
-      {presentationsOfThisCategory.map((presentation) =>
-        <Layer {...{ dispatch, presentation, presentationsEnabled }} key={makePresentationId(presentation)} />
+      {presentations.map((presentation) =>
+        <Layer {...{ dispatch, presentation, enabled_presentation }} key={presentation.name} />
       )}
     </List>
   </div>
 }
 
-const LayersControl = ({
-  presentationsMerged,
-  presentationsEnabled,
-  dispatch,
-}) => {
-  const presentationsByCategory = groupPresentationsByCategory(presentationsMerged)
-
-  const enabledCategories = Object.keys(presentationsEnabled).filter(category => presentationsByCategory[category])
-  const disabledCategories = Object.keys(presentationsByCategory).filter(category => !presentationsEnabled[category])
-
-  enabledCategories.sort((a, b) => Object.keys(presentationsByCategory[a]).length - Object.keys(presentationsByCategory[b]).length)
-  disabledCategories.sort((a, b) => Object.keys(presentationsByCategory[a]).length - Object.keys(presentationsByCategory[b]).length)
-
-  const commonProps = {
-    dispatch,
-    presentationsByCategory,
-    presentationsEnabled,
+class LayersControl extends React.PureComponent {
+  constructor(props) {
+    super(props)
+    const enabledCollections = Object.values(props.collections).filter(c => c.presentations[c.enabled_presentation])
+    const disabledCollections = Object.values(props.collections).filter(c => !c.presentations[c.enabled_presentation])
+    this.state = {
+      layerOrder: [...enabledCollections, ...disabledCollections].map(({ source }) => source),
+    }
   }
 
-  return <div>
-    <List disablePadding subheader={<ListSubheader>Visible Layers</ListSubheader>}>
-      {enabledCategories.map((category) => <LayersForCategory {...commonProps} category={category} key={category} />)}
-    </List>
+  componentWillReceiveProps(nextProps) {
+    // TODO handle collections getting added/removed
+  }
 
-    <List disablePadding subheader={<ListSubheader>Invisible Layers</ListSubheader>}>
-      {disabledCategories.map((category) => <LayersForCategory {...commonProps} category={category} key={category} />)}
-    </List>
-  </div>
+  render() {
+    const {
+      collections,
+      dispatch,
+    } = this.props
+
+    const { layerOrder } = this.state
+
+    return <div>
+      <List disablePadding>
+        {layerOrder.map(source => <PresentationsForCollection dispatch={dispatch} collection={collections[source]} key={source} />)}
+      </List>
+    </div>
+  }
 }
 
-const mapStateToProps = ({ presentations: { presentationsMerged, presentationsEnabled } }) => {
+const mapStateToProps = ({ collections }) => {
   return {
-    presentationsMerged,
-    presentationsEnabled,
+    collections,
   }
 }
 

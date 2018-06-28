@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
-import { inspect } from 'util'
 
 import EditableCircle from './EditableCircle'
 import EditableLine from './EditableLine'
@@ -10,7 +9,6 @@ import EditablePolygon from './EditablePolygon'
 import { deepFlip } from '../../utils/math'
 import PassiveLabel from './PassiveLabel'
 import { defaultPresentation, getZoomStyle, lookupStyle } from '../../utils/presentation'
-import { groupPresentationsByCategory } from '../../utils/state';
 import { openFeatureDetail } from '../../store'
 
 export function getFeatureComponent(feature, zoom) {
@@ -30,10 +28,10 @@ export function getFeatureComponent(feature, zoom) {
 }
 
 function FeatureOverlayImage({ feature, dispatch }) {
-  const { id, map_image, style = {} } = feature
+  const { id, source, map_image, style = {} } = feature
   const { url, bounds } = map_image
   return <RL.ImageOverlay
-    onclick={() => dispatch(openFeatureDetail(id))}
+    onclick={() => dispatch(openFeatureDetail(id, source))}
     url={url}
     bounds={deepFlip(bounds)}
     {...style}
@@ -57,43 +55,48 @@ function prepareListForFeatureGroup(list) {
 
 const LeafOverlay = ({
   activeFeatureId,
+  activeFeatureCollection,
   appMode,
-  featuresMerged,
-  presentationsEnabled,
-  presentationsMerged,
+  collections,
   zoom,
   dispatch,
 }) => {
   const featuresPresentations = {}
-  Object.values(featuresMerged).forEach(feature => {
-    const presentation = presentationsMerged[presentationsEnabled[feature.category]]
-    const presentationsThisCategory = Object.values(groupPresentationsByCategory(presentationsMerged)[feature.category] || {})
 
-    if (activeFeatureId === feature.id) {
-      const presentationHl = presentation || presentationsThisCategory[0] || defaultPresentation
-      featuresPresentations[feature.id] = {
-        feature,
-        baseStyle: presentationHl.style_base,
-        zoomStyle: presentationHl.style_highlight,
+  const highlightActiveFeature = ['EDIT', 'FEATURE', 'SEARCH'].includes(appMode)
+
+  // TODO separate RL.FeatureGroup per collection to reduce updates
+  Object.values(collections).forEach(collection => {
+    const presentation = collection.presentations[collection.enabled_presentation]
+    const fallbackPresentations = Object.values(collection.presentations)
+
+    Object.values(collection.features).forEach(feature => {
+      if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.source) {
+        const presentationHl = presentation || fallbackPresentations[0] || defaultPresentation
+        featuresPresentations[feature.id] = {
+          feature,
+          baseStyle: presentationHl.style_base,
+          zoomStyle: presentationHl.style_highlight,
+        }
+      } else if (presentation) {
+        const baseStyle = presentation.style_base
+        const zoomStyle = getZoomStyle(presentation, zoom) // TODO we can calculate this once for all enabled presentations before looping the features
+        const featureWithStyles = { feature, baseStyle, zoomStyle }
+        const opacity = lookupStyle("opacity", featureWithStyles, 1)
+        if (opacity > 0) {
+          featuresPresentations[feature.id] = featureWithStyles
+        }
+      } else if (fallbackPresentations.length <= 0) {
+        // unknown category, always show with default style
+        featuresPresentations[feature.id] = {
+          feature,
+          baseStyle: defaultPresentation.style_base,
+          zoomStyle: getZoomStyle(defaultPresentation, zoom),
+        }
+      } else {
+        // all presentations disabled for this category, nor highlighted: do not show feature
       }
-    } else if (presentation) {
-      const baseStyle = presentation.style_base
-      const zoomStyle = getZoomStyle(presentation, zoom) // TODO we can calculate this once for all enabled presentations before looping the features
-      const featureWithStyles = { feature, baseStyle, zoomStyle }
-      const opacity = lookupStyle("opacity", featureWithStyles, 1)
-      if (opacity > 0) {
-        featuresPresentations[feature.id] = featureWithStyles
-      }
-    } else if (presentationsThisCategory.length <= 0) {
-      // unknown category, always show with default style
-      featuresPresentations[feature.id] = {
-        feature,
-        baseStyle: defaultPresentation.style_base,
-        zoomStyle: getZoomStyle(defaultPresentation, zoom),
-      }
-    } else {
-      // all presentations disabled for this category, nor highlighted: do not show feature
-    }
+    })
   })
 
   return <RL.FeatureGroup>
@@ -119,14 +122,12 @@ const LeafOverlay = ({
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ control, features, presentations }, { zoom }) => {
-  const { presentationsEnabled, presentationsMerged } = presentations
+const mapStateToProps = ({ control, collections }, { zoom }) => {
   return {
-    activeFeatureId: ['EDIT', 'FEATURE', 'SEARCH'].includes(control.appMode) ? control.activeFeatureId : null,
+    activeFeatureId: control.activeFeatureId,
+    activeFeatureCollection: control.activeFeatureCollection,
     appMode: control.appMode,
-    featuresMerged: features.featuresMerged,
-    presentationsEnabled,
-    presentationsMerged,
+    collections,
     zoom,
   }
 }
