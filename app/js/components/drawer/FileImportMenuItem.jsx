@@ -97,8 +97,10 @@ class FileImportMenuItem extends React.Component {
   }
 
   handleTextImport = (importText) => {
+    const dispatch = this.props.dispatch
+    dispatch(setDrawerClosed())
     // TODO recognize import type from text, import snitches/JSON too
-    processVoxelWaypointsText(importText, this.props.dispatch, 'text import dialog')
+    processVoxelWaypointsText(importText, dispatch, 'text import dialog')
   }
 
   render() {
