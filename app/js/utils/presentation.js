@@ -53,6 +53,7 @@ export function calculateFeatureStyle({ feature, baseStyle, zoomStyle }) {
  * Find the zoom style that applies to the given zoom level.
  */
 export function getZoomStyle({ zoom_styles }, zoom) {
+  if (!zoom_styles) return {}
   let zoomStyle = {}
   for (let z = zoom; z >= -6; z--) {
     if (zoom_styles[z]) {
@@ -96,6 +97,7 @@ export function convertStyle(styleIn) {
 export const defaultPresentation = {
   style_base: {
     color: '$color|#ff8800',
+    icon_size: 16,
     label: '$name',
     opacity: 1,
   },
