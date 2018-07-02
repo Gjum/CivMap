@@ -14,6 +14,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server --hot --inline --progress --colors",
+    "test": "jest",
     "build": "webpack --config webpack-production.config.js --progress --colors"
   },
   "private": true,
@@ -29,6 +30,8 @@
     "babel-preset-stage-0": "^6.24.1",
     "file-loader": "^0.8.5",
     "html-webpack-plugin": "^2.30.1",
+    "jest": "^23.3.0",
+    "jest-babel": "^1.0.1",
     "react-hot-loader": "^1.3.1",
     "transfer-webpack-plugin": "^0.1.4",
     "webpack": "^1.15.0",

@@ -1,11 +1,16 @@
-import * as L from 'leaflet'
-
 export function intCoords(point) {
-  var x = parseInt(point.lng)
-  var z = parseInt(point.lat)
-  if (x !== point.lng && point.lng < 0) x -= 1
-  if (z !== point.lat && point.lat < 0) z -= 1
-  return [x, z]
+  let x, z
+  if (Array.isArray(point)) {
+    [x, z] = point
+  } else {
+    x = point.lng
+    z = point.lat
+  }
+  let rx = parseInt(x)
+  let rz = parseInt(z)
+  if (rx !== x && x < 0) rx -= 1
+  if (rz !== z && z < 0) rz -= 1
+  return [rx, rz]
 }
 
 export function intCoord(c) {
@@ -22,16 +27,11 @@ export function boundsToContainedCircle(bounds) {
   return { x, z, radius }
 }
 
-export function boundsToEnclosingCircle(bounds) {
-  const [x, z] = intCoords(bounds.getCenter())
-  const [e, n] = intCoords(bounds.getNorthEast())
-  const [w, s] = intCoords(bounds.getSouthWest())
+export function rectToEnclosingCircle(rect) {
+  const [[w, n], [e, s]] = rect
+  const [x, z] = intCoords([(e + w) / 2, (s + n) / 2])
   const radius = Math.round(Math.max(Math.abs(e - w), Math.abs(s - n)) / 2)
   return { x, z, radius }
-}
-
-export function boundsToRect(bounds) {
-  return [intCoords(bounds.getNorthEast()), intCoords(bounds.getSouthWest())]
 }
 
 export function circleToBounds({ x, z, radius }) {
@@ -87,12 +87,30 @@ export function reversePolyPositions(positions) {
   return positions
 }
 
+export function boundsFromPositions(positions) {
+  if (positions[0] instanceof Array) {
+    let [[w, n], [e, s]] = boundsFromPositions(positions[0])
+    positions.forEach(pos => {
+      let [[pw, pn], [pe, ps]] = boundsFromPositions(pos)
+      if (w > pw) w = pw
+      if (n > pn) n = pn
+      if (e < pe) e = pe
+      if (s < ps) s = ps
+    })
+    return [[w, n], [e, s]]
+  } else { // point
+    const [x, z] = positions
+
+    return [[x, z], [x, z]]
+  }
+}
+
 export function rectBoundsFromFeature(feature) {
   const has = (k) => feature[k] !== undefined
   // TODO select largest/according to zoom level
-  if (has('map_image')) return boundsToRect(L.latLngBounds(deepFlip(feature.map_image.bounds)))
-  if (has('polygon')) return boundsToRect(L.latLngBounds(deepFlip(feature.polygon)))
-  if (has('line')) return boundsToRect(L.latLngBounds(deepFlip(feature.line)))
+  if (has('map_image')) return boundsFromPositions(feature.map_image.bounds)
+  if (has('polygon')) return boundsFromPositions(feature.polygon)
+  if (has('line')) return boundsFromPositions(feature.line)
   if (has('x') && has('z')) {
     const { x, z, radius = 100 } = feature // TODO arbitrary radius
     return [[x - radius, z - radius], [x + radius, z + radius]]
@@ -103,15 +121,5 @@ export function rectBoundsFromFeature(feature) {
 }
 
 export function circleBoundsFromFeature(feature) {
-  const has = (k) => feature[k] !== undefined
-  // TODO select largest/according to zoom level
-  if (has('map_image')) return boundsToEnclosingCircle(L.latLngBounds(deepFlip(feature.map_image.bounds)))
-  if (has('polygon')) return boundsToEnclosingCircle(L.latLngBounds(deepFlip(feature.polygon)))
-  if (has('line')) return boundsToEnclosingCircle(L.latLngBounds(deepFlip(feature.line)))
-  if (has('x') && has('z')) {
-    return { x: feature.x, z: feature.z, radius: feature.radius || 100 } // TODO arbitrary radius
-  }
-
-  console.error("[circleBoundsFromFeature] Unknown feature geometry", feature)
-  return { x: 0, z: 0, radius: 9000 }
+  return rectToEnclosingCircle(rectBoundsFromFeature(feature))
 }
