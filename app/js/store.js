@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+import { inspect } from 'util'
 
 import { importPositions } from './utils/importExport'
 import murmurhash3 from './utils/murmurhash3_gc' // TODO use longer hash for less collisions, or just don't accept features without id
@@ -181,20 +182,23 @@ const defaultCollectionState = {
 const collection = (state = defaultCollectionState, action) => {
   switch (action.type) {
     case 'IMPORT_COLLECTION': {
+      const source = action.collectionId || action.collection.source
       const newState = {
-        enabled_presentation: null, // can be overridden by imported collection
+        ...state,
         ...action.collection,
-        source: action.collectionId || action.collection.source, // precedence
+        source, // precedence
         features: {}, // override list with object for indexing
         presentations: {}, // override list with object for indexing
+        editable: action.editable,
+        persistent: action.persistent,
       }
       if (action.collection.features) action.collection.features.forEach(f => {
         const newFeature = feature(null, updateFeatureInCollection(newState.source, f))
-        newState.features[newFeature.id] = newFeature
+        newState.features[newFeature.id] = { ...newFeature, source }
       })
       if (action.collection.presentations) action.collection.presentations.forEach(p => {
         const newPresentation = p // XXX presentation(null, updatePresentationInCollection(newState.source, p))
-        newState.presentations[newPresentation.name] = newPresentation
+        newState.presentations[newPresentation.name] = { ...newPresentation, source }
       })
       return newState
     }
@@ -227,11 +231,23 @@ const collections = (state = {}, action) => {
       return { ...state, ...action.state.collections }
     }
 
+    case 'IMPORT_COLLECTION': {
+      if (!action.collectionId) {
+        console.error(`Not importing collection without id: ${inspect(action)}`)
+        return state // require collection id
+      }
+      const newCollection = collection(state[action.collectionId], action)
+      return { ...state, [newCollection.source]: newCollection }
+    }
+
     case 'ENABLE_PRESENTATION':
     case 'DISABLE_PRESENTATION':
     case 'REMOVE_FEATURE_IN_COLLECTION':
-    case 'UPDATE_FEATURE_IN_COLLECTION':
-    case 'IMPORT_COLLECTION': {
+    case 'UPDATE_FEATURE_IN_COLLECTION': {
+      if (!state[action.collectionId]) {
+        console.error(`Not updating unknown collection: ${inspect(action)}`)
+        return state // only update existing collections
+      }
       const newCollection = collection(state[action.collectionId], action)
       return { ...state, [newCollection.source]: newCollection }
     }
@@ -243,11 +259,20 @@ const collections = (state = {}, action) => {
 
 export const appLoad = (state) => ({ type: 'APP_LOAD', state })
 
-export const importCollection = (collection, collectionId) => ({ type: 'IMPORT_COLLECTION', collection, collectionId })
+export const importCollection = (collection, collectionId = null) => ({
+  type: 'IMPORT_COLLECTION',
+  collection,
+  collectionId: collectionId || collection.id,
+})
 
 export const removeFeatureInCollection = (collectionId, featureId) => ({ type: 'REMOVE_FEATURE_IN_COLLECTION', collectionId, featureId })
 
-export const updateFeatureInCollection = (collectionId, feature, featureId = undefined) => ({ type: 'UPDATE_FEATURE_IN_COLLECTION', collectionId, feature, featureId: (featureId || feature.id) })
+export const updateFeatureInCollection = (collectionId, feature, featureId = undefined) => ({
+  type: 'UPDATE_FEATURE_IN_COLLECTION',
+  collectionId,
+  feature,
+  featureId: featureId || feature.id,
+})
 
 export const disablePresentationInCollection = (collectionId, presentationId = null) => ({ type: 'DISABLE_PRESENTATION', collectionId, presentationId })
 

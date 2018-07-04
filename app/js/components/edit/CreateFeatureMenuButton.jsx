@@ -36,7 +36,7 @@ export default class CreateFeatureMenuButton extends React.Component {
     const { dispatch } = this.props
 
     const makeNewAndEdit = (defaultProps) => {
-      const feature = { ...defaultProps, id: makeId() }
+      const feature = { id: makeId(), source: 'civmap:no_source', ...defaultProps }
       dispatch(updateFeatureInCollection(feature.source, feature))
       this.handleClose()
       dispatch(openEditMode(feature.id, feature.source))

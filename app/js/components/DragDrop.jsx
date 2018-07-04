@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getFileProcessor } from '../utils/importExport'
+import { getFileProcessor } from '../utils/importFile'
 
 class DragDrop extends React.PureComponent {
   componentWillMount() {

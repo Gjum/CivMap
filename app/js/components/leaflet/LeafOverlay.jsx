@@ -53,32 +53,26 @@ function prepareListForFeatureGroup(list) {
   return null
 }
 
-const LeafOverlay = ({
-  activeFeatureId,
-  activeFeatureCollection,
-  appMode,
-  collections,
-  zoom,
-  dispatch,
-}) => {
-  const featuresPresentations = {}
-
+export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureId, appMode, collections, zoom }) {
   const highlightActiveFeature = ['EDIT', 'FEATURE', 'SEARCH'].includes(appMode)
+
+  const featuresPresentations = {}
 
   // TODO separate RL.FeatureGroup per collection to reduce updates
   Object.values(collections).forEach(collection => {
-    const presentation = collection.presentations[collection.enabled_presentation]
-    const fallbackPresentations = Object.values(collection.presentations)
+    const { enabled_presentation, features, presentations } = collection
 
-    Object.values(collection.features).forEach(feature => {
+    const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
+    const presentation = presentations[enabled_presentation] || fallbackPresentation
+
+    Object.values(features).forEach(feature => {
       if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.source) {
-        const presentationHl = presentation || fallbackPresentations[0] || defaultPresentation
         featuresPresentations[feature.id] = {
           feature,
-          baseStyle: presentationHl.style_base,
-          zoomStyle: presentationHl.style_highlight,
+          baseStyle: presentation.style_base,
+          zoomStyle: presentation.style_highlight,
         }
-      } else if (presentation) {
+      } else if (enabled_presentation) {
         const baseStyle = presentation.style_base
         const zoomStyle = getZoomStyle(presentation, zoom) // TODO we can calculate this once for all enabled presentations before looping the features
         const featureWithStyles = { feature, baseStyle, zoomStyle }
@@ -86,18 +80,23 @@ const LeafOverlay = ({
         if (opacity > 0) {
           featuresPresentations[feature.id] = featureWithStyles
         }
-      } else if (fallbackPresentations.length <= 0) {
-        // unknown category, always show with default style
-        featuresPresentations[feature.id] = {
-          feature,
-          baseStyle: defaultPresentation.style_base,
-          zoomStyle: getZoomStyle(defaultPresentation, zoom),
-        }
       } else {
         // all presentations disabled for this category, nor highlighted: do not show feature
       }
     })
   })
+  return featuresPresentations
+}
+
+export const RealLeafOverlay = ({
+  activeFeatureId,
+  activeFeatureCollection,
+  appMode,
+  collections,
+  zoom,
+  dispatch,
+}) => {
+  const featuresPresentations = selectRenderedFeatures({ activeFeatureCollection, activeFeatureId, appMode, collections, zoom })
 
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
@@ -132,4 +131,4 @@ const mapStateToProps = ({ control, collections }, { zoom }) => {
   }
 }
 
-export default connect(mapStateToProps)(LeafOverlay)
+export default connect(mapStateToProps)(RealLeafOverlay)

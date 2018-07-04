@@ -14,7 +14,7 @@ import TextField from 'material-ui/TextField'
 import CloseIcon from 'material-ui-icons/Close'
 import FileUploadIcon from 'material-ui-icons/FileUpload'
 
-import { getFileProcessor, processVoxelWaypointsText } from '../../utils/importExport'
+import { getFileProcessor, processVoxelWaypointsText } from '../../utils/importFile'
 import { setDrawerClosed } from '../../store'
 
 export class ImportDialog extends React.Component {
