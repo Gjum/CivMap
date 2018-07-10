@@ -1,6 +1,7 @@
 import { createStore } from 'redux'
 
 import { loadAppStateFromUrlData } from './importExport'
+import { processCollectionFile } from './importFile'
 import { combinedReducers } from '../store'
 
 jest.mock('./net')
@@ -37,5 +38,26 @@ describe("loadAppStateFromUrlData", () => {
     const collection = store.getState().collections[collectionUrl]
     expect(collection.features).toHaveProperty([feature.id])
     expect(collection.features[feature.id]).toEqual({ ...feature, source: collectionUrl })
+  })
+})
+
+describe("processCollectionFile", () => {
+  it("imports collection from file", () => {
+    const store = createStore(combinedReducers)
+    const feature = { id: 'feature_id', x: -123, z: 123 }
+    const collectionJson = JSON.stringify({
+      info: { version: '0.3.3' },
+      features: [{ ...feature }],
+    })
+    const fileName = 'test.civmap.json'
+    const collectionFile = new File([collectionJson], fileName)
+
+    return processCollectionFile(collectionFile, store.dispatch).then(() => {
+      const cid = `civmap:dragdrop/${fileName}`
+      expect(store.getState().collections).toHaveProperty([cid])
+      const collection = store.getState().collections[cid]
+      expect(collection.features).toHaveProperty([feature.id])
+      expect(collection.features[feature.id]).toEqual({ ...feature, source: cid })
+    })
   })
 })

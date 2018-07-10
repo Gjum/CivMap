@@ -12,13 +12,16 @@ export function getFileProcessor(fileName) {
 }
 
 export function processCollectionFile(file, dispatch) {
-  const reader = new FileReader()
-  reader.onload = (eventRead) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = resolve
+    reader.onerror = reject
+    reader.readAsText(file)
+  }).then((eventRead) => {
     const text = eventRead.target.result
     const json = JSON.parse(text)
-    loadCollectionJson(json, dispatch, 'drag-drop')
-  }
-  reader.readAsText(file)
+    return loadCollectionJson(json, dispatch, `civmap:dragdrop/${file.name}`)
+  })
 }
 
 export function processVoxelWaypointsFile(file, dispatch) {
