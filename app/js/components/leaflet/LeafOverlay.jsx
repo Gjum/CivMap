@@ -62,6 +62,8 @@ export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureI
   Object.values(collections).forEach(collection => {
     const { enabled_presentation, features = {}, presentations = {} } = collection
 
+    if (!enabled_presentation) return
+
     const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
     const presentation = presentations[enabled_presentation] || fallbackPresentation
 
@@ -69,8 +71,8 @@ export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureI
       if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.source) {
         featuresPresentations[feature.id] = {
           feature,
-          baseStyle: presentation.style_base,
-          zoomStyle: presentation.style_highlight,
+          baseStyle: presentation.style_base || defaultPresentation.style_base,
+          zoomStyle: presentation.style_highlight || defaultPresentation.style_highlight,
         }
       } else if (enabled_presentation) {
         const baseStyle = presentation.style_base

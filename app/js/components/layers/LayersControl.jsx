@@ -1,22 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from 'material-ui/Button'
 import IconButton from 'material-ui/IconButton'
 import List, { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader } from 'material-ui/List'
 
-import DeleteIcon from 'material-ui-icons/Delete'
 import EditIcon from 'material-ui-icons/Edit'
 import InvisibleIcon from 'material-ui-icons/VisibilityOff'
 import VisibleIcon from 'material-ui-icons/Visibility'
 
-import JsonEditor from '../edit/JsonEditor'
 import { disablePresentationInCollection, enablePresentationInCollection, openPresentationEdit } from '../../store'
 
 const Layer = ({ dispatch, presentation, enabled_presentation }) => {
   if (!presentation) return null
 
-  const isEnabled = enabled_presentation === presentation.name
+  const isEnabled = enabled_presentation === presentation.name || enabled_presentation === true
 
   return <ListItem button onClick={() => {
     if (isEnabled) dispatch(disablePresentationInCollection(presentation.source, presentation.name))
@@ -37,13 +34,13 @@ const PresentationsForCollection = ({ dispatch, collection }) => {
   let presentations = Object.values(collection.presentations || {})
   if (enabled_presentation) {
     presentations = [
-      collection.presentations[enabled_presentation],
+      (collection.presentations || {})[enabled_presentation],
       ...presentations.filter(p => p.name !== enabled_presentation),
     ]
   }
 
   if (presentations.length <= 1) {
-    const presentation = presentations[0]
+    const presentation = presentations[0] || { name: collection.name, source: collection.source }
     return <Layer {...{ dispatch, presentation, enabled_presentation }} />
   }
 
@@ -62,8 +59,8 @@ const PresentationsForCollection = ({ dispatch, collection }) => {
 class LayersControl extends React.PureComponent {
   constructor(props) {
     super(props)
-    const enabledCollections = Object.values(props.collections).filter(c => c.presentations[c.enabled_presentation])
-    const disabledCollections = Object.values(props.collections).filter(c => !c.presentations[c.enabled_presentation])
+    const enabledCollections = Object.values(props.collections).filter(c => (c.presentations || {})[c.enabled_presentation])
+    const disabledCollections = Object.values(props.collections).filter(c => !(c.presentations || {})[c.enabled_presentation])
     this.state = {
       layerOrder: [...enabledCollections, ...disabledCollections].map(({ source }) => source),
     }
