@@ -2,6 +2,7 @@ import { createStore } from 'redux'
 
 import { loadAppStateFromUrlData } from './importExport'
 import { processCollectionFile } from './importFile'
+import murmurhash3 from './murmurhash3_gc'
 import { combinedReducers } from '../store'
 
 jest.mock('./net')
@@ -16,8 +17,9 @@ describe("loadAppStateFromUrlData", () => {
 
     loadAppStateFromUrlData({ feature: { ...feature } }, store)
 
-    const generatedFeatureId = 1803919729 // deterministic because of using the same seed during test
+    const generatedFeatureId = murmurhash3(JSON.stringify(feature), 1)
     const source = 'civmap:url_import'
+
     expect(store.getState().collections).toHaveProperty([source])
     const collection = store.getState().collections[source]
     expect(Object.values(collection.features)[0]).toEqual({ ...feature, id: generatedFeatureId, source: source })
@@ -53,7 +55,7 @@ describe("processCollectionFile", () => {
     const collectionFile = new File([collectionJson], fileName)
 
     return processCollectionFile(collectionFile, store.dispatch).then(() => {
-      const cid = `civmap:dragdrop/${fileName}`
+      const cid = `civmap:collection/file/${fileName}`
       expect(store.getState().collections).toHaveProperty([cid])
       const collection = store.getState().collections[cid]
       expect(collection.features).toHaveProperty([feature.id])

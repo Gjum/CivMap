@@ -20,7 +20,7 @@ export function processCollectionFile(file, dispatch) {
   }).then((eventRead) => {
     const text = eventRead.target.result
     const json = JSON.parse(text)
-    return loadCollectionJson(json, dispatch, `civmap:dragdrop/${file.name}`)
+    return loadCollectionJson(json, dispatch, `civmap:collection/file/${file.name}`)
   })
 }
 
@@ -50,7 +50,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
 
       const [r, g, b] = [p.red, p.green, p.blue].map(c => Math.round(255 * c))
 
-      const fid = `civmap:dragdrop/waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
+      const fid = `civmap:waypoint/voxelmap/${p.x},${p.y},${p.z},${p.name}`
       const color = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 
       return {
@@ -65,7 +65,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
   dispatch(importCollection({
     features,
     name: 'My VoxelMap Waypoints',
-    source: 'civmap:User/VoxelMap/Waypoints',
+    source: 'civmap:collection/waypoint/voxelmap',
     enabled_presentation: 'Waypoints',
     presentations: [{
       "name": "Waypoints",
@@ -101,7 +101,7 @@ export function processSnitchMasterFile(file, dispatch) {
 
         name = name || `Snitch at ${x},${y},${z} on [${group}]`
 
-        const fid = `civmap:dragdrop/snitchmaster/${x},${y},${z},${group}`
+        const fid = `civmap:snitchmaster/${x},${y},${z},${group}`
 
         // TODO colorize groups
 
@@ -118,7 +118,7 @@ export function processSnitchMasterFile(file, dispatch) {
     dispatch(importCollection({
       features,
       name: 'My Snitches',
-      source: 'civmap:User/Snitches',
+      source: 'civmap:collection/snitches',
       enabled_presentation: 'Snitches',
       presentations: [
         {
