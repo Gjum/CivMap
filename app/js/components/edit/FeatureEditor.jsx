@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { v4 } from 'node-uuid'
 
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
@@ -17,7 +16,7 @@ import JsonEditor from '../edit/JsonEditor'
 import { reversePolyPositions } from '../../utils/math'
 import { lookupFeature, openBrowseMode, openEditMode, openFeatureDetail, removeFeatureInCollection, updateFeatureInCollection } from '../../store'
 
-class FeatureEditor extends React.Component {
+export class RealFeatureEditor extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -129,4 +128,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(FeatureEditor)
+export default connect(mapStateToProps)(RealFeatureEditor)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { v4 } from 'node-uuid'
+import Uuid from 'node-uuid'
 
 import IconButton from 'material-ui/IconButton'
 import { ListItemIcon } from 'material-ui/List'
@@ -12,11 +12,7 @@ import LineIcon from 'material-ui-icons/Timeline'
 import MarkerIcon from 'material-ui-icons/AddLocation'
 import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
 
-import { openEditMode, updateFeatureInCollection } from '../../store'
-
-function makeId() {
-  return v4()
-}
+import { openEditMode, createFeature, updateFeatureInCollection } from '../../store'
 
 export default class CreateFeatureMenuButton extends React.Component {
   state = {
@@ -36,7 +32,7 @@ export default class CreateFeatureMenuButton extends React.Component {
     const { dispatch } = this.props
 
     const makeNewAndEdit = (defaultProps) => {
-      const feature = { id: makeId(), source: 'civmap:no_source', ...defaultProps }
+      const feature = createFeature({ ...defaultProps })
       dispatch(updateFeatureInCollection(feature.source, feature))
       this.handleClose()
       dispatch(openEditMode(feature.id, feature.source))

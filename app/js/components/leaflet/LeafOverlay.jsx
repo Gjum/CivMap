@@ -60,7 +60,7 @@ export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureI
 
   // TODO separate RL.FeatureGroup per collection to reduce updates
   Object.values(collections).forEach(collection => {
-    const { enabled_presentation, features, presentations } = collection
+    const { enabled_presentation, features = {}, presentations = {} } = collection
 
     const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
     const presentation = presentations[enabled_presentation] || fallbackPresentation

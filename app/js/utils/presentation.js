@@ -96,6 +96,7 @@ export function convertStyle(styleIn) {
 }
 
 export const defaultPresentation = {
+  name: "(default)",
   style_base: {
     color: '$color|#ff8800',
     icon_size: 16,

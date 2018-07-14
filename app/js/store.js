@@ -1,3 +1,4 @@
+import Uuid from 'node-uuid'
 import { combineReducers } from 'redux'
 import { inspect } from 'util'
 
@@ -224,7 +225,17 @@ const collection = (state = defaultCollectionState, action) => {
   }
 }
 
-const collections = (state = {}, action) => {
+const defaultCollectionsState = {
+  'civmap:collection/user': {
+    source: "civmap:collection/user",
+    name: "My Markings",
+    features: {},
+    presentations: {},
+    enabled_presentation: true,
+  },
+}
+
+const collections = (state = defaultCollectionsState, action) => {
   switch (action.type) {
     case 'APP_LOAD': {
       if (!action.state.collections) return state
@@ -296,3 +307,9 @@ export function lookupFeature(state, featureId, collectionId) {
     })
   }
 }
+
+export const createFeature = (feature) => ({
+  id: Uuid.v4(),
+  source: 'civmap:collection/user',
+  ...feature,
+})
