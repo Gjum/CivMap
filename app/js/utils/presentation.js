@@ -46,6 +46,7 @@ export function calculateFeatureStyle({ feature, baseStyle, zoomStyle }) {
   for (let k in combinedStyle) {
     style[k] = calculateFeatureStyleProp(feature, combinedStyle[k])
   }
+  if (style.hue) style.color = `hsl(${style.hue}, 100%, 50%)`
   return style
 }
 
