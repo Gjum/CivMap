@@ -43,7 +43,7 @@
     "material-ui-icons": "^1.0.0-beta.36",
     "node-uuid": "^1.4.8",
     "react": "^15.6.2",
-    "react-dom": "^15.6.2",
+    "react-dom": "^16.0.1",
     "react-leaflet": "^1.9.1",
     "react-redux": "^5.0.7",
     "react-tap-event-plugin": "^2.0.1",
