@@ -85,7 +85,7 @@ export function lookupStyle(styleKey, { feature, baseStyle, zoomStyle }, default
 export function convertStyle(styleIn) {
   let { color, dash_array, fill_opacity, opacity, stroke_color, stroke_width } = styleIn
   const styleOut = {
-    color: stroke_color || color,
+    color: stroke_color || color || '#ff8800',
     dashArray: dash_array,
     fillColor: color,
     fillOpacity: fill_opacity !== undefined ? fill_opacity : opacity * .3,
