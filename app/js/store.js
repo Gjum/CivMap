@@ -6,7 +6,7 @@ import { importPositions } from './utils/importExport'
 import murmurhash3 from './utils/murmurhash3_gc' // TODO use longer hash for less collisions, or just don't accept features without id
 
 export const defaultControlState = {
-  appMode: 'BROWSE',
+  appMode: 'LAYERS',
   activeFeatureId: null,
   activeFeatureCollection: null,
   drawerOpen: false,
