@@ -6,6 +6,8 @@ export const defaultAppState = {
       biome: { name: 'Biome', id: 'biome', bgColor: '#000' },
       height: { name: 'Height', id: 'height', bgColor: '#888' },
       simple: { name: 'Simple', id: 'simple', bgColor: '#888' },
+      night: { name: 'Night', id: 'night', bgColor: '#000' },
+      light: { name: 'Light', id: 'light', bgColor: '#000' },
     },
     borderApothem: 13000,
     tilesRoot: 'https://raw.githubusercontent.com/ccmap/tiles/master/',
