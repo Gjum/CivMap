@@ -44,7 +44,7 @@ export function exportCollection(collection) {
   }
   const keepKeys = ['enabled_presentation', 'id', 'info', 'name', 'source']
   for (const key of keepKeys) {
-    if (collection[key] instanceof String) {
+    if (collection[key] !== undefined) {
       exportedCollection[key] = collection[key]
     }
   }
@@ -52,14 +52,16 @@ export function exportCollection(collection) {
 }
 
 export function autoImportCollectionsOnStartup(store) {
-  // XXX for each present collection: if source is url and is external: load from source
-  const defaultCollections = [
-    "data/settlements.civmap.json",
-    "data/mta_plots.civmap.json",
-  ]
-  defaultCollections.forEach(url => {
-    loadCollectionJsonAsync(url, store.dispatch)
-  })
+  for (const collection of Object.values(store.getState().collections)) {
+    const source = collection.source
+    if (!(typeof source === 'string')) continue
+    if (!source.startsWith('http://')
+      && !source.startsWith('https://')
+      && !source.startsWith('/')) {
+      continue
+    }
+    loadCollectionJsonAsync(source, store.dispatch)
+  }
 }
 
 const getDefaultUrlCollection = (feature = null) => ({

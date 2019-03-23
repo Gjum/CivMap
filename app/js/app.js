@@ -8,7 +8,7 @@ import AppFrame from './components/AppFrame'
 import { appLoad, combinedReducers } from './store'
 import { getAppStateFromLocalStorage, saveAppStateToLocalStorage } from './utils/localStorage'
 import { defaultAppState } from './utils/state'
-import { autoImportCollectionsOnStartup, loadAppStateFromUrlData, parseUrlHash } from './utils/importExport'
+import { autoImportCollectionsOnStartup, loadAppStateFromUrlData, parseUrlHash, loadCollectionJsonAsync } from './utils/importExport'
 
 // TODO encapsulate in init() function, pass branding options (defaults, texts, links etc.)
 const preloadedState = {}
@@ -28,6 +28,12 @@ if (location.hash) {
   // if (urlData.feature || urlData.collection) {
   location.hash = ""
   // }
+}
+
+if (!window.localStorage.getItem('CivMap.data.0.3.3')) {
+  for (const url of ["/data/settlements.civmap.json", "/data/mta_plots.civmap.json"]) {
+    loadCollectionJsonAsync(url, store.dispatch)
+  }
 }
 
 autoImportCollectionsOnStartup(store)
