@@ -119,7 +119,7 @@ class LeafMap extends React.Component {
 
 const mapStateToProps = ({ control, mapConfig, mapView }) => {
   return {
-    mapBgColor: mapConfig.basemaps[mapView.basemapId].bgColor,
+    mapBgColor: (mapConfig.basemaps[mapView.basemapId] || {}).bgColor,
     viewport: mapView.viewport,
     _appMode: control.appMode, // dummy, only to trigger a re-render
   }

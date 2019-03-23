@@ -36,8 +36,9 @@ export default class PassiveLabel extends React.PureComponent {
     // TODO configurable label font size, color, positioning, rotation, ...
     // TODO get offset from marker size
 
-    const labelText = lookupStyle("label", { feature, baseStyle, zoomStyle }, feature.name)
+    let labelText = lookupStyle("label", { feature, baseStyle, zoomStyle }, feature.name)
     if (!labelText) return
+    labelText = (labelText + '').replace(/\n/g, "<br />")
 
     this.icon = L.divIcon({
       className: 'leaflabel',

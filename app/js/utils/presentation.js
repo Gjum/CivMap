@@ -9,11 +9,15 @@
  * @param {StyleProp} styleProp
  */
 export function calculateFeatureStyleProp(feature, styleProp) {
+  // TODO contains($) -> replace ${x} with feature.x
   if ((typeof (styleProp) === 'string' || styleProp instanceof String) && styleProp.startsWith('\$')) {
     const [key, fallback] = styleProp.substr(1).split('\|')
     return feature[key] || fallback
   }
   if (!(styleProp instanceof Object)) {
+    return styleProp
+  }
+  if (Array.isArray(styleProp)) {
     return styleProp
   }
   const { feature_key, categories, range, default: defaultVal } = styleProp
