@@ -19,10 +19,33 @@ export function importPositions(positionsStr) {
 
 export function exportStringFromFeature(feature) {
   const f = { ...feature }
+  delete f.source
   if (f.line) f.line = exportPositions(f.line)
   if (f.polygon) f.polygon = exportPositions(f.polygon)
   // instead of encodeURIComponent, because here most special characters are fine
   return encodeURI(JSON.stringify(f)).replace(/#/g, '%23')
+}
+
+export function exportCollection(collection) {
+  const exportedCollection = {
+    features: Object.values(collection.features).map(f => {
+      const fc = { ...f }
+      delete fc.source
+      return fc
+    }),
+    presentations: Object.values(collection.presentations).map(p => {
+      const pc = { ...p }
+      delete pc.source
+      return pc
+    }),
+  }
+  const keepKeys = ['name', 'info', 'enabled_presentation']
+  for (const key of keepKeys) {
+    if (collection[key] instanceof String) {
+      exportedCollection[key] = collection[key]
+    }
+  }
+  return exportedCollection
 }
 
 export function autoImportCollectionsOnStartup(store) {
