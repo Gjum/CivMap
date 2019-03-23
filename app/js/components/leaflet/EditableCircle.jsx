@@ -54,7 +54,7 @@ export default class EditableCircle extends React.PureComponent {
     let { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
     editable = false // TODO fix radius marker projection
 
-    const { id, source, x, z, radius } = feature
+    const { id, collectionId, x, z, radius } = feature
     const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     if (!radius) {
@@ -64,7 +64,7 @@ export default class EditableCircle extends React.PureComponent {
         const [zNew, xNew] = intCoords(tempCircle.getLatLng())
         const radiusNew = Math.round(tempCircle.getRadius())
         tempCircle.remove()
-        this.props.dispatch(updateFeatureInCollection(this.props.feature.source, { ...this.props.feature, xNew, zNew, radiusNew }))
+        this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, xNew, zNew, radiusNew }))
       })
 
       return null
@@ -75,7 +75,7 @@ export default class EditableCircle extends React.PureComponent {
 
     return <RL.Circle
       ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       {...convertStyle(style)}
       center={[z + .5, x + .5]}
       radius={radius}

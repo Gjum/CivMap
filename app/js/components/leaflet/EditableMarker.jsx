@@ -72,7 +72,7 @@ export default class EditableMarker extends React.PureComponent {
   updatePositions = (e) => {
     const [x, z] = intCoords(this.featureRef.getLatLng())
     const { feature } = this.props
-    this.props.dispatch(updateFeatureInCollection(feature.source, { ...feature, x, z }))
+    this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, x, z }))
   }
 
   onRef(ref) {
@@ -86,7 +86,7 @@ export default class EditableMarker extends React.PureComponent {
 
   render() {
     const { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
-    const { id, source, x, z } = feature
+    const { id, collectionId, x, z } = feature
     const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     if (x === null || z === null) {
@@ -95,7 +95,7 @@ export default class EditableMarker extends React.PureComponent {
       tempMarker.on('editable:drawing:clicked', e => {
         const [x, z] = intCoords(tempMarker.getLatLng())
         tempMarker.remove()
-        this.props.dispatch(updateFeatureInCollection(this.props.feature.source, { ...this.props.feature, x, z }))
+        this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, x, z }))
       })
 
       return null
@@ -108,13 +108,13 @@ export default class EditableMarker extends React.PureComponent {
 
     if (this.icon) return <RL.Marker
       ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       position={[z + .5, x + .5]}
       icon={this.icon}
     />
     return <RL.Marker
       ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       position={[z + .5, x + .5]}
     />
   }

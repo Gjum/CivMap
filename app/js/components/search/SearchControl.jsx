@@ -49,6 +49,7 @@ class SearchControl extends React.PureComponent {
       )
     )
 
+    // TODO show matching string as secondary text
     // TODO sort search results
 
     const numResults = searchResults.length
@@ -69,14 +70,14 @@ class SearchControl extends React.PureComponent {
         {topResults.map((feature, i) => {
           return <ListItem button key={feature.id}
             onClick={() => {
-              dispatch(openFeatureDetail(feature.id, feature.source))
+              dispatch(openFeatureDetail(feature.id, feature.collectionId))
               dispatch(setViewport(rectBoundsFromFeature(feature)))
             }}
           >
             <ListItemText primary={feature.name || feature.label || feature.id || '(unnamed feature)'} />
             <ListItemSecondaryAction>
               <IconButton onClick={() => {
-                dispatch(highlightFeature(feature.id, feature.source))
+                dispatch(highlightFeature(feature.id, feature.collectionId))
                 dispatch(setViewport(rectBoundsFromFeature(feature)))
               }}>
                 <ShowOnMapIcon />

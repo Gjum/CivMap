@@ -7,11 +7,11 @@ describe("createFeature", () => {
     const store = createStore(combinedReducers)
     const feature = createFeature({ x: null, z: null })
 
-    store.dispatch(updateFeatureInCollection(feature.source, feature))
+    store.dispatch(updateFeatureInCollection(feature.collectionId, feature))
 
-    const source = 'civmap:collection/user'
-    expect(store.getState().collections).toHaveProperty([source])
-    const collection = store.getState().collections[source]
-    expect(Object.values(collection.features)[0]).toEqual({ ...feature, source: source })
+    const collectionId = 'civmap:collection/user'
+    expect(store.getState().collections).toHaveProperty([collectionId])
+    const collection = store.getState().collections[collectionId]
+    expect(Object.values(collection.features)[0]).toEqual({ ...feature, collectionId })
   })
 })

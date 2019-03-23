@@ -18,28 +18,31 @@ export function importPositions(positionsStr) {
 }
 
 export function exportStringFromFeature(feature) {
-  const f = { ...feature }
-  delete f.source
+  const f = exportFeature(feature)
   if (f.line) f.line = exportPositions(f.line)
   if (f.polygon) f.polygon = exportPositions(f.polygon)
   // instead of encodeURIComponent, because here most special characters are fine
   return encodeURI(JSON.stringify(f)).replace(/#/g, '%23')
 }
 
+export function exportFeature(feature) {
+  const fExport = { ...feature }
+  delete fExport.collectionId
+  return fExport
+}
+
+export function exportPresentation(presentation) {
+  const pExport = { ...presentation }
+  delete pExport.collectionId
+  return pExport
+}
+
 export function exportCollection(collection) {
   const exportedCollection = {
-    features: Object.values(collection.features).map(f => {
-      const fc = { ...f }
-      delete fc.source
-      return fc
-    }),
-    presentations: Object.values(collection.presentations).map(p => {
-      const pc = { ...p }
-      delete pc.source
-      return pc
-    }),
+    features: Object.values(collection.features).map(exportFeature),
+    presentations: Object.values(collection.presentations).map(exportPresentation),
   }
-  const keepKeys = ['name', 'info', 'enabled_presentation']
+  const keepKeys = ['enabled_presentation', 'id', 'info', 'name', 'source']
   for (const key of keepKeys) {
     if (collection[key] instanceof String) {
       exportedCollection[key] = collection[key]
@@ -49,6 +52,7 @@ export function exportCollection(collection) {
 }
 
 export function autoImportCollectionsOnStartup(store) {
+  // XXX for each present collection: if source is url and is external: load from source
   const defaultCollections = [
     "data/settlements.civmap.json",
     "data/mta_plots.civmap.json",
@@ -102,7 +106,7 @@ export function loadAppStateFromUrlData(urlData, store) {
     if (urlData.featureId) {
       const feature = lookupFeature(store.getState(), urlData.featureId, (urlCollectionData || {}).id)
       if (feature) {
-        store.dispatch(openFeatureDetail(feature.id, feature.source))
+        store.dispatch(openFeatureDetail(feature.id, feature.collectionId))
         if (!urlData.viewport) {
           const viewport = circleBoundsFromFeature(feature)
           store.dispatch(setViewport(viewport))
@@ -139,17 +143,9 @@ export function loadCollectionJson(data, dispatch, source) {
     source,
   })
 
-  collection.features.forEach(f => {
-    f.source = collection.source
-  })
-
-  collection.presentations.forEach(p => {
-    p.source = collection.source
-  })
-
   if (!collection.enabled_presentation && collection.presentations[0]) collection.enabled_presentation = collection.presentations[0].name
 
-  dispatch(importCollection(collection, collection.source))
+  dispatch(importCollection(collection))
 
   console.log(`Loaded collection with ${collection.features.length} features and ${collection.presentations.length} presentations at version "${collection.info.version}" from ${collection.source}`)
 

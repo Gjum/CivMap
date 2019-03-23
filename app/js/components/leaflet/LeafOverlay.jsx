@@ -28,10 +28,10 @@ export function getFeatureComponent(feature, zoom) {
 }
 
 function FeatureOverlayImage({ feature, dispatch }) {
-  const { id, source, map_image, style = {} } = feature
+  const { id, collectionId, map_image, style = {} } = feature
   const { url, bounds } = map_image
   return <RL.ImageOverlay
-    onclick={() => dispatch(openFeatureDetail(id, source))}
+    onclick={() => dispatch(openFeatureDetail(id, collectionId))}
     url={url}
     bounds={deepFlip(bounds)}
     {...style}
@@ -59,16 +59,28 @@ export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureI
   const featuresPresentations = {}
 
   // TODO separate RL.FeatureGroup per collection to reduce updates
+  // TODO lazily separate into zoom groups, reset that cache when features change
   Object.values(collections).forEach(collection => {
     const { enabled_presentation, features = {}, presentations = {} } = collection
-
-    if (!enabled_presentation) return
 
     const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
     const presentation = presentations[enabled_presentation] || fallbackPresentation
 
+    if (!enabled_presentation) {
+      if (highlightActiveFeature && activeFeatureCollection == collection.id) {
+        // show active/edited feature anyway
+        const feature = features[activeFeatureId]
+        featuresPresentations[feature.id] = {
+          feature,
+          baseStyle: presentation.style_base || defaultPresentation.style_base,
+          zoomStyle: presentation.style_highlight || defaultPresentation.style_highlight,
+        }
+      }
+      return
+    }
+
     Object.values(features).forEach(feature => {
-      if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.source) {
+      if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.collectionId) {
         featuresPresentations[feature.id] = {
           feature,
           baseStyle: presentation.style_base || defaultPresentation.style_base,
@@ -123,13 +135,12 @@ export const RealLeafOverlay = ({
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ control, collections }, { zoom }) => {
+const mapStateToProps = ({ control, collections }) => {
   return {
     activeFeatureId: control.activeFeatureId,
     activeFeatureCollection: control.activeFeatureCollection,
     appMode: control.appMode,
     collections,
-    zoom,
   }
 }
 

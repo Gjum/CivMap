@@ -5,6 +5,7 @@ import * as BROWSE from './browse'
 import * as EDIT from './edit'
 import * as FEATURE from './feature'
 import * as LAYERS from './layers'
+import * as COLLECTION from './collection'
 import * as SEARCH from './search'
 
 import AppBar from './AppBar'
@@ -17,6 +18,7 @@ const modes = {
   EDIT,
   FEATURE,
   LAYERS,
+  COLLECTION,
   SEARCH,
 }
 

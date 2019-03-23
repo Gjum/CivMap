@@ -3,10 +3,11 @@ import { combineReducers } from 'redux'
 import { inspect } from 'util'
 
 import { importPositions } from './utils/importExport'
-import murmurhash3 from './utils/murmurhash3_gc' // TODO use longer hash for less collisions, or just don't accept features without id
+import murmurhash3 from './utils/murmurhash3_gc'
 
 export const defaultControlState = {
   appMode: 'LAYERS',
+  activeCollectionId: null,
   activeFeatureId: null,
   activeFeatureCollection: null,
   drawerOpen: false,
@@ -39,12 +40,14 @@ const control = (state = defaultControlState, action) => {
       return { ...state, drawerOpen: false, appMode: 'BROWSE' }
     case 'OPEN_EDIT_MODE':
       return { ...state, drawerOpen: false, appMode: 'EDIT', activeFeatureId: action.featureId, activeFeatureCollection: action.collectionId }
+    case 'OPEN_COLLECTION':
+      return { ...state, drawerOpen: false, appMode: 'COLLECTION', activeCollectionId: action.collectionId }
     case 'OPEN_FEATURE_DETAIL':
       return { ...state, drawerOpen: false, appMode: 'FEATURE', activeFeatureId: action.featureId, activeFeatureCollection: action.collectionId }
     case 'OPEN_LAYERS':
       return { ...state, drawerOpen: false, appMode: 'LAYERS' }
     case 'OPEN_SEARCH':
-      return { ...state, drawerOpen: false, appMode: 'SEARCH', searchQuery: action.query }
+      return { ...state, drawerOpen: false, appMode: 'SEARCH', searchQuery: action.query, activeFeatureId: null }
 
     default:
       return state
@@ -61,7 +64,7 @@ export const openFeatureDetail = (featureId, collectionId) => ({ type: 'OPEN_FEA
 
 export const openLayers = () => ({ type: 'OPEN_LAYERS' })
 
-export const openPresentationEdit = (presentationId) => alert('layer editing is not implemented yet') || ({ type: 'OPEN_PRESENTATION', presentationId })
+export const openCollectionEdit = (collectionId) => ({ type: 'OPEN_COLLECTION', collectionId })
 
 export const openSearch = (query = "") => ({ type: 'OPEN_SEARCH', query })
 
@@ -140,16 +143,22 @@ const mapConfig = (state = defaultMapConfig, action) => {
   }
 }
 
+/** @typedef {{id: String, [propertyName: String]: Any}} Feature */
+
+/**
+ * @param {Feature} state
+ * @returns Feature
+ */
 const feature = (state, action) => {
   switch (action.type) {
     case 'UPDATE_FEATURE_IN_COLLECTION':
+      // TODO use longer fallback hash for less collisions, or just don't accept features without id
       const f = {
         ...action.feature,
         id: action.feature.id || murmurhash3(JSON.stringify(action.feature), 1),
       }
       if (f.line && !Array.isArray(f.line)) f.line = importPositions(f.line)
       if (f.polygon && !Array.isArray(f.polygon)) f.polygon = importPositions(f.polygon)
-      if (f.type && !f.category) f.category = f.type
       return f
     default:
       return state
@@ -172,47 +181,68 @@ const features = (state = {}, action) => {
   }
 }
 
+/** @typedef {String} PresentationId */
+/** @typedef {{enabled_presentation: PresentationId, features: {[id: String]: Feature}, id: String, info: any, name: String, persistent: Boolean, presentations: {[name: String]: Presentation}, source: String}} Collection */
+/** @typedef {{enabled_presentation: PresentationId, features: [Feature], id: String, info: any, name: String, presentations: {[name: String]: Presentation}}} CollectionJson */
+
+/** @type {Collection} */
 const defaultCollectionState = {
   enabled_presentation: null,
   features: {},
+  id: null,
+  info: {},
   name: '(unnamed)',
+  persistent: false,
   presentations: {},
-  source: 'civmap:no_source',
+  source: null,
 }
 
+/**
+ * @param {Collection} state
+ * @returns Collection
+ */
 const collection = (state = defaultCollectionState, action) => {
   switch (action.type) {
+    case 'UPDATE_COLLECTION': {
+      return { ...state, ...action.collection }
+    }
+
     case 'IMPORT_COLLECTION': {
-      const source = action.collectionId || action.collection.source
+      /** @type CollectionJson */
+      const collection = action.collection
+      /** @type Collection */
       const newState = {
         ...state,
-        ...action.collection,
-        source, // precedence
+        ...collection,
+        id: action.collectionId, // precedence
+        persistent: action.persistent, // precedence
         features: {}, // override list with object for indexing
         presentations: {}, // override list with object for indexing
-        editable: action.editable,
-        persistent: action.persistent,
       }
-      if (action.collection.features) action.collection.features.forEach(f => {
-        const newFeature = feature(null, updateFeatureInCollection(newState.source, f))
-        newState.features[newFeature.id] = { ...newFeature, source }
+      if (state !== defaultCollectionState) {
+        newState.enabled_presentation = state.enabled_presentation
+      }
+      const collectionId = action.collectionId
+      if (collection.features) collection.features.forEach(f => {
+        const newFeature = feature(null, updateFeatureInCollection(collectionId, f))
+        newState.features[newFeature.id] = { ...newFeature, collectionId }
       })
-      if (action.collection.presentations) action.collection.presentations.forEach(p => {
-        const newPresentation = p // XXX presentation(null, updatePresentationInCollection(newState.source, p))
-        newState.presentations[newPresentation.name] = { ...newPresentation, source }
+      if (collection.presentations) collection.presentations.forEach(p => {
+        const newPresentation = p // XXX presentation(null, updatePresentationInCollection(collectionId, p))
+        newState.presentations[newPresentation.name] = { ...newPresentation, collectionId }
       })
       return newState
     }
 
     case 'REMOVE_FEATURE_IN_COLLECTION':
     case 'UPDATE_FEATURE_IN_COLLECTION': {
-      if (state.source !== (action.collectionId || action.feature.source)) return state
+      if (state.id !== (action.collectionId || action.feature.id)) return state
       return { ...state, features: features(state.features, action) }
     }
 
     case 'ENABLE_PRESENTATION': {
       if (state.enabled_presentation === action.presentationId) return state // already enabled
-      if (!state.presentations[action.presentationId]) return state // invalid id
+      if (Object.keys(state.presentations || {}).length && !state.presentations[action.presentationId]) return state // invalid id
       return { ...state, enabled_presentation: action.presentationId }
     }
 
@@ -225,9 +255,11 @@ const collection = (state = defaultCollectionState, action) => {
   }
 }
 
+/** @typedef {{[id: String]: Collection}} Collections */
+
 const defaultCollectionsState = {
   'civmap:collection/user': {
-    source: "civmap:collection/user",
+    id: "civmap:collection/user",
     name: "My Markings",
     features: {},
     presentations: {},
@@ -235,6 +267,10 @@ const defaultCollectionsState = {
   },
 }
 
+/**
+ * @param {Collections} state
+ * @returns Collections
+ */
 const collections = (state = defaultCollectionsState, action) => {
   switch (action.type) {
     case 'APP_LOAD': {
@@ -248,11 +284,12 @@ const collections = (state = defaultCollectionsState, action) => {
         return state // require collection id
       }
       const newCollection = collection(state[action.collectionId], action)
-      return { ...state, [newCollection.source]: newCollection }
+      return { ...state, [newCollection.id]: newCollection }
     }
 
     case 'ENABLE_PRESENTATION':
     case 'DISABLE_PRESENTATION':
+    case 'UPDATE_COLLECTION':
     case 'REMOVE_FEATURE_IN_COLLECTION':
     case 'UPDATE_FEATURE_IN_COLLECTION': {
       if (!state[action.collectionId]) {
@@ -260,7 +297,13 @@ const collections = (state = defaultCollectionsState, action) => {
         return state // only update existing collections
       }
       const newCollection = collection(state[action.collectionId], action)
-      return { ...state, [newCollection.source]: newCollection }
+      return { ...state, [newCollection.id]: newCollection }
+    }
+
+    case 'REMOVE_COLLECTION': {
+      const newState = { ...state }
+      delete newState[action.collectionId]
+      return newState
     }
 
     default:
@@ -270,13 +313,18 @@ const collections = (state = defaultCollectionsState, action) => {
 
 export const appLoad = (state) => ({ type: 'APP_LOAD', state })
 
-export const importCollection = (collection, collectionId = null) => ({
+export const importCollection = (collection, persistent = false) => ({
   type: 'IMPORT_COLLECTION',
   collection,
-  collectionId: collectionId || collection.id,
+  collectionId: collection.id || collection.source,
+  persistent,
 })
 
 export const removeFeatureInCollection = (collectionId, featureId) => ({ type: 'REMOVE_FEATURE_IN_COLLECTION', collectionId, featureId })
+
+export const removeCollection = (collectionId) => ({ type: 'REMOVE_COLLECTION', collectionId })
+
+export const updateCollection = (collection) => ({ type: 'UPDATE_COLLECTION', collection, collectionId: collection.id })
 
 export const updateFeatureInCollection = (collectionId, feature, featureId = undefined) => ({
   type: 'UPDATE_FEATURE_IN_COLLECTION',
@@ -296,20 +344,21 @@ export const combinedReducers = combineReducers({
   mapView,
 })
 
-// XXX
 export function lookupFeature(state, featureId, collectionId) {
-  if (collectionId) {
-    return state.collections[collectionId].features[featureId]
-  } else {
-    Object.values(state.collections).forEach(collection => {
-      const feature = collection.features[featureId]
-      if (feature) return feature
-    })
+  const collection = state.collections[collectionId]
+  if (collection) {
+    const feature = collection.features[featureId]
+    if (feature) return feature
+  }
+  for (const collection of Object.values(state.collections)) {
+    const feature = collection.features[featureId]
+    if (feature) return feature
   }
 }
 
+// XXX should be action, not just constructor
 export const createFeature = (feature) => ({
   id: Uuid.v4(),
-  source: 'civmap:collection/user',
+  collectionId: 'civmap:collection/user',
   ...feature,
 })

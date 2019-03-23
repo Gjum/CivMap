@@ -33,7 +33,7 @@ export function processVoxelWaypointsFile(file, dispatch) {
 export function processVoxelWaypointsText(text, dispatch, source) {
   // name, x, z, y, enabled, red, green, blue, suffix, world, dimensions
   const features = text.split('\n')
-    .filter(line => line.includes('x:'))
+    .filter(line => line.includes(',z:'))
     .map(line => {
       const p = {}
       line.split(',').map(entry => {
@@ -57,15 +57,16 @@ export function processVoxelWaypointsText(text, dispatch, source) {
         ...p,
         id: fid,
         color,
-        category: "waypoint",
       }
     })
 
   // TODO instead, add to existing collection
   dispatch(importCollection({
     features,
+    // XXX allow importing+viewing multiple snitch files in parallel
     name: 'My VoxelMap Waypoints',
-    source: 'civmap:collection/waypoint/voxelmap',
+    id: 'civmap:collection/waypoint/voxelmap',
+    source,
     enabled_presentation: 'Waypoints',
     presentations: [{
       "name": "Waypoints",
@@ -109,7 +110,6 @@ export function processSnitchMasterFile(file, dispatch) {
           id: fid,
           polygon: [[[x - 11, z - 11], [x + 12, z - 11], [x + 12, z + 12], [x - 11, z + 12]]],
           name, x, y, z, world, source, group, cull,
-          category: "snitch",
           from_snitchmaster: true,
         }
       })
@@ -117,8 +117,10 @@ export function processSnitchMasterFile(file, dispatch) {
     // TODO instead, add to existing collection
     dispatch(importCollection({
       features,
+      // XXX allow importing+viewing multiple snitch files in parallel
       name: 'My Snitches',
-      source: 'civmap:collection/snitches',
+      id: 'civmap:collection/snitches',
+      source: file.name,
       enabled_presentation: 'Snitches',
       presentations: [
         {

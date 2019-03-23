@@ -14,6 +14,7 @@ import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
 import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature } from '../store'
 
 const AppBar = ({
+  collection,
   appMode,
   feature,
   searchQuery,
@@ -41,9 +42,9 @@ const AppBar = ({
     }
 
     <IconButton onClick={() => {
-      if (appMode === 'FEATURE' && feature && feature.source) {
+      if (appMode === 'FEATURE' && feature && collection && collection.source) {
         const name = encodeURIComponent(feature.name || '')//.replace('%20', '_')
-        location.hash = `#q=${name}#f=${encodeURIComponent(feature.id)}#url=${encodeURIComponent(feature.source)}`
+        location.hash = `#q=${name}#f=${encodeURIComponent(feature.id)}#url=${encodeURIComponent(collection.source)}`
       } else if (appMode === 'SEARCH' && searchQuery) {
         location.hash = `#q=${encodeURIComponent(searchQuery)}`
       } else {
@@ -57,7 +58,7 @@ const AppBar = ({
 
     {appMode === 'FEATURE' ?
       <IconButton onClick={() => {
-        dispatch(openEditMode(feature.id, feature.source))
+        dispatch(openEditMode(feature.id, feature.collectionId))
       }}>
         <EditIcon />
       </IconButton>
@@ -78,11 +79,13 @@ const AppBar = ({
 }
 
 const mapStateToProps = (state) => {
-  const { control, mapView } = state
+  const { collections, control, mapView } = state
+  const { activeFeatureCollection, activeFeatureId, appMode, searchQuery } = control
   return {
-    appMode: control.appMode,
-    feature: lookupFeature(state, control.activeFeatureId, control.activeFeatureCollection),
-    searchQuery: control.searchQuery,
+    appMode: appMode,
+    collection: collections[activeFeatureCollection],
+    feature: lookupFeature(state, activeFeatureId, activeFeatureCollection),
+    searchQuery: searchQuery,
     viewport: mapView.viewport,
   }
 }

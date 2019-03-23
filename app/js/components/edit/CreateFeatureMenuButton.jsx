@@ -33,9 +33,9 @@ export default class CreateFeatureMenuButton extends React.Component {
 
     const makeNewAndEdit = (defaultProps) => {
       const feature = createFeature({ ...defaultProps })
-      dispatch(updateFeatureInCollection(feature.source, feature))
+      dispatch(updateFeatureInCollection(feature.collectionId, feature))
       this.handleClose()
-      dispatch(openEditMode(feature.id, feature.source))
+      dispatch(openEditMode(feature.id, feature.collectionId))
     }
 
     return <div>

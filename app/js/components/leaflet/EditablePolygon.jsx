@@ -44,7 +44,7 @@ export default class EditablePolygon extends React.PureComponent {
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
     // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
-    this.props.dispatch(updateFeatureInCollection(feature.source, { ...feature, polygon: positions }))
+    this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, polygon: positions }))
   }
 
   onRef = (ref) => {
@@ -58,7 +58,7 @@ export default class EditablePolygon extends React.PureComponent {
 
   render() {
     const { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
-    const { id, source, polygon } = feature
+    const { id, collectionId, polygon } = feature
     const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     // let leaflet internals finish updating before we interact with it
@@ -66,7 +66,7 @@ export default class EditablePolygon extends React.PureComponent {
 
     return <RL.Polygon
       ref={this.onRef}
-      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       {...convertStyle(style)}
       positions={!polygon ? [] : deepFlip(polygon)}
     />

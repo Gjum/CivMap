@@ -43,7 +43,7 @@ export default class EditableLine extends React.PureComponent {
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
     // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
-    this.props.dispatch(updateFeatureInCollection(feature.source, { ...feature, line: positions }))
+    this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, line: positions }))
   }
 
   onRef = (ref) => {
@@ -57,7 +57,7 @@ export default class EditableLine extends React.PureComponent {
 
   render() {
     let { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
-    const { id, source, line } = feature
+    const { id, collectionId, line } = feature
     const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
 
     // let leaflet internals finish updating before we interact with it
@@ -65,7 +65,7 @@ export default class EditableLine extends React.PureComponent {
 
     return <RL.Polyline
       ref={this.onRef}
-      onclick={() => editable || dispatch(openFeatureDetail(id, source))}
+      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       {...convertStyle(style)}
       positions={!line ? [] : centered(deepFlip(line))}
     />

@@ -34,15 +34,15 @@ export class RealFeatureEditor extends React.Component {
       <div style={{ margin: '16px' }}>
 
         <Button variant='raised' onClick={() => {
-          dispatch(updateFeatureInCollection(feature.source, originalFeature, feature.id))
-          dispatch(openEditMode(originalFeature.id, originalFeature.source))
+          dispatch(updateFeatureInCollection(feature.collectionId, originalFeature, feature.id))
+          dispatch(openEditMode(originalFeature.id, originalFeature.collectionId))
         }}>
           <ResetIcon />
           Reset
         </Button>
 
         <Button variant='raised' onClick={() => {
-          dispatch(removeFeatureInCollection(feature.source, feature.id))
+          dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
           dispatch(openBrowseMode()) // TODO show similar features in search results instead
         }}>
           <DeleteIcon />
@@ -50,7 +50,7 @@ export class RealFeatureEditor extends React.Component {
         </Button>
 
         <Button variant='raised' onClick={() => {
-          dispatch(openFeatureDetail(feature.id, feature.source))
+          dispatch(openFeatureDetail(feature.id, feature.collectionId))
         }}>
           <CheckIcon />
           Save
@@ -61,13 +61,13 @@ export class RealFeatureEditor extends React.Component {
             <Button variant='raised' onClick={() => {
               const f = { ...feature, line: feature.polygon }
               delete f.polygon
-              dispatch(updateFeatureInCollection(f.source, f))
+              dispatch(updateFeatureInCollection(f.collectionId, f))
             }}><LineIcon />Convert to line</Button>
             : feature.line !== undefined ?
               <Button variant='raised' onClick={() => {
                 const f = { ...feature, polygon: feature.line }
                 delete f.line
-                dispatch(updateFeatureInCollection(f.source, f))
+                dispatch(updateFeatureInCollection(f.collectionId, f))
               }}><PolygonIcon />Convert to area</Button>
               : null
         }
@@ -77,14 +77,14 @@ export class RealFeatureEditor extends React.Component {
             const featureNew = { ...feature }
             if (feature.polygon) featureNew.polygon = reversePolyPositions(feature.polygon)
             if (feature.line) featureNew.line = reversePolyPositions(feature.line)
-            dispatch(updateFeatureInCollection(feature.source, featureNew))
+            dispatch(updateFeatureInCollection(feature.collectionId, featureNew))
           }}><SwapIcon />Reverse line/area direction</Button>
         }
 
         <TextField autoFocus fullWidth
           label="Name"
           value={String(feature.name || '')}
-          onChange={e => dispatch(updateFeatureInCollection(feature.source, { ...feature, name: e.target.value }))}
+          onChange={e => dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, name: e.target.value }))}
           style={{ margin: '16px 0px' }}
         />
 
@@ -95,8 +95,8 @@ export class RealFeatureEditor extends React.Component {
           data={feature}
           onChange={(newFeature) => {
             // TODO validate feature
-            dispatch(updateFeatureInCollection(feature.source, newFeature, feature.id))
-            dispatch(openEditMode(newFeature.id, feature.source))
+            dispatch(updateFeatureInCollection(feature.collectionId, newFeature, feature.id))
+            dispatch(openEditMode(newFeature.id, feature.collectionId))
           }}
         />
       </div>
@@ -104,22 +104,6 @@ export class RealFeatureEditor extends React.Component {
   }
 }
 
-
-function closestStop(position, features) {
-  const [fz, fx] = position
-  let stopId = null
-  let minDist = 200 // won't search further than this
-  features.filter(f => f.rail_stop_id)
-    .forEach(f => {
-      const [ax, az] = [f.x, f.z]
-      const da = Math.abs(az - fz) + Math.abs(ax - fx)
-      if (minDist > da) {
-        minDist = da
-        stopId = f.rail_stop_id
-      }
-    })
-  return stopId
-}
 
 const mapStateToProps = (state) => {
   const { control } = state

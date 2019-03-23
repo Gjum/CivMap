@@ -49,7 +49,7 @@ const FeatureProps = ({ feature }) => {
       // TODO prefer `image` but also preview `mapImage.url`
     } else if (key === 'style') {
       // TODO show compact style (color etc)
-    } else if (key === 'source') {
+    } else if (key === 'collectionId') {
       // TODO show collection name
     } else if (key === 'category') { // already shown
     } else if ('XxZz'.includes(key)) { // don't show x/z in props
@@ -84,7 +84,7 @@ const FeatureProps = ({ feature }) => {
   </div>
 }
 
-const FeatureInfo = ({
+const RealFeatureInfo = ({
   feature,
   dispatch,
 }) => {
@@ -112,7 +112,7 @@ const FeatureInfo = ({
       </Button>
 
       <Button variant='raised' onClick={() => {
-        dispatch(removeFeatureInCollection(feature.source, feature.id))
+        dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
         dispatch(openBrowseMode()) // TODO show similar features in search results instead
       }}>
         <DeleteIcon />
@@ -129,4 +129,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(FeatureInfo)
+export default connect(mapStateToProps)(RealFeatureInfo)

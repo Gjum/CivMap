@@ -8,21 +8,26 @@ import EditIcon from 'material-ui-icons/Edit'
 import InvisibleIcon from 'material-ui-icons/VisibilityOff'
 import VisibleIcon from 'material-ui-icons/Visibility'
 
-import { disablePresentationInCollection, enablePresentationInCollection, openPresentationEdit } from '../../store'
+import { disablePresentationInCollection, enablePresentationInCollection, openCollectionEdit } from '../../store'
 
-const Layer = ({ dispatch, presentation, enabled_presentation }) => {
+// TODO better visually distinguish multi-layer collections from single-layer collections
+
+const Layer = ({ dispatch, collection, presentation, enabled_presentation }) => {
   if (!presentation) return null
 
   const isEnabled = enabled_presentation === presentation.name || enabled_presentation === true
 
   return <ListItem button onClick={() => {
-    if (isEnabled) dispatch(disablePresentationInCollection(presentation.source, presentation.name))
-    else dispatch(enablePresentationInCollection(presentation.source, presentation.name))
+    if (isEnabled) dispatch(disablePresentationInCollection(collection.id, presentation.name))
+    else dispatch(enablePresentationInCollection(collection.id, presentation.name))
   }}>
     <ListItemIcon>{isEnabled ? <VisibleIcon /> : <InvisibleIcon />}</ListItemIcon>
     <ListItemText primary={presentation.name} />
     <ListItemSecondaryAction>
-      <IconButton onClick={() => dispatch(openPresentationEdit(presentation.name))}>
+      <IconButton onClick={() =>
+        // TODO dispatch(openPresentationEdit(presentation.name))
+        dispatch(openCollectionEdit(collection.id))
+      }>
         <EditIcon />
       </IconButton>
     </ListItemSecondaryAction>
@@ -40,8 +45,8 @@ const PresentationsForCollection = ({ dispatch, collection }) => {
   }
 
   if (presentations.length <= 1) {
-    const presentation = presentations[0] || { name: collection.name, source: collection.source }
-    return <Layer {...{ dispatch, presentation, enabled_presentation }} />
+    const presentation = presentations[0] || { name: collection.name, id: collection.id }
+    return <Layer {...{ dispatch, collection, presentation, enabled_presentation }} />
   }
 
   return <div>
@@ -50,24 +55,20 @@ const PresentationsForCollection = ({ dispatch, collection }) => {
     </ListItem>
     <List disablePadding>
       {presentations.map((presentation) =>
-        <Layer {...{ dispatch, presentation, enabled_presentation }} key={presentation.name} />
+        <Layer {...{ dispatch, collection, presentation, enabled_presentation }} key={presentation.name} />
       )}
     </List>
   </div>
 }
 
-class LayersControl extends React.PureComponent {
+class RealLayersControl extends React.PureComponent {
   constructor(props) {
     super(props)
     const enabledCollections = Object.values(props.collections).filter(c => (c.presentations || {})[c.enabled_presentation])
     const disabledCollections = Object.values(props.collections).filter(c => !(c.presentations || {})[c.enabled_presentation])
     this.state = {
-      layerOrder: [...enabledCollections, ...disabledCollections].map(({ source }) => source),
+      layerOrder: [...enabledCollections, ...disabledCollections].map(({ id }) => id),
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // TODO handle collections getting added/removed
   }
 
   render() {
@@ -80,7 +81,7 @@ class LayersControl extends React.PureComponent {
 
     return <div>
       <List disablePadding>
-        {layerOrder.map(source => <PresentationsForCollection dispatch={dispatch} collection={collections[source]} key={source} />)}
+        {layerOrder.map(id => <PresentationsForCollection dispatch={dispatch} collection={collections[id]} key={id} />)}
       </List>
     </div>
   }
@@ -92,4 +93,4 @@ const mapStateToProps = ({ collections }) => {
   }
 }
 
-export default connect(mapStateToProps)(LayersControl)
+export default connect(mapStateToProps)(RealLayersControl)

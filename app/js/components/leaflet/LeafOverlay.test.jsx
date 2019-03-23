@@ -3,7 +3,7 @@ import { selectRenderedFeatures } from './LeafOverlay'
 const featureBase = { id: 'test_id', x: 123, z: -123 }
 
 const collectionBase = {
-  id: "civmap:url_import",
+  id: "test_collection_id",
   name: "Linked to me",
   mode: "temporary",
   enabled_presentation: null,
@@ -37,10 +37,26 @@ describe("LeafOverlay.selectRenderedFeatures", () => {
       collections: { [collection.id]: collection },
     })
 
-    expect(rendered).toHaveProperty('test_id')
-    expect(rendered.test_id).toHaveProperty('baseStyle')
-    expect(rendered.test_id).toHaveProperty('zoomStyle')
-    expect(rendered.test_id).toHaveProperty('feature')
-    expect(rendered.test_id.feature).toEqual(featureBase)
+    expect(rendered).toHaveProperty(featureBase.id)
+    expect(rendered[featureBase.id]).toHaveProperty('baseStyle')
+    expect(rendered[featureBase.id]).toHaveProperty('zoomStyle')
+    expect(rendered[featureBase.id]).toHaveProperty('feature')
+    expect(rendered[featureBase.id].feature).toEqual(featureBase)
+  })
+
+  it("always shows active feature", () => {
+    const collection = {
+      ...collectionBase,
+      enabled_presentation: null,
+    }
+
+    const rendered = selectRenderedFeatures({
+      activeFeatureCollection: collection.id, activeFeatureId: featureBase.id,
+      appMode: 'FEATURE', zoom: 0,
+      collections: { [collection.id]: collection },
+    })
+
+    expect(rendered).toHaveProperty(featureBase.id)
+    expect(rendered[featureBase.id].feature).toEqual(featureBase)
   })
 })

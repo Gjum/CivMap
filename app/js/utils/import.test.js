@@ -1,9 +1,9 @@
 import { createStore } from 'redux'
 
-import { loadAppStateFromUrlData } from './importExport'
+import { autoImportCollectionsOnStartup, loadAppStateFromUrlData } from './importExport'
 import { processCollectionFile } from './importFile'
 import murmurhash3 from './murmurhash3_gc'
-import { combinedReducers } from '../store'
+import { combinedReducers, importCollection } from '../store'
 
 jest.mock('./net')
 
@@ -18,11 +18,11 @@ describe("loadAppStateFromUrlData", () => {
     loadAppStateFromUrlData({ feature: { ...feature } }, store)
 
     const generatedFeatureId = murmurhash3(JSON.stringify(feature), 1)
-    const source = 'civmap:url_import'
+    const id = 'civmap:url_import'
 
-    expect(store.getState().collections).toHaveProperty([source])
-    const collection = store.getState().collections[source]
-    expect(Object.values(collection.features)[0]).toEqual({ ...feature, id: generatedFeatureId, source: source })
+    expect(store.getState().collections).toHaveProperty([id])
+    const collection = store.getState().collections[id]
+    expect(Object.values(collection.features)[0]).toEqual({ ...feature, id: generatedFeatureId, collectionId: id })
   })
 
   it("imports collection from url", () => {
@@ -33,13 +33,14 @@ describe("loadAppStateFromUrlData", () => {
       features: [{ ...feature }],
     })
     const collectionUrl = 'test://url.please/ignore'
+    const cid = collectionUrl
 
     loadAppStateFromUrlData({ collectionUrl }, store)
 
-    expect(store.getState().collections).toHaveProperty([collectionUrl])
-    const collection = store.getState().collections[collectionUrl]
+    expect(store.getState().collections).toHaveProperty([cid])
+    const collection = store.getState().collections[cid]
     expect(collection.features).toHaveProperty([feature.id])
-    expect(collection.features[feature.id]).toEqual({ ...feature, source: collectionUrl })
+    expect(collection.features[feature.id]).toEqual({ ...feature, collectionId: cid })
   })
 })
 
@@ -59,7 +60,7 @@ describe("processCollectionFile", () => {
       expect(store.getState().collections).toHaveProperty([cid])
       const collection = store.getState().collections[cid]
       expect(collection.features).toHaveProperty([feature.id])
-      expect(collection.features[feature.id]).toEqual({ ...feature, source: cid })
+      expect(collection.features[feature.id]).toEqual({ ...feature, collectionId: cid })
     })
   })
 })
