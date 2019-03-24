@@ -26,7 +26,7 @@ export function exportStringFromFeature(feature) {
 }
 
 export function exportFeature(feature) {
-  const fExport = { ...feature }
+  const fExport = { name: feature.name, ...feature }
   delete fExport.collectionId
   return fExport
 }
@@ -94,7 +94,6 @@ export function loadAppStateFromUrlData(urlData, store) {
     }
     // TODO move into view if collectionUrl but no viewport is set
     if (urlData.collection) {
-      // TODO move into view if no viewport is set
       loadCollectionJson(urlData.collection, store, 'civmap:url_import/collection')
     }
     if (urlData.feature) {
@@ -114,7 +113,7 @@ export function loadAppStateFromUrlData(urlData, store) {
           store.dispatch(setViewport(viewport))
         }
       } else {
-        // TODO handle error
+        console.warn(`Could not find feature by id from hash: ${urlData.featureId}`)
       }
     }
     if (urlData.viewport) {
