@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import * as RL from 'react-leaflet'
 
 import EditableCircle from './EditableCircle'
+import EditableImage from './EditableImage';
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
@@ -16,7 +17,7 @@ export function getFeatureComponent(feature, zoom) {
   // TODO take zoom vs size into account
 
   // order matters: first matching determines display mode
-  if (has('map_image')) return FeatureOverlayImage
+  if (has('map_image')) return EditableImage
   if (has('polygon')) return EditablePolygon
   if (has('line')) return EditableLine
   if (has('x') && has('z')) {
@@ -25,17 +26,6 @@ export function getFeatureComponent(feature, zoom) {
   }
 
   return null
-}
-
-function FeatureOverlayImage({ feature, dispatch }) {
-  const { id, collectionId, map_image, style = {} } = feature
-  const { url, bounds } = map_image
-  return <RL.ImageOverlay
-    onclick={() => dispatch(openFeatureDetail(id, collectionId))}
-    url={url}
-    bounds={deepFlip(bounds)}
-    {...style}
-  />
 }
 
 function doesFeatureHaveLabel(featureWithStyles) {
