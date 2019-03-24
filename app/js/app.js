@@ -2,6 +2,7 @@ import throttle from 'lodash/throttle'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
+import injectTapEventPlugin from 'react-tap-event-plugin';
 import { createStore } from 'redux'
 
 import AppFrame from './components/AppFrame'
@@ -10,6 +11,10 @@ import { getAppStateFromLocalStorage, saveAppStateToLocalStorage } from './utils
 import { autoImportCollectionsOnStartup, loadAppStateFromUrlData, parseUrlHash, loadCollectionJsonAsync } from './utils/importExport'
 
 export function start(config) {
+  // Needed for onTouchTap
+  // http://stackoverflow.com/a/34015469/988941
+  injectTapEventPlugin();
+
   const store = createStore(combinedReducers, {},
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
