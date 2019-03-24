@@ -30,13 +30,11 @@ if (location.hash) {
   // }
 }
 
-if (!window.localStorage.getItem('CivMap.data.0.3.3')) {
-  for (const url of ["/data/settlements.civmap.json", "/data/mta_plots.civmap.json"]) {
-    loadCollectionJsonAsync(url, store.dispatch)
-  }
-}
-
 autoImportCollectionsOnStartup(store)
+
+loadCollectionJsonAsync("/data/settlements.civmap.json", store.dispatch)
+loadCollectionJsonAsync("/data/rails.civmap.json", store.dispatch)
+loadCollectionJsonAsync("/data/political.civmap.json", store.dispatch)
 
 store.subscribe(throttle(
   () => saveAppStateToLocalStorage(store.getState()),

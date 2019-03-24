@@ -1,3 +1,5 @@
+import { currentVersion } from "./convertFromOld";
+
 export const defaultAppState = {
   mapConfig: {
     basemapPreview: '/z-2/0,0.png',
