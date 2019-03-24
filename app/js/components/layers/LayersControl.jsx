@@ -61,13 +61,16 @@ const PresentationsForCollection = ({ dispatch, collection }) => {
   </div>
 }
 
-class RealLayersControl extends React.PureComponent {
+class RealLayersControl extends React.Component {
   constructor(props) {
     super(props)
+    // remember initial ordering, so entries don't move around while open
     const enabledCollections = Object.values(props.collections).filter(c => (c.presentations || {})[c.enabled_presentation])
     const disabledCollections = Object.values(props.collections).filter(c => !(c.presentations || {})[c.enabled_presentation])
+    enabledCollections.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
+    disabledCollections.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
     this.state = {
-      layerOrder: [...enabledCollections, ...disabledCollections].map(({ id }) => id),
+      initialOrder: [...enabledCollections, ...disabledCollections].map(({ id }) => id),
     }
   }
 
@@ -77,11 +80,20 @@ class RealLayersControl extends React.PureComponent {
       dispatch,
     } = this.props
 
-    const { layerOrder } = this.state
+    const { initialOrder } = this.state
+
+    // remove collections that have gone away after opening
+    const initialExistant = initialOrder.filter(id => this.props.collections[id])
+
+    // add collections that were created after opening
+    const newCollections = Object.keys(this.props.collections)
+      .filter(id => !initialOrder.includes(id))
+
+    const currentOrder = [...initialExistant, ...newCollections]
 
     return <div>
       <List disablePadding>
-        {layerOrder.map(id => <PresentationsForCollection dispatch={dispatch} collection={collections[id]} key={id} />)}
+        {currentOrder.map(id => <PresentationsForCollection dispatch={dispatch} collection={collections[id]} key={id} />)}
       </List>
     </div>
   }
