@@ -4,6 +4,13 @@
  * @typedef {{name: String, style_base: Styling, style_highlight: Styling, zoom_styles: {Number: Styling}}} Presentation
  */
 
+export function getCurrentPresentation(collection) {
+  const { enabled_presentation, presentations = {} } = collection
+  const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
+  const presentation = enabled_presentation && (presentations[enabled_presentation] || fallbackPresentation)
+  return presentation
+}
+
 /**
  * Apply the style to the feature, resolving `$props`, categories, ranges, etc.
  * @param {StyleProp} styleProp

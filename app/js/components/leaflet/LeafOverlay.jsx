@@ -7,10 +7,8 @@ import EditableImage from './EditableImage';
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
-import { deepFlip } from '../../utils/math'
 import PassiveLabel from './PassiveLabel'
-import { defaultPresentation, getZoomStyle, lookupStyle } from '../../utils/presentation'
-import { openFeatureDetail } from '../../store'
+import { defaultPresentation, getCurrentPresentation, getZoomStyle, lookupStyle } from '../../utils/presentation'
 
 export function getFeatureComponent(feature, zoom) {
   const has = (k) => feature[k] !== undefined
@@ -51,34 +49,33 @@ export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureI
   // TODO separate RL.FeatureGroup per collection to reduce updates
   // TODO lazily separate into zoom groups, reset that cache when features change
   Object.values(collections).forEach(collection => {
-    const { enabled_presentation, features = {}, presentations = {} } = collection
+    const { features = {} } = collection
+    const presentation = getCurrentPresentation(collection)
 
-    const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
-    const presentation = presentations[enabled_presentation] || fallbackPresentation
-
-    if (!enabled_presentation) {
+    if (!presentation) {
       if (highlightActiveFeature && activeFeatureCollection == collection.id) {
         // show active/edited feature anyway
         const feature = features[activeFeatureId]
         featuresPresentations[feature.id] = {
           feature,
-          baseStyle: presentation.style_base || defaultPresentation.style_base,
-          zoomStyle: presentation.style_highlight || defaultPresentation.style_highlight,
+          baseStyle: (presentation || defaultPresentation).style_base,
+          zoomStyle: (presentation || defaultPresentation).style_highlight,
         }
       }
       return
     }
 
+    const baseStyle = presentation.style_base
+    const zoomStyle = getZoomStyle(presentation, zoom)
+
     Object.values(features).forEach(feature => {
       if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.collectionId) {
         featuresPresentations[feature.id] = {
           feature,
-          baseStyle: presentation.style_base || defaultPresentation.style_base,
-          zoomStyle: presentation.style_highlight || defaultPresentation.style_highlight,
+          baseStyle: (presentation || defaultPresentation).style_base,
+          zoomStyle: (presentation || defaultPresentation).style_highlight,
         }
-      } else if (enabled_presentation) {
-        const baseStyle = presentation.style_base
-        const zoomStyle = getZoomStyle(presentation, zoom) // TODO we can calculate this once for all enabled presentations before looping the features
+      } else if (presentation) {
         const featureWithStyles = { feature, baseStyle, zoomStyle }
         const opacity = lookupStyle("opacity", featureWithStyles, 1)
         if (opacity > 0) {
