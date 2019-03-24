@@ -8,7 +8,6 @@ import List from 'material-ui/List'
 import { setDrawerClosed } from '../../store'
 
 import BasemapSelectorList from './BasemapSelectorList'
-import ResetMenuItem from './ResetMenuItem'
 import FileImportMenuItem from './FileImportMenuItem'
 
 const AppDrawer = ({
@@ -25,7 +24,6 @@ const AppDrawer = ({
       <Divider />
       <List>
         <FileImportMenuItem />
-        <ResetMenuItem />
       </List>
     </div>
   </Drawer>

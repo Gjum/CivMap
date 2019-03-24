@@ -24,6 +24,30 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/leaflet.css" />
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script src="js/bundle.js"></script>
+    <script type="text/javascript">
+        var config = {
+            defaultCollectionUrls: [
+                "https://ccmap.github.io/data/settlements.civmap.json",
+                "https://ccmap.github.io/data/rails.civmap.json",
+                "https://ccmap.github.io/data/political.civmap.json",
+            ],
+            initialState: {
+                mapConfig: {
+                    borderApothem: 13000,
+                    tilesRoot: 'http://ccmap.duckdns.org:44443/tiles_beta/',
+                    basemaps: {
+                        terrain: { name: 'Terrain', id: 'terrain', bgColor: '#000', isDefault: true },
+                        biome: { name: 'Biome', id: 'biome', bgColor: '#000' },
+                        height: { name: 'Height', id: 'height', bgColor: '#888' },
+                        simple: { name: 'Simple', id: 'simple', bgColor: '#888' },
+                        night: { name: 'Night', id: 'night', bgColor: '#000' },
+                        light: { name: 'Light', id: 'light', bgColor: '#000' },
+                    },
+                }
+            }
+        }
+        window.civMapApi = CivMap.start(config)
+    </script>
 </body>
 
 </html>
