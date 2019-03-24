@@ -1,18 +1,20 @@
+import { currentVersion } from "./convertFromOld";
+
 let lastLocalStorageError = {}
 
 export function saveAppStateToLocalStorage(state) {
   try {
-    // TODO noop if unchanged
-
     const {
       collections,
       mapView,
     } = state
 
-    window.localStorage.setItem('CivMap.data.0.3.3', JSON.stringify({
-      collections,
+    // TODO noop if unchanged
+
+    window.localStorage.setItem('CivMap.data.'+currentVersion, JSON.stringify({
+      collections, // TODO filter out non-persistent collections (e.g. journeymap)
     }))
-    window.localStorage.setItem('CivMap.view.0.3.3', JSON.stringify({
+    window.localStorage.setItem('CivMap.view.'+currentVersion, JSON.stringify({
       mapView,
     }))
 
@@ -30,12 +32,12 @@ export function getAppStateFromLocalStorage() {
   try {
     // TODO check if older states exist (e.g. `CivMap.data`)
 
-    const dataJson = window.localStorage.getItem('CivMap.data.0.3.3')
+    const dataJson = window.localStorage.getItem('CivMap.data.'+currentVersion)
     if (dataJson) {
       state = { ...state, ...JSON.parse(dataJson) }
     }
 
-    const viewJson = window.localStorage.getItem('CivMap.view.0.3.3')
+    const viewJson = window.localStorage.getItem('CivMap.view.'+currentVersion)
     if (viewJson) {
       state = { ...state, ...JSON.parse(viewJson) }
     }

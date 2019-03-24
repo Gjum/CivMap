@@ -1,6 +1,6 @@
 {
   "name": "civmap",
-  "version": "0.3.2",
+  "version": "3.0.0-beta3",
   "description": "Generic web map for Civ-style Minecraft servers",
   "author": "Gjum",
   "license": "GPL-3.0",

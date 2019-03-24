@@ -1,5 +1,6 @@
 import { createStore } from 'redux'
 
+import { currentVersion } from './convertFromOld';
 import { autoImportCollectionsOnStartup, loadAppStateFromUrlData } from './importExport'
 import { processCollectionFile } from './importFile'
 import murmurhash3 from './murmurhash3_gc'
@@ -31,7 +32,7 @@ describe("loadAppStateFromUrlData", () => {
     const collectionUrl = 'test://url.please/ignore'
 
     __setMockGetJson({
-      info: { version: '0.3.3' },
+      info: { version: currentVersion },
       features: [{ ...feature }],
     })
     loadAppStateFromUrlData({ collectionUrl }, store)
@@ -50,7 +51,7 @@ describe("processCollectionFile", () => {
     const store = createStore(combinedReducers)
     const feature = { id: 'feature_id', x: -123, z: 123 }
     const collectionJson = JSON.stringify({
-      info: { version: '0.3.3' },
+      info: { version: currentVersion },
       features: [{ ...feature }],
     })
     const fileName = 'test.civmap.json'
@@ -81,7 +82,7 @@ describe("autoImportCollectionsOnStartup", () => {
 
     const feature = { id: 'test_feature_id', x: -123, z: 123 }
     __setMockGetJson({
-      info: { version: '0.3.3' },
+      info: { version: currentVersion },
       features: [{ ...feature }],
     })
     autoImportCollectionsOnStartup(store)
