@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import IconButton from 'material-ui/IconButton'
+import IconButton from '@material-ui/core/IconButton'
 
-import CloseIcon from 'material-ui-icons/Close'
-import EditIcon from 'material-ui-icons/Edit'
-import LaunchIcon from 'material-ui-icons/Launch'
-import LayersIcon from 'material-ui-icons/Layers'
-import MenuIcon from 'material-ui-icons/Menu'
-import SearchIcon from 'material-ui-icons/Search'
+import CloseIcon from '@material-ui/icons/Close'
+import EditIcon from '@material-ui/icons/Edit'
+import LaunchIcon from '@material-ui/icons/Launch'
+import LayersIcon from '@material-ui/icons/Layers'
+import MenuIcon from '@material-ui/icons/Menu'
+import SearchIcon from '@material-ui/icons/Search'
 
 import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
 import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature } from '../store'

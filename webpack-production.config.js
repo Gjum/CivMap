@@ -2,6 +2,7 @@ const webpack = require('webpack')
 const defaultConf = require('./webpack.config.js')
 
 module.exports = Object.assign({}, defaultConf, {
+  mode: 'production', // enables optimizations like uglify
   plugins: [
     // Define production build to allow React to strip out unnecessary checks
     new webpack.DefinePlugin({
@@ -9,14 +10,5 @@ module.exports = Object.assign({}, defaultConf, {
         'NODE_ENV': JSON.stringify('production'),
       },
     }),
-    // Minify the bundle
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        // suppresses warnings, usually from module minification
-        warnings: false,
-      },
-    }),
-    // Allows error warnings but does not stop compiling.
-    new webpack.NoErrorsPlugin(),
   ],
 })

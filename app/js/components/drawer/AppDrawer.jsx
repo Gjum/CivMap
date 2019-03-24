@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Divider from 'material-ui/Divider'
-import Drawer from 'material-ui/Drawer'
-import List from 'material-ui/List'
+import Divider from '@material-ui/core/Divider'
+import Drawer from '@material-ui/core/Drawer'
+import List from '@material-ui/core/List'
 
 import { setDrawerClosed } from '../../store'
 

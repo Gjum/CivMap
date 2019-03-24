@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import IconButton from 'material-ui/IconButton'
+import IconButton from '@material-ui/core/IconButton'
 
-import ShareIcon from 'material-ui-icons/Share'
+import ShareIcon from '@material-ui/icons/Share'
 
 const ShareSearchButton = ({
   dispatch,

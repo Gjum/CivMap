@@ -1,16 +1,17 @@
 import React from 'react'
 import Uuid from 'node-uuid'
 
-import IconButton from 'material-ui/IconButton'
-import { ListItemIcon } from 'material-ui/List'
-import Menu, { MenuItem } from 'material-ui/Menu'
+import IconButton from '@material-ui/core/IconButton'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 
-import CircleIcon from 'material-ui-icons/AddCircle'
-import EditIcon from 'material-ui-icons/Edit'
-import ImageIcon from 'material-ui-icons/InsertPhoto'
-import LineIcon from 'material-ui-icons/Timeline'
-import MarkerIcon from 'material-ui-icons/AddLocation'
-import PolygonIcon from 'material-ui-icons/PanoramaHorizontal'
+import CircleIcon from '@material-ui/icons/AddCircle'
+import EditIcon from '@material-ui/icons/Edit'
+import ImageIcon from '@material-ui/icons/InsertPhoto'
+import LineIcon from '@material-ui/icons/Timeline'
+import MarkerIcon from '@material-ui/icons/AddLocation'
+import PolygonIcon from '@material-ui/icons/PanoramaHorizontal'
 
 import { openEditMode, createFeature, updateFeatureInCollection } from '../../store'
 

@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from 'material-ui/Button'
-import IconButton from 'material-ui/IconButton'
-import TextField from 'material-ui/TextField'
+import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
+import TextField from '@material-ui/core/TextField'
 
-import CheckIcon from 'material-ui-icons/Check'
-import DeleteIcon from 'material-ui-icons/Delete'
-import DownloadIcon from 'material-ui-icons/FileDownload'
-import ResetIcon from 'material-ui-icons/Undo'
+import CheckIcon from '@material-ui/icons/Check'
+import DeleteIcon from '@material-ui/icons/Delete'
+import DownloadIcon from '@material-ui/icons/Save'
+import ResetIcon from '@material-ui/icons/Undo'
 
 import { exportCollection } from '../../utils/importExport'
 import JsonEditor from '../edit/JsonEditor'
@@ -29,14 +29,14 @@ class RealCollectionEditor extends React.PureComponent {
     return <div>
       <div style={{ margin: '16px' }}>
 
-        <Button variant='raised' onClick={() => {
+        <Button variant='contained' onClick={() => {
           dispatch(updateCollection(originalCollection))
         }}>
           <ResetIcon />
           Reset
         </Button>
 
-        <Button variant='raised' onClick={() => {
+        <Button variant='contained' onClick={() => {
           dispatch(removeCollection(collection.id))
           dispatch(openLayers())
         }}>
@@ -44,7 +44,7 @@ class RealCollectionEditor extends React.PureComponent {
           Delete
         </Button>
 
-        <Button variant='raised' onClick={() => {
+        <Button variant='contained' onClick={() => {
           dispatch(openLayers())
         }}>
           <CheckIcon />
@@ -58,7 +58,7 @@ class RealCollectionEditor extends React.PureComponent {
           style={{ margin: '16px 0px' }}
         />
 
-        <Button variant='raised' onClick={(e) => {
+        <Button variant='contained' onClick={(e) => {
           const json = JSON.stringify(exportCollection(collection))
           const filename = collection.name + ".civmap.json"
 

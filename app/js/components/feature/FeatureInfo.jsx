@@ -1,13 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from 'material-ui/Button'
-import IconButton from 'material-ui/IconButton'
+import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
 
-import DeleteIcon from 'material-ui-icons/Delete'
-import EditIcon from 'material-ui-icons/Edit'
-import FilterIcon from 'material-ui-icons/FilterList'
-import ShowOnMapIcon from 'material-ui-icons/Explore'
+import DeleteIcon from '@material-ui/icons/Delete'
+import EditIcon from '@material-ui/icons/Edit'
+import FilterIcon from '@material-ui/icons/FilterList'
+import ShowOnMapIcon from '@material-ui/icons/Explore'
 
 import { circleBoundsFromFeature, rectBoundsFromFeature } from '../../utils/math'
 import { openBrowseMode, removeFeatureInCollection, setViewport, lookupFeature } from '../../store'
@@ -94,7 +94,7 @@ const RealFeatureInfo = ({
     return <div style={{ margin: '16px' }}>
       <h2>There might have been an error.</h2>
       <p>Sorry about that.</p>
-      <Button variant='raised' onClick={() => dispatch(openBrowseMode())}>
+      <Button variant='contained' onClick={() => dispatch(openBrowseMode())}>
         Close
       </Button>
     </div>
@@ -106,12 +106,12 @@ const RealFeatureInfo = ({
     <FeatureProps feature={feature} />
 
     <div style={{ margin: '16px' }}>
-      <Button variant='raised' onClick={() => dispatch(setViewport(rectBounds))}>
+      <Button variant='contained' onClick={() => dispatch(setViewport(rectBounds))}>
         <ShowOnMapIcon />
         Show on map
       </Button>
 
-      <Button variant='raised' onClick={() => {
+      <Button variant='contained' onClick={() => {
         dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
         dispatch(openBrowseMode()) // TODO show similar features in search results instead
       }}>

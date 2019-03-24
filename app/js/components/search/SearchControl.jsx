@@ -1,13 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from 'material-ui/Button'
-import IconButton from 'material-ui/IconButton'
-import List, { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader } from 'material-ui/List'
-import TextField from 'material-ui/TextField'
+import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
+import ListItemText from '@material-ui/core/ListItemText'
+import TextField from '@material-ui/core/TextField'
 
-import CloseIcon from 'material-ui-icons/Close'
-import ShowOnMapIcon from 'material-ui-icons/Explore'
+import CloseIcon from '@material-ui/icons/Close'
+import ShowOnMapIcon from '@material-ui/icons/Explore'
 
 import { rectBoundsFromFeature } from '../../utils/math'
 import { highlightFeature, openFeatureDetail, openSearch, setViewport } from '../../store'
