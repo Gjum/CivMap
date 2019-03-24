@@ -140,8 +140,9 @@ export function loadCollectionJson(data, dispatch, source, enabled_presentation)
     info: {},
     features: [],
     presentations: [],
+    id: source, // fallback
     ...data,
-    source,
+    source, // override whatever is inside data
   })
 
   if (enabled_presentation === undefined) {

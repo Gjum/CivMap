@@ -4,6 +4,7 @@ import { inspect } from 'util'
 
 import { importPositions } from './utils/importExport'
 import murmurhash3 from './utils/murmurhash3_gc'
+import { currentVersion } from './utils/convertFromOld';
 
 export const defaultControlState = {
   appMode: 'LAYERS',
@@ -190,7 +191,7 @@ const defaultCollectionState = {
   enabled_presentation: null,
   features: {},
   id: null,
-  info: {},
+  info: { version: currentVersion },
   name: '(unnamed)',
   persistent: false,
   presentations: {},
@@ -236,7 +237,8 @@ const collection = (state = defaultCollectionState, action) => {
 
     case 'REMOVE_FEATURE_IN_COLLECTION':
     case 'UPDATE_FEATURE_IN_COLLECTION': {
-      if (state.id !== (action.collectionId || action.feature.id)) return state
+      const anyCollectionId = action.collectionId || action.feature.collectionId
+      if (state.id !== anyCollectionId) return state
       return { ...state, features: features(state.features, action) }
     }
 
@@ -316,7 +318,7 @@ export const appLoad = (state) => ({ type: 'APP_LOAD', state })
 export const importCollection = (collection, persistent = false) => ({
   type: 'IMPORT_COLLECTION',
   collection,
-  collectionId: collection.id || collection.source,
+  collectionId: collection.id,
   persistent,
 })
 
