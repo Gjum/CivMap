@@ -32,8 +32,8 @@ export function start(config) {
   autoImportCollectionsOnStartup(store)
 
   if (Array.isArray(config.defaultCollectionUrls)) {
-    for (const url of config.defaultCollectionUrls) {
-      loadCollectionJsonAsync(url, store.dispatch)
+    for (const { source, enabled_presentation } of config.defaultCollectionUrls) {
+      loadCollectionJsonAsync(source, store.dispatch, null, enabled_presentation)
     }
   }
 

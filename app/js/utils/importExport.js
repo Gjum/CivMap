@@ -122,10 +122,10 @@ export function loadAppStateFromUrlData(urlData, store) {
   }
 }
 
-export function loadCollectionJsonAsync(url, dispatch, cb) {
+export function loadCollectionJsonAsync(url, dispatch, cb, enabled_presentation) {
   getJSON(url,
     data => {
-      loadCollectionJson(data, dispatch, url)
+      loadCollectionJson(data, dispatch, url, enabled_presentation)
       cb && cb(null, data)
     },
     err => {
@@ -135,7 +135,7 @@ export function loadCollectionJsonAsync(url, dispatch, cb) {
   )
 }
 
-export function loadCollectionJson(data, dispatch, source) {
+export function loadCollectionJson(data, dispatch, source, enabled_presentation) {
   const collection = convertCollectionFromAny({
     info: {},
     features: [],
@@ -144,7 +144,18 @@ export function loadCollectionJson(data, dispatch, source) {
     source,
   })
 
-  if (!collection.enabled_presentation && collection.presentations[0]) collection.enabled_presentation = collection.presentations[0].name
+  if (enabled_presentation === undefined) {
+    if (!collection.enabled_presentation && collection.presentations[0]) {
+      collection.enabled_presentation = collection.presentations[0].name
+    }
+  } else {
+    if (enabled_presentation === true && collection.presentations[0]) {
+      collection.enabled_presentation = collection.presentations[0].name
+    }
+    else if (collection.presentations[enabled_presentation]) {
+      collection.enabled_presentation = enabled_presentation
+    }
+  }
 
   dispatch(importCollection(collection))
 
