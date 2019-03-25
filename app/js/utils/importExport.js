@@ -96,6 +96,13 @@ export function loadAppStateFromUrlData(urlData, store) {
     if (urlData.collection) {
       loadCollectionJson(urlData.collection, store, 'civmap:url_import/collection')
     }
+
+    // make any imported collection visible
+    const linkedCollectionId = (urlData.collection || {}).id || urlCollectionData.id
+    if (linkedCollectionId) {
+      store.dispatch(enablePresentationInCollection(linkedCollectionId, true))
+    }
+
     if (urlData.feature) {
       if (urlData.feature.geometry && urlData.feature.properties) {
         // probably a v2.0.0 feature

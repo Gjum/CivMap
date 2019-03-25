@@ -243,9 +243,15 @@ const collection = (state = defaultCollectionState, action) => {
     }
 
     case 'ENABLE_PRESENTATION': {
-      if (state.enabled_presentation === action.presentationId) return state // already enabled
-      if (Object.keys(state.presentations || {}).length && !state.presentations[action.presentationId]) return state // invalid id
-      return { ...state, enabled_presentation: action.presentationId }
+      let presentationId = action.presentationId
+      if (state.enabled_presentation === presentationId) return state // already enabled
+      const presKeys = Object.keys(state.presentations || {})
+      if (presentationId === true) {
+        presentationId = presKeys[0]
+      }
+      if (state.enabled_presentation === presentationId) return state // already enabled
+      if (presKeys.length && !state.presentations[presentationId]) return state // invalid id
+      return { ...state, enabled_presentation: presentationId }
     }
 
     case 'DISABLE_PRESENTATION': {
