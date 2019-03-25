@@ -98,7 +98,7 @@ export function loadAppStateFromUrlData(urlData, store) {
     }
 
     // make any imported collection visible
-    const linkedCollectionId = (urlData.collection || {}).id || urlCollectionData.id
+    const linkedCollectionId = (urlData.collection || urlCollectionData || {}).id
     if (linkedCollectionId) {
       store.dispatch(enablePresentationInCollection(linkedCollectionId, true))
     }
