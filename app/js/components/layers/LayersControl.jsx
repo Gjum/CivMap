@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import Collapse from '@material-ui/core/Collapse'
 import IconButton from '@material-ui/core/IconButton'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -17,12 +18,14 @@ import { disablePresentationInCollection, enablePresentationInCollection, openCo
 
 // TODO better visually distinguish multi-layer collections from single-layer collections
 
-const Layer = ({ dispatch, collection, presentation, enabled_presentation }) => {
+const Layer = ({ nested, dispatch, collection, presentation, enabled_presentation }) => {
   if (!presentation) return null
 
   const isEnabled = enabled_presentation === presentation.name || enabled_presentation === true
 
-  return <ListItem button onClick={() => {
+  const style = nested ? { paddingLeft: '32px' } : null
+
+  return <ListItem style={style} button onClick={() => {
     if (isEnabled) dispatch(disablePresentationInCollection(collection.id, presentation.name))
     else dispatch(enablePresentationInCollection(collection.id, presentation.name))
   }}>
@@ -58,11 +61,13 @@ const PresentationsForCollection = ({ dispatch, collection }) => {
     <ListItem>
       <ListItemText primary={collection.name} style={{ color: '#444444' }} />
     </ListItem>
-    <List disablePadding>
-      {presentations.map((presentation) =>
-        <Layer {...{ dispatch, collection, presentation, enabled_presentation }} key={presentation.name} />
-      )}
-    </List>
+    <Collapse in={true}>
+      <List disablePadding>
+        {presentations.map((presentation) =>
+          <Layer nested {...{ dispatch, collection, presentation, enabled_presentation }} key={presentation.name} />
+        )}
+      </List>
+    </Collapse>
   </div>
 }
 
