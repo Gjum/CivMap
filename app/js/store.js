@@ -1,4 +1,4 @@
-import Uuid from 'node-uuid'
+import Uuid from 'uuid'
 import { combineReducers } from 'redux'
 import { inspect } from 'util'
 

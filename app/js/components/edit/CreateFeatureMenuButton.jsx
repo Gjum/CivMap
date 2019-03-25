@@ -1,5 +1,5 @@
 import React from 'react'
-import Uuid from 'node-uuid'
+import Uuid from 'uuid'
 
 import IconButton from '@material-ui/core/IconButton'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
