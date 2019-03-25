@@ -185,7 +185,7 @@ export function parseUrlHash(hash) {
   if (oldUrlMatch) {
     const [x, z, zoom = 0] = oldUrlMatch.slice(1).map(parseFloat)
     const radius = Math.pow(2, -zoom) * 500 // arbitrary, the old urls didn't track the actual radius
-    urlData.viewport = circleToBounds({ x, z, radius })
+    urlData.viewport = { x, z, radius }
     return urlData
   }
 
@@ -197,7 +197,14 @@ export function parseUrlHash(hash) {
       radius = radius || 100
       urlData.viewport = { x, z, radius }
     }
-    else if (key == 'b') urlData.basemap = val
+    else if (key == 'b') {
+      const [w, n, e, s] = val.split(',', 4).map(parseFloat);
+      urlData.viewport = {
+        x: Math.round((w + e) / 2),
+        z: Math.round((n + s) / 2),
+        radius: Math.round(Math.max(e - w, s - n) / 2),
+      }
+    }
     else if (key == 't') urlData.basemap = val
     else if (key == 'f') urlData.featureId = val
     else if (key == 'feature') urlData.feature = JSON.parse(val)
