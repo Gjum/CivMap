@@ -28,6 +28,7 @@ export function calculateFeatureStyleProp(feature, styleProp) {
     return styleProp
   }
   const { feature_key, categories, range, default: defaultVal } = styleProp
+  // TODO defaultVal should allow $keys
   if (categories && feature_key) {
     const featureVal = feature[feature_key]
     if (featureVal === undefined) return defaultVal

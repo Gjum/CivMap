@@ -63,7 +63,7 @@ export function processVoxelWaypointsText(text, dispatch, source) {
   // TODO instead, add to existing collection
   dispatch(importCollection({
     features,
-    // XXX allow importing+viewing multiple snitch files in parallel
+    // XXX allow importing+viewing multiple waypoint files in parallel
     name: 'My VoxelMap Waypoints',
     id: 'civmap:collection/waypoint/voxelmap',
     source,

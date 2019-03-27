@@ -28,6 +28,7 @@ export function start(config) {
 
   if (Array.isArray(config.defaultCollectionUrls)) {
     for (const { source, enabled_presentation } of config.defaultCollectionUrls) {
+      // TODO don't load a second time if it's already done by autoImportCollectionsOnStartup
       loadCollectionJsonAsync(source, store.dispatch, null, enabled_presentation)
     }
   }
