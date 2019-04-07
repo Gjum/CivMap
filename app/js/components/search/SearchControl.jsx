@@ -16,14 +16,52 @@ import { rectBoundsFromFeature } from '../../utils/math'
 import { highlightFeature, openFeatureDetail, openSearch, setViewport } from '../../store'
 
 function fuzzyMatch(query, str) {
-  query = query.toLowerCase()
-  let hay = str.toLowerCase(), i = 0, n = -1, l
+  let hay = str, i = 0, n = -1, l
   for (; l = query[i++];) {
     if (!~(n = hay.indexOf(l, n + 1))) {
       return false
     }
   }
   return true
+}
+
+function matchScore(query, words, str) {
+  if (!str) return 99
+  const strLower = str.toLowerCase()
+  if (str.startsWith(query)) return 0
+  if (str.includes(query)) return 1
+  const paddedStr = ' ' + str + ' '
+  for (const word of words) {
+    if (paddedStr.includes(' ' + word + ' ')) return 2
+  }
+  for (const word of words) {
+    if (paddedStr.includes(' ' + word)) return 3
+  }
+  for (const word of words) {
+    if (paddedStr.includes(word)) return 4
+  }
+  if (strLower.length < 200 && fuzzyMatch(query, strLower)) return 9
+  return 99
+}
+
+function search(query, collections) {
+  query = String(query).toLowerCase()
+  if (!query || query.length <= 1) return []
+  const words = query.split(' ')
+
+  let searchResults = []
+  Object.values(collections).forEach(collection =>
+    searchResults = searchResults.concat(
+      Object.values(collection.features).map(f => {
+        const scores = Object.entries(f)
+          .filter(([k, v]) => !(['id', 'collectionId'].includes(k)))
+          .map(([k, v]) => matchScore(query, words, String(v)))
+        return [Math.min.apply(null, scores), f]
+      }).filter(r => r[0] < 99)
+    )
+  )
+  searchResults.sort()
+  return searchResults.map(r => r[1])
 }
 
 class SearchControl extends React.PureComponent {
@@ -37,23 +75,10 @@ class SearchControl extends React.PureComponent {
       dispatch,
       searchQuery,
     } = this.props
-    const searchQueryLower = String(searchQuery).toLowerCase()
 
-    let searchResults = []
-    Object.values(collections).forEach(collection =>
-      searchResults = searchResults.concat(
-        Object.values(collection.features).filter(f =>
-          !searchQuery
-          || f.name && fuzzyMatch(searchQueryLower, f.name)
-          || f.nation && fuzzyMatch(searchQueryLower, f.nation)
-          || f.contact && fuzzyMatch(searchQueryLower, f.contact)
-          || f.notes && fuzzyMatch(searchQueryLower, f.notes.slice(0, 200))
-        )
-      )
-    )
+    const searchResults = search(searchQuery, collections)
 
     // TODO show matching string as secondary text
-    // TODO sort search results
 
     const numResults = searchResults.length
     const numTop = 50
@@ -77,7 +102,10 @@ class SearchControl extends React.PureComponent {
               dispatch(setViewport(rectBoundsFromFeature(feature)))
             }}
           >
-            <ListItemText primary={feature.name || feature.label || feature.id || '(unnamed feature)'} />
+            <ListItemText
+              primary={feature.name || feature.label || feature.id || '(unnamed feature)'}
+              secondary={'in ' + (collections[feature.collectionId].name || '(unnamed layer)')}
+            />
             <ListItemSecondaryAction>
               <IconButton onClick={() => {
                 dispatch(highlightFeature(feature.id, feature.collectionId))
