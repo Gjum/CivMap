@@ -10,7 +10,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListSubheader from '@material-ui/core/ListSubheader'
 
-import EditIcon from '@material-ui/icons/Edit'
+import MoreIcon from '@material-ui/icons/MoreVert'
 import InvisibleIcon from '@material-ui/icons/VisibilityOff'
 import VisibleIcon from '@material-ui/icons/Visibility'
 
@@ -36,7 +36,7 @@ const Layer = ({ nested, dispatch, collection, presentation, enabled_presentatio
         // TODO dispatch(openPresentationEdit(presentation.name))
         dispatch(openCollectionEdit(collection.id))
       }>
-        <EditIcon />
+        <MoreIcon />
       </IconButton>
     </ListItemSecondaryAction>
   </ListItem>

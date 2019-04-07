@@ -5,10 +5,10 @@ import IconButton from '@material-ui/core/IconButton'
 
 import CloseIcon from '@material-ui/icons/Close'
 import EditIcon from '@material-ui/icons/Edit'
-import LaunchIcon from '@material-ui/icons/Launch'
 import LayersIcon from '@material-ui/icons/Layers'
 import MenuIcon from '@material-ui/icons/Menu'
 import SearchIcon from '@material-ui/icons/Search'
+import ShareLinkIcon from '@material-ui/icons/Link'
 
 import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
 import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature } from '../store'
@@ -53,7 +53,7 @@ const AppBar = ({
         // TODO better location sharing: create marker with name prompt, add query for close-by features, etc.
       }
     }}>
-      <LaunchIcon />
+      <ShareLinkIcon />
     </IconButton>
 
     {appMode === 'FEATURE' ?

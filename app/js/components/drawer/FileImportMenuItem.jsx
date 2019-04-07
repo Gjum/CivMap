@@ -13,7 +13,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import TextField from '@material-ui/core/TextField'
 
 import CloseIcon from '@material-ui/icons/Close'
-import FileUploadIcon from '@material-ui/icons/CloudUpload'
+import FileUploadIcon from '@material-ui/icons/VerticalAlignTop'
 
 import { getFileProcessor, processVoxelWaypointsText } from '../../utils/importFile'
 import { setDrawerClosed } from '../../store'
