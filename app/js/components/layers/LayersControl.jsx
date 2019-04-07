@@ -46,10 +46,9 @@ const PresentationsForCollection = ({ dispatch, collection }) => {
   const { enabled_presentation } = collection
   let presentations = Object.values(collection.presentations || {})
   if (enabled_presentation) {
-    presentations = [
-      (collection.presentations || {})[enabled_presentation],
-      ...presentations.filter(p => p.name !== enabled_presentation),
-    ]
+    const matchingPresentation = (collection.presentations || {})[enabled_presentation]
+    presentations = presentations.filter(p => p.name !== enabled_presentation)
+    if (matchingPresentation) presentations.unshift(matchingPresentation)
   }
 
   if (presentations.length <= 1) {
