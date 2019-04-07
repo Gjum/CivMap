@@ -5,11 +5,12 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 import AppFrame from './components/AppFrame'
+import ErrorBoundary from './components/ErrorBoundary'
 import { appLoad, combinedReducers } from './store'
 import { getAppStateFromLocalStorage, saveAppStateToLocalStorage } from './utils/localStorage'
 import { autoImportCollectionsOnStartup, loadAppStateFromUrlData, parseUrlHash, loadCollectionJsonAsync } from './utils/importExport'
 
-export function start(config) {
+export function start(config, rootElement) {
   const store = createStore(combinedReducers, {},
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
@@ -39,10 +40,12 @@ export function start(config) {
   ))
 
   ReactDOM.render(
-    <Provider store={store}>
-      <AppFrame />
-    </Provider>,
-    document.getElementById('app-root')
+    <ErrorBoundary>
+      <Provider store={store}>
+        <AppFrame />
+      </Provider>
+    </ErrorBoundary>,
+    rootElement || document.getElementById('app-root')
   )
 
   return { store } // TODO export redux actions
