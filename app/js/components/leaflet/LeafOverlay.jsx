@@ -53,7 +53,9 @@ export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureI
     const presentation = getCurrentPresentation(collection)
 
     if (!presentation) {
-      if (highlightActiveFeature && activeFeatureCollection == collection.id) {
+      if (highlightActiveFeature
+        && activeFeatureCollection == collection.id
+        && features[activeFeatureId]) {
         // show active/edited feature anyway
         const feature = features[activeFeatureId]
         featuresPresentations[feature.id] = {
