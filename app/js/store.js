@@ -204,6 +204,15 @@ const defaultCollectionState = {
  */
 const collection = (state = defaultCollectionState, action) => {
   switch (action.type) {
+    case 'CREATE_COLLECTION': {
+      const newState = { ...defaultCollectionState, id: action.collectionId }
+      const keepKeys = ['enabled_presentation', 'id', 'name', 'persistent', 'presentations', 'source']
+      for (const key of keepKeys) {
+        if (action.collection[key]) newState[key] = action.collection[key]
+      }
+      return newState
+    }
+
     case 'UPDATE_COLLECTION': {
       return { ...state, ...action.collection }
     }
@@ -286,9 +295,10 @@ const collections = (state = defaultCollectionsState, action) => {
       return { ...state, ...action.state.collections }
     }
 
+    case 'CREATE_COLLECTION':
     case 'IMPORT_COLLECTION': {
       if (!action.collectionId) {
-        console.error(`Not importing collection without id: ${inspect(action)}`)
+        console.error('Not creating/importing collection without id:', action)
         return state // require collection id
       }
       const newCollection = collection(state[action.collectionId], action)
@@ -301,7 +311,7 @@ const collections = (state = defaultCollectionsState, action) => {
     case 'REMOVE_FEATURE_IN_COLLECTION':
     case 'UPDATE_FEATURE_IN_COLLECTION': {
       if (!state[action.collectionId]) {
-        console.error(`Not updating unknown collection: ${inspect(action)}`)
+        console.error('Not updating unknown collection:', action)
         return state // only update existing collections
       }
       const newCollection = collection(state[action.collectionId], action)
@@ -320,6 +330,12 @@ const collections = (state = defaultCollectionsState, action) => {
 }
 
 export const appLoad = (state) => ({ type: 'APP_LOAD', state })
+
+export const createCollection = (collectionId, collection) => ({
+  type: 'CREATE_COLLECTION',
+  collection,
+  collectionId: collectionId || collection.id,
+})
 
 export const importCollection = (collection, persistent = false) => ({
   type: 'IMPORT_COLLECTION',
