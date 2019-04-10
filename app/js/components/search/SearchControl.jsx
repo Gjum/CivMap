@@ -28,17 +28,18 @@ function fuzzyMatch(query, str) {
 function matchScore(query, words, str) {
   if (!str) return 99
   const strLower = str.toLowerCase()
-  if (str.startsWith(query)) return 0
-  if (str.includes(query)) return 1
-  const paddedStr = ' ' + str + ' '
+  if (strLower === query) return 0
+  if (strLower.startsWith(query)) return 1
+  if (strLower.includes(query)) return 2
+  const paddedStr = ' ' + strLower + ' '
   for (const word of words) {
-    if (paddedStr.includes(' ' + word + ' ')) return 2
+    if (paddedStr.includes(' ' + word + ' ')) return 3
   }
   for (const word of words) {
-    if (paddedStr.includes(' ' + word)) return 3
+    if (paddedStr.includes(' ' + word)) return 4
   }
   for (const word of words) {
-    if (paddedStr.includes(word)) return 4
+    if (paddedStr.includes(word)) return 5
   }
   if (strLower.length < 200 && fuzzyMatch(query, strLower)) return 9
   return 99
