@@ -4,7 +4,3 @@ node_js: "node"
 script:
   - npm test
   - npm run build
-
-cache:
-  directories:
-    - "/home/travis/.nvm/versions/node/*/lib/node_modules/firebase-tools"
