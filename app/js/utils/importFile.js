@@ -4,7 +4,7 @@ import { importCollection } from '../store'
 export function getFileProcessor(fileName) {
   if (fileName === 'Snitches.csv') {
     return { process: processSnitchMasterFile, description: 'SnitchMaster snitches' }
-  } else if (fileName.endsWith('.civmap.json')) {
+  } else if (fileName.endsWith('.json')) {
     return { process: processCollectionFile, description: 'CivMap Collection' }
   } else if (fileName.endsWith('.points')) {
     return { process: processVoxelWaypointsFile, description: 'VoxelMap waypoints' }

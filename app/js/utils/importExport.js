@@ -9,18 +9,18 @@ import { enablePresentationInCollection, importCollection, openFeatureDetail, op
 
 // the [[#,#],[#,#]] blow up the url size when encoded
 // TODO represent number arrays in binary+base64 format
-export function exportPositions(positions) {
+export function exportPositionsString(positions) {
   return JSON.stringify(positions).replace(/\],\[/g, '!').replace(/\[/g, '(').replace(/\]/g, ')')
 }
 
-export function importPositions(positionsStr) {
+export function importPositionsString(positionsStr) {
   return JSON.parse(positionsStr.replace(/!/g, '],[').replace(/\(/g, '[').replace(/\)/g, ']'))
 }
 
 export function exportStringFromFeature(feature) {
   const f = exportFeature(feature)
-  if (f.line) f.line = exportPositions(f.line)
-  if (f.polygon) f.polygon = exportPositions(f.polygon)
+  if (f.line) f.line = exportPositionsString(f.line)
+  if (f.polygon) f.polygon = exportPositionsString(f.polygon)
   // instead of encodeURIComponent, because here most special characters are fine
   return encodeURI(JSON.stringify(f)).replace(/#/g, '%23')
 }

@@ -60,10 +60,10 @@ class RealCollectionEditor extends React.PureComponent {
 
         <Button variant='contained' onClick={(e) => {
           const json = JSON.stringify(exportCollection(collection))
-          const filename = collection.name + ".civmap.json"
+          const filename = collection.name + ".json"
 
           const element = document.createElement('a')
-          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
+          element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(json))
           element.setAttribute('download', filename)
           element.style.display = 'none'
           document.body.appendChild(element)

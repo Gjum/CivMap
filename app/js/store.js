@@ -2,7 +2,7 @@ import Uuid from 'uuid'
 import { combineReducers } from 'redux'
 import { inspect } from 'util'
 
-import { importPositions } from './utils/importExport'
+import { importPositionsString } from './utils/importExport'
 import murmurhash3 from './utils/murmurhash3_gc'
 import { currentVersion } from './utils/convertFromOld';
 
