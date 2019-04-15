@@ -67,7 +67,15 @@ export default class EditableLine extends React.PureComponent {
       ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       {...convertStyle(style)}
-      positions={!line ? [] : centered(deepFlip(line))}
+      positions={!deepCheckValidLine(line) ? [] : centered(deepFlip(line))}
     />
+  }
+}
+
+function deepCheckValidLine(line) {
+  if (Array.isArray(line)) {
+    return line.length > 0 && line.every(deepCheckValidLine)
+  } else {
+    return Number.isFinite(line)
   }
 }
