@@ -58,24 +58,26 @@ export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureI
         && features[activeFeatureId]) {
         // show active/edited feature anyway
         const feature = features[activeFeatureId]
+        const { style_base, style_highlight } = defaultPresentation
         featuresPresentations[feature.id] = {
           feature,
-          baseStyle: (presentation || defaultPresentation).style_base,
-          zoomStyle: (presentation || defaultPresentation).style_highlight,
+          baseStyle: { ...style_base, ...style_highlight },
+          zoomStyle: { ...getZoomStyle(presentation, zoom), ...style_highlight },
         }
       }
       return
     }
 
     const baseStyle = presentation.style_base
+    const highlightStyle = presentation.style_highlight || defaultPresentation.style_highlight
     const zoomStyle = getZoomStyle(presentation, zoom)
 
     Object.values(features).forEach(feature => {
       if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.collectionId) {
         featuresPresentations[feature.id] = {
           feature,
-          baseStyle: (presentation || defaultPresentation).style_base,
-          zoomStyle: (presentation || defaultPresentation).style_highlight,
+          baseStyle: { ...baseStyle, ...highlightStyle },
+          zoomStyle: { ...zoomStyle, ...highlightStyle },
         }
       } else if (presentation) {
         const featureWithStyles = { feature, baseStyle, zoomStyle }
