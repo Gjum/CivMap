@@ -159,8 +159,9 @@ export function loadCollectionJson(data, dispatch, source, enabled_presentation)
   } else {
     if (enabled_presentation === true && collection.presentations[0]) {
       collection.enabled_presentation = collection.presentations[0].name
-    }
-    else if (collection.presentations[enabled_presentation]) {
+    } else if (!enabled_presentation) {
+      collection.enabled_presentation = enabled_presentation
+    } else if (collection.presentations[enabled_presentation]) {
       collection.enabled_presentation = enabled_presentation
     }
   }
