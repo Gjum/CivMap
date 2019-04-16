@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField'
 
 import CheckIcon from '@material-ui/icons/Check'
 import DeleteIcon from '@material-ui/icons/Delete'
-import DownloadIcon from '@material-ui/icons/Save'
+import DownloadIcon from '@material-ui/icons/CloudDownload'
 import ResetIcon from '@material-ui/icons/Undo'
 
 import { exportCollection } from '../../utils/importExport'
@@ -58,12 +58,14 @@ class RealCollectionEditor extends React.PureComponent {
           style={{ margin: '16px 0px' }}
         />
 
-        <Button variant='contained' onClick={(e) => {
-          const json = JSON.stringify(exportCollection(collection))
+        <Button variant='contained' onClick={() => {
+          const exportedCollection = exportCollection(collection)
+          exportedCollection.features.sort()
+          const content = JSON.stringify(exportedCollection).replace(/\},\{/g, '},\n{')
           const filename = collection.name + ".json"
 
           const element = document.createElement('a')
-          element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(json))
+          element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(content))
           element.setAttribute('download', filename)
           element.style.display = 'none'
           document.body.appendChild(element)
