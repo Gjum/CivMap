@@ -175,8 +175,8 @@ const feature = (state, action) => {
         ...action.feature,
         id: action.feature.id || murmurhash3(JSON.stringify(action.feature), 1),
       }
-      if (f.line && !Array.isArray(f.line)) f.line = importPositions(f.line)
-      if (f.polygon && !Array.isArray(f.polygon)) f.polygon = importPositions(f.polygon)
+      if (f.line && !Array.isArray(f.line)) f.line = importPositionsString(f.line)
+      if (f.polygon && !Array.isArray(f.polygon)) f.polygon = importPositionsString(f.polygon)
       return f
     default:
       return state
