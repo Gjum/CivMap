@@ -290,6 +290,7 @@ const defaultCollectionsState = {
   'civmap:collection/user': {
     id: "civmap:collection/user",
     name: "My Markings",
+    info: { version: currentVersion },
     features: {},
     presentations: {},
     enabled_presentation: true,
@@ -304,6 +305,12 @@ const collections = (state = defaultCollectionsState, action) => {
   switch (action.type) {
     case 'APP_LOAD': {
       if (!action.state.collections) return state
+      // make sure all collections have info.version
+      Object.values(action.state.collections).forEach(collection => {
+        if (!collection.info || !collection.info.version) {
+          collection.info = { ...collection.info, version: currentVersion }
+        }
+      })
       return { ...state, ...action.state.collections }
     }
 
