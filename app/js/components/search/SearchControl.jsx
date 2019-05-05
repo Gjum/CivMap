@@ -55,7 +55,7 @@ function search(query, collections) {
     searchResults = searchResults.concat(
       Object.values(collection.features).map(f => {
         const scores = Object.entries(f)
-          .filter(([k, v]) => !(['id', 'collectionId'].includes(k)))
+          .filter(([k, v]) => !(['collectionId'].includes(k)))
           .map(([k, v]) => matchScore(query, words, String(v)))
         return [Math.min.apply(null, scores), f]
       }).filter(r => r[0] < 99)
