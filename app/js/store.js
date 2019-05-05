@@ -48,7 +48,8 @@ const control = (state = defaultControlState, action) => {
     case 'OPEN_LAYERS':
       return { ...state, drawerOpen: false, appMode: 'LAYERS' }
     case 'OPEN_SEARCH':
-      return { ...state, drawerOpen: false, appMode: 'SEARCH', searchQuery: action.query, activeFeatureId: null }
+      const searchQuery = typeof action.query === 'string' ? action.query : state.searchQuery
+      return { ...state, drawerOpen: false, appMode: 'SEARCH', activeFeatureId: null, searchQuery }
 
     default:
       return state
@@ -67,7 +68,7 @@ export const openLayers = () => ({ type: 'OPEN_LAYERS' })
 
 export const openCollectionEdit = (collectionId) => ({ type: 'OPEN_COLLECTION', collectionId })
 
-export const openSearch = (query = "") => ({ type: 'OPEN_SEARCH', query })
+export const openSearch = (query) => ({ type: 'OPEN_SEARCH', query })
 
 
 export const setDrawerClosed = () => ({ type: 'SET_DRAWER_CLOSED' })
