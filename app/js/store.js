@@ -94,19 +94,24 @@ const mapView = (state = defaultMapView, action) => {
     }
     case 'SET_ACTIVE_BASEMAP':
       return { ...state, basemapId: action.basemapId }
-    case 'SET_VIEWPORT':
-      if (!action.viewport.radius) {
+    case 'SET_VIEWPORT': {
+      let viewport = action.viewport
+      if (!viewport.radius) {
         // convert from bounds to inner circle
         const [[e, n], [w, s]] = action.viewport
-        const viewport = {
+        viewport = {
           x: (e + w) / 2,
           z: (s + n) / 2,
           radius: Math.min(Math.abs(w - e), Math.abs(s - n)), // XXX both max and min are wrong, we should always store rect in viewport
         }
-        return { ...state, viewport }
       }
-      return { ...state, viewport: action.viewport }
-
+      if (viewport.radius === state.viewport.radius
+        && viewport.x === state.viewport.x
+        && viewport.z === state.viewport.z) {
+        return state
+      }
+      return { ...state, viewport }
+    }
     default:
       return state
   }
