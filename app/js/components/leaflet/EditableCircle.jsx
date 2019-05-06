@@ -51,11 +51,11 @@ export default class EditableCircle extends React.PureComponent {
   }
 
   render() {
-    let { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
+    let { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
     editable = false // TODO fix radius marker projection
 
     const { id, collectionId, x, z, radius } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
+    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
     if (!radius) {
       const tempCircle = this.context.leafMap.editTools.startCircle()

@@ -234,6 +234,7 @@ const collection = (state = defaultCollectionState, action) => {
       return { ...state, ...action.collection }
     }
 
+    // TODO skip render if collection is deep equal after import
     case 'IMPORT_COLLECTION': {
       /** @type CollectionJson */
       const collection = action.collection
@@ -271,12 +272,6 @@ const collection = (state = defaultCollectionState, action) => {
     case 'ENABLE_PRESENTATION': {
       let presentationId = action.presentationId
       if (state.enabled_presentation === presentationId) return state // already enabled
-      const presKeys = Object.keys(state.presentations || {})
-      if (presentationId === true) {
-        presentationId = presKeys[0]
-      }
-      if (state.enabled_presentation === presentationId) return state // already enabled
-      if (presKeys.length && !state.presentations[presentationId]) return state // invalid id
       return { ...state, enabled_presentation: presentationId }
     }
 

@@ -57,9 +57,9 @@ export default class EditablePolygon extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
+    const { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
     const { id, collectionId, polygon } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
+    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)

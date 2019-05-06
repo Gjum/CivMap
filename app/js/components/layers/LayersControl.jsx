@@ -27,7 +27,7 @@ const Layer = ({ nested, dispatch, collection, presentation, enabled_presentatio
 
   return <ListItem style={style} button onClick={() => {
     if (isEnabled) dispatch(disablePresentationInCollection(collection.id, presentation.name))
-    else dispatch(enablePresentationInCollection(collection.id, presentation.name))
+    else dispatch(enablePresentationInCollection(collection.id, nested ? presentation.name : true))
   }}>
     <ListItemIcon>{isEnabled ? <VisibleIcon /> : <InvisibleIcon />}</ListItemIcon>
     <ListItemText primary={presentation.name} />

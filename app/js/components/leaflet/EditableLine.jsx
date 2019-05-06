@@ -56,9 +56,9 @@ export default class EditableLine extends React.PureComponent {
   }
 
   render() {
-    let { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
+    let { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
     const { id, collectionId, line } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
+    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)

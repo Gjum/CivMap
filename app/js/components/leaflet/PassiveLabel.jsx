@@ -23,20 +23,21 @@ export default class PassiveLabel extends React.PureComponent {
 
   componentWillUpdate(nextProps, nextState) {
     // TODO also check if label placement is different
-    if (nextProps.feature !== this.props.feature
-      || nextProps.baseStyle !== this.props.baseStyle
-      || nextProps.zoomStyle !== this.props.zoomStyle) {
-      this.icon = null
+    for (const propKey of ['feature', 'baseStyle', 'highlightStyle', 'zoomStyle']) {
+      if (nextProps[propKey] !== this.props[propKey]) {
+        this.icon = null
+        break
+      }
     }
   }
 
-  recreateLabel({ feature, baseStyle, zoomStyle }) {
+  recreateLabel({ feature, baseStyle, highlightStyle, zoomStyle }) {
     this.icon = null
 
     // TODO configurable label font size, color, positioning, rotation, ...
     // TODO get offset from marker size
 
-    let labelText = lookupStyle("label", { feature, baseStyle, zoomStyle }, feature.name)
+    let labelText = lookupStyle("label", { feature, baseStyle, highlightStyle, zoomStyle }, feature.name)
     if (!labelText) return
     labelText = (labelText + '').replace(/\n/g, "<br />")
 

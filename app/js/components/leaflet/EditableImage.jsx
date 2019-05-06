@@ -7,9 +7,9 @@ import { openFeatureDetail } from '../../store'
 
 export default class EditableImage extends React.PureComponent {
   render() {
-    let { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
+    let { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
     const { id, collectionId, map_image: { url, bounds } } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
+    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
     return <RL.ImageOverlay
       onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}

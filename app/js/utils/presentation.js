@@ -6,9 +6,14 @@
 
 export function getCurrentPresentation(collection) {
   const { enabled_presentation, presentations = {} } = collection
-  const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
-  const presentation = enabled_presentation && (presentations[enabled_presentation] || fallbackPresentation)
-  return presentation
+  if (!enabled_presentation) return null
+  const presentation = presentations[enabled_presentation]
+  if (presentation) return presentation
+  if (enabled_presentation === true) {
+    const fallbackPresentation = Object.values(presentations)[0] || defaultPresentation
+    return fallbackPresentation
+  }
+  return null // unknown presentation name
 }
 
 /**
@@ -52,9 +57,9 @@ export function calculateFeatureStyleProp(feature, styleProp) {
 /**
  * Apply the styles to the feature, resolving `$props`, categories, ranges, etc.
  */
-export function calculateFeatureStyle({ feature, baseStyle, zoomStyle }) {
+export function calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle }) {
+  const combinedStyle = { ...baseStyle, ...zoomStyle, ...highlightStyle }
   const style = {}
-  const combinedStyle = { ...baseStyle, ...zoomStyle }
   for (let k in combinedStyle) {
     style[k] = calculateFeatureStyleProp(feature, combinedStyle[k])
   }
@@ -65,9 +70,9 @@ export function calculateFeatureStyle({ feature, baseStyle, zoomStyle }) {
 /**
  * Find the zoom style that applies to the given zoom level.
  */
-export function getZoomStyle({ zoom_styles }, zoom) {
-  if (!zoom_styles) return {}
-  let zoomStyle = {}
+export function getZoomStyle(zoom_styles, zoom) {
+  if (!zoom_styles) return defaultZoomStyle
+  let zoomStyle = defaultZoomStyle
   for (let z = zoom; z >= -6; z--) {
     if (zoom_styles[z]) {
       zoomStyle = zoom_styles[z]
@@ -81,12 +86,11 @@ export function getZoomStyle({ zoom_styles }, zoom) {
  * Get styleKey after applying the styles to the feature,
  * or return the defaultVal if the value at styleKey is undefined.
  */
-export function lookupStyle(styleKey, { feature, baseStyle, zoomStyle }, defaultVal) {
-  if (zoomStyle && zoomStyle[styleKey] !== undefined) {
-    return calculateFeatureStyleProp(feature, zoomStyle[styleKey])
-  }
-  if (baseStyle && baseStyle[styleKey] !== undefined) {
-    return calculateFeatureStyleProp(feature, baseStyle[styleKey])
+export function lookupStyle(styleKey, { feature, baseStyle, highlightStyle, zoomStyle }, defaultVal) {
+  for (const style of [highlightStyle, zoomStyle, baseStyle]) {
+    if (style && style[styleKey] !== undefined) {
+      return calculateFeatureStyleProp(feature, style[styleKey])
+    }
   }
   return defaultVal
 }
@@ -107,6 +111,8 @@ export function convertStyle(styleIn) {
   return styleOut
 }
 
+const defaultZoomStyle = {}
+
 export const defaultPresentation = {
   name: "(default)",
   style_base: {
@@ -121,6 +127,6 @@ export const defaultPresentation = {
     stroke_width: 2,
   },
   zoom_styles: {
-    "-6": {},
+    "-6": defaultZoomStyle,
   },
 }

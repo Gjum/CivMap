@@ -41,56 +41,20 @@ function prepareListForFeatureGroup(list) {
   return null
 }
 
-export function selectRenderedFeatures({ activeFeatureCollection, activeFeatureId, appMode, collections, zoom }) {
-  const highlightActiveFeature = ['EDIT', 'FEATURE', 'SEARCH'].includes(appMode)
-
-  const featuresPresentations = {}
-
-  // TODO separate RL.FeatureGroup per collection to reduce updates
-  // TODO lazily separate into zoom groups, reset that cache when features change
-  Object.values(collections).forEach(collection => {
-    const { features = {} } = collection
-    const presentation = getCurrentPresentation(collection)
-
-    if (!presentation) {
-      if (highlightActiveFeature
-        && activeFeatureCollection == collection.id
-        && features[activeFeatureId]) {
-        // show active/edited feature anyway
-        const feature = features[activeFeatureId]
-        const { style_base, style_highlight } = defaultPresentation
-        featuresPresentations[feature.id] = {
-          feature,
-          baseStyle: { ...style_base, ...style_highlight },
-          zoomStyle: { ...getZoomStyle(presentation, zoom), ...style_highlight },
-        }
-      }
-      return
+/** @param {{ activeFeatureCollection: string, activeFeatureId: string, collections: {[id: string]: any}, zoom: number }} args */
+export function selectRenderedLayers(args) {
+  const { activeFeatureCollection, activeFeatureId, collections } = args
+  const renderedLayers = Object.values(collections).map(layer => {
+    let presentationMaybe = getCurrentPresentation(layer)
+    if (!presentationMaybe) {
+      if (layer.id !== activeFeatureCollection) return null
+      const layerHasActiveFeature = layer.features && layer.features[activeFeatureId]
+      if (!layerHasActiveFeature) return null
+      // else: show (only) active/edited feature anyway - indicated by a false-ish presentationMaybe
     }
-
-    const baseStyle = presentation.style_base
-    const highlightStyle = presentation.style_highlight || defaultPresentation.style_highlight
-    const zoomStyle = getZoomStyle(presentation, zoom)
-
-    Object.values(features).forEach(feature => {
-      if (highlightActiveFeature && activeFeatureId === feature.id && activeFeatureCollection === feature.collectionId) {
-        featuresPresentations[feature.id] = {
-          feature,
-          baseStyle: { ...baseStyle, ...highlightStyle },
-          zoomStyle: { ...zoomStyle, ...highlightStyle },
-        }
-      } else if (presentation) {
-        const featureWithStyles = { feature, baseStyle, zoomStyle }
-        const opacity = lookupStyle("opacity", featureWithStyles, 1)
-        if (opacity > 0) {
-          featuresPresentations[feature.id] = featureWithStyles
-        }
-      } else {
-        // all presentations disabled for this category, nor highlighted: do not show feature
-      }
-    })
-  })
-  return featuresPresentations
+    return [layer, presentationMaybe]
+  }).filter(pair => pair !== null)
+  return renderedLayers.sort()
 }
 
 export const RealLeafOverlay = ({
@@ -101,27 +65,51 @@ export const RealLeafOverlay = ({
   zoom,
   dispatch,
 }) => {
-  const featuresPresentations = selectRenderedFeatures({ activeFeatureCollection, activeFeatureId, appMode, collections, zoom })
+  const editableMode = appMode === 'EDIT'
+  if (!['EDIT', 'FEATURE', 'SEARCH'].includes(appMode)) {
+    activeFeatureId = null
+    activeFeatureCollection = null
+  }
 
+  const renderedLayers = selectRenderedLayers({ activeFeatureCollection, activeFeatureId, collections, zoom })
   return <RL.FeatureGroup>
     {prepareListForFeatureGroup(
-      Object.values(featuresPresentations).map(({ feature, baseStyle, zoomStyle }, i) => {
-        const editable = appMode === 'EDIT' && activeFeatureId === feature.id
-        const props = { dispatch, editable, feature, baseStyle, zoomStyle }
-        const FeatureComponent = getFeatureComponent(feature)
-        if (!FeatureComponent) {
-          console.error("[FeaturesOverlay] Don't know how to display feature", feature)
-          return null
+      renderedLayers.map(([layer, presentationMaybe], i) => {
+        const presentation = presentationMaybe || defaultPresentation
+        const activeLayer = layer.id === activeFeatureCollection
+        const baseStyle = presentation.style_base
+        const zoomStyle = getZoomStyle(presentation.zoom_styles, zoom)
+
+        let renderedFeatures
+        const onlyRenderActiveFeature = !presentationMaybe
+        if (onlyRenderActiveFeature && activeLayer && activeFeatureId) {
+          renderedFeatures = [layer.features[activeFeatureId]]
+        } else {
+          renderedFeatures = Object.values(layer.features)
         }
-        return <FeatureComponent key={feature.id || i} {...props} />
+
+        return <RL.FeatureGroup key={layer.id || i} >
+          {prepareListForFeatureGroup(
+            renderedFeatures.map(feature => {
+              const editable = editableMode && activeFeatureId === feature.id
+              const active = activeLayer && feature.id === activeFeatureId
+              const highlightStyle = (active || editable) && (presentation.style_highlight || defaultPresentation.style_highlight)
+              const FeatureComponent = getFeatureComponent(feature)
+              if (!FeatureComponent) {
+                console.error("[LeafOverlay] Don't know how to display feature", feature)
+                return null
+              }
+              const props = { baseStyle, dispatch, editable, feature, highlightStyle, zoomStyle }
+              const opacity = lookupStyle("opacity", props, 1)
+              if (opacity <= 0) return null // invisible
+              return [
+                <FeatureComponent key={feature.id} {...props} />,
+                doesFeatureHaveLabel(props) && <PassiveLabel key={feature.id + '_label'} {...props} />,
+              ]
+            })
+          )}
+        </RL.FeatureGroup>
       })
-    )}
-    {prepareListForFeatureGroup(
-      Object.values(featuresPresentations)
-        .filter((featureWithStyles) => doesFeatureHaveLabel(featureWithStyles))
-        .map((featureWithStyles, i) => {
-          return <PassiveLabel key={(featureWithStyles.feature.id || i) + '_label'} {...featureWithStyles} />
-        })
     )}
   </RL.FeatureGroup>
 }

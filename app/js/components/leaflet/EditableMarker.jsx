@@ -43,10 +43,11 @@ export default class EditableMarker extends React.PureComponent {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.feature !== this.props.feature
-      || nextProps.baseStyle !== this.props.baseStyle
-      || nextProps.zoomStyle !== this.props.zoomStyle) {
-      this.icon = null
+    for (const propKey of ['feature', 'baseStyle', 'highlightStyle', 'zoomStyle']) {
+      if (nextProps[propKey] !== this.props[propKey]) {
+        this.icon = null
+        break
+      }
     }
   }
 
@@ -85,9 +86,9 @@ export default class EditableMarker extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, editable, feature, baseStyle, zoomStyle } = this.props
+    const { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
     const { id, collectionId, x, z } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, zoomStyle })
+    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
     if (x === null || z === null) {
       const tempMarker = this.context.leafMap.editTools.startMarker()
