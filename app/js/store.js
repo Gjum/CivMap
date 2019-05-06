@@ -79,6 +79,7 @@ export const defaultMapView = {
   // describes the enclosed "circle"
   // XXX use rectangle always, find more descriptive name
   viewport: null,
+  zoom: -6,
 }
 
 // should be session-local, but we persist it anyway for user convenience
@@ -92,11 +93,12 @@ const mapView = (state = defaultMapView, action) => {
       } = action.state.mapView
       return { basemapId, viewport }
     }
-    case 'SET_ACTIVE_BASEMAP':
+    case 'SET_ACTIVE_BASEMAP': {
       return { ...state, basemapId: action.basemapId }
+    }
     case 'SET_VIEWPORT': {
       let viewport = action.viewport
-      if (!viewport.radius) {
+      if (viewport && !viewport.radius) {
         // convert from bounds to inner circle
         const [[e, n], [w, s]] = action.viewport
         viewport = {
@@ -105,21 +107,30 @@ const mapView = (state = defaultMapView, action) => {
           radius: Math.min(Math.abs(w - e), Math.abs(s - n)), // XXX both max and min are wrong, we should always store rect in viewport
         }
       }
-      if (viewport.radius === state.viewport.radius
-        && viewport.x === state.viewport.x
-        && viewport.z === state.viewport.z) {
+      if (!viewport) viewport = state.viewport
+      const zoom = action.zoom || state.zoom
+      if (zoom === state.zoom && equalViewports(viewport, state.viewport)) {
         return state
       }
-      return { ...state, viewport }
+      return { ...state, viewport, zoom }
     }
     default:
       return state
   }
 }
 
+export const equalViewports = (a, b) => a === b || (a && b && (
+  a.radius === b.radius && a.x === b.x && a.z === b.z
+))
+
 export const setActiveBasemap = (basemapId) => ({ type: 'SET_ACTIVE_BASEMAP', basemapId })
 
-export const setViewport = (viewport) => ({ type: 'SET_VIEWPORT', viewport })
+// TODO clean up legacy code passing wrong args
+export const setViewport = arg => {
+  let { viewport, zoom } = arg
+  if (!viewport) viewport = arg
+  return { type: 'SET_VIEWPORT', viewport, zoom }
+}
 
 // just stores the default config
 // no need to persist as it is rebuilt on load,

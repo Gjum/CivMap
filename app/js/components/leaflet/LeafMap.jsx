@@ -8,7 +8,7 @@ import 'leaflet-editable'
 import LeafBaseMap from './LeafBaseMap'
 import LeafOverlay from './LeafOverlay'
 
-import { setViewport } from '../../store'
+import { equalViewports, setViewport } from '../../store'
 import { boundsToContainedCircle, circleToBounds, deepFlip, intCoord } from '../../utils/math'
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
@@ -20,10 +20,6 @@ var mcCRS = L.extend({}, L.CRS.Simple, {
 class LeafMap extends React.Component {
   static childContextTypes = {
     leafMap: PropTypes.object,
-  }
-
-  state = {
-    zoom: -6,
   }
 
   getChildContext() {
@@ -43,7 +39,7 @@ class LeafMap extends React.Component {
     if (viewport !== this.props.viewport) {
       this.checkAndSetView(viewport)
     }
-    if (viewport === this.waitingForView) {
+    if (equalViewports(viewport, this.waitingForView)) {
       this.waitingForView = null
     }
   }
@@ -66,10 +62,9 @@ class LeafMap extends React.Component {
   }
 
   onViewChange(e) {
-    const newView = boundsToContainedCircle(e.target.getBounds())
-    this.waitingForView = newView
-    this.props.dispatch(setViewport(newView))
-    this.setState({ zoom: e.target.getZoom() })
+    const viewport = boundsToContainedCircle(e.target.getBounds())
+    this.waitingForView = viewport
+    this.props.dispatch(setViewport({ viewport, zoom: e.target.getZoom() }))
   }
 
   onCoordsRef(ref) {
@@ -111,7 +106,7 @@ class LeafMap extends React.Component {
           ref={this.onCoordsRef.bind(this)}
         >X 0 0 Z</div>
         <LeafBaseMap />
-        <LeafOverlay zoom={this.state.zoom} />
+        <LeafOverlay />
       </RL.Map>
     </div>
   }

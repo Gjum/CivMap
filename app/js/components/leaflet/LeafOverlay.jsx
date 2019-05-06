@@ -126,12 +126,13 @@ export const RealLeafOverlay = ({
   </RL.FeatureGroup>
 }
 
-const mapStateToProps = ({ control, collections }) => {
+const mapStateToProps = ({ control, collections, mapView }) => {
   return {
     activeFeatureId: control.activeFeatureId,
     activeFeatureCollection: control.activeFeatureCollection,
     appMode: control.appMode,
     collections,
+    zoom: mapView.zoom,
   }
 }
 

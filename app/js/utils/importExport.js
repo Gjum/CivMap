@@ -1,5 +1,5 @@
 import { convertFeatureFrom200, convertCollectionFromAny } from './convertFromOld'
-import { circleBoundsFromFeature, circleToBounds } from './math'
+import { rectBoundsFromFeature } from './math'
 import { getJSON } from './net'
 import { enablePresentationInCollection, importCollection, openFeatureDetail, openSearch, setActiveBasemap, setViewport, updateFeatureInCollection, lookupFeature } from '../store'
 
@@ -116,7 +116,7 @@ export function loadAppStateFromUrlData(urlData, store) {
       if (feature) {
         store.dispatch(openFeatureDetail(feature.id, feature.collectionId))
         if (!urlData.viewport) {
-          const viewport = circleBoundsFromFeature(feature)
+          const viewport = rectBoundsFromFeature(feature)
           store.dispatch(setViewport(viewport))
         }
       } else {
