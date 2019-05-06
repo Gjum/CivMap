@@ -26,6 +26,9 @@ class RealCollectionEditor extends React.PureComponent {
     const { collection, dispatch } = this.props
     const { originalCollection } = this.state
 
+    const editableCollection = { ...collection }
+    delete editableCollection.features
+
     return <div>
       <div style={{ margin: '16px' }}>
 
@@ -80,10 +83,11 @@ class RealCollectionEditor extends React.PureComponent {
 
         <JsonEditor
           style={{ margin: '16px 0px' }}
-          data={collection.presentations}
-          onChange={(newPresentations) => {
-            // TODO validate collection
-            dispatch(updateCollection({ ...collection, presentations: newPresentations }))
+          data={editableCollection}
+          onChange={(editedCollection) => {
+            const newCollection = { ...collection, ...editedCollection, id: collection.id }
+            // TODO validate newCollection
+            dispatch(updateCollection(newCollection))
           }}
         />
       </div>
