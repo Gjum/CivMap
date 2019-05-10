@@ -1,8 +1,11 @@
 import { loadCollectionJson } from './importExport'
+import Uuid from 'uuid'
 import { importCollection } from '../store'
 
 export function getFileProcessor(fileName) {
-  if (fileName === 'Snitches.csv') {
+  if (fileName.endsWith('Snitches.csv')) {
+    return { process: processSnitchMasterFile, description: 'SnitchMaster snitches' }
+  } else if (fileName.startsWith('Snitches') && fileName.endsWith('.csv')) {
     return { process: processSnitchMasterFile, description: 'SnitchMaster snitches' }
   } else if (fileName.endsWith('.json')) {
     return { process: processCollectionFile, description: 'CivMap Collection' }
@@ -64,8 +67,8 @@ export function processVoxelWaypointsText(text, dispatch, source) {
   dispatch(importCollection({
     features,
     // XXX allow importing+viewing multiple waypoint files in parallel
-    name: 'My VoxelMap Waypoints',
-    id: 'civmap:collection/waypoint/voxelmap',
+    name: 'My VoxelMap Waypoints from ' + source,
+    id: 'civmap:voxelmap-waypoints/' + Uuid.v4(),
     source,
     enabled_presentation: 'Waypoints',
     presentations: [{
@@ -94,7 +97,7 @@ export function processSnitchMasterFile(file, dispatch) {
     const features = text.split('\n')
       .filter(line => line) // skip empty
       .map(line => {
-        let [x, y, z, world, source, group, name, cull] = line.split(',')
+        let [x, y, z, world, tagsStr, group, name, cull] = line.split(',')
         x = parseInt(x)
         y = parseInt(y)
         z = parseInt(z)
@@ -102,30 +105,51 @@ export function processSnitchMasterFile(file, dispatch) {
 
         name = name || `Snitch at ${x},${y},${z} on [${group}]`
 
-        const fid = `civmap:snitchmaster/${x},${y},${z},${group}`
+        const fid = `civmap:snitchmaster/${x},${y},${z},${world},${group}`
+
+        const tags = {}
+        tagsStr.split('#').forEach(tag => tags[`tag_${tag}`] = tag)
 
         // TODO colorize groups
 
         return {
           id: fid,
           polygon: [[[x - 11, z - 11], [x + 12, z - 11], [x + 12, z + 12], [x - 11, z + 12]]],
-          name, x, y, z, world, source, group, cull,
+          name, x, y, z, world, group, cull,
           from_snitchmaster: true,
+          ...tags,
         }
       })
 
-    // TODO instead, add to existing collection
     dispatch(importCollection({
       features,
-      // XXX allow importing+viewing multiple snitch files in parallel
-      name: 'My Snitches',
-      id: 'civmap:collection/snitches',
+      name: 'Snitches from ' + file.name,
+      id: 'civmap:snitchmaster/' + Uuid.v4(),
       source: file.name,
       enabled_presentation: 'Snitches',
       presentations: [
         {
           "name": "Snitches",
-          "style_base": { "icon": "snitch" },
+          "style_base": {
+            "icon": "snitch",
+            "label": null,
+            "opacity": {
+              "feature_key": "tag_gone",
+              "default": 1,
+              "categories": { "gone": 0 }
+            }
+          },
+          "zoom_styles": {
+            "-1": { "label": "$name" },
+            "1": {
+              "label": "$name",
+              "opacity": {
+                "feature_key": "tag_gone",
+                "default": 1,
+                "categories": { "gone": 0.4 }
+              }
+            }
+          }
         },
         // TODO add presentations for soon-culled etc.
       ],
