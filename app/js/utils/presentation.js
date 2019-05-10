@@ -21,7 +21,7 @@ export function getCurrentPresentation(collection) {
  * @param {StyleProp} styleProp
  */
 export function calculateFeatureStyleProp(feature, styleProp) {
-  // TODO contains($) -> replace ${x} with feature.x
+  // TODO contains('${') -> replace each ${x} with feature.x
   if ((typeof (styleProp) === 'string' || styleProp instanceof String) && styleProp.startsWith('\$')) {
     const [key, fallback] = styleProp.substr(1).split('\|')
     return feature[key] || fallback
@@ -33,19 +33,18 @@ export function calculateFeatureStyleProp(feature, styleProp) {
     return styleProp
   }
   const { feature_key, categories, range, default: defaultVal } = styleProp
-  // TODO defaultVal should allow $keys
   if (categories && feature_key) {
     const featureVal = feature[feature_key]
-    if (featureVal === undefined) return defaultVal
+    if (featureVal === undefined) return calculateFeatureStyleProp(feature, defaultVal)
 
     const categoryVal = categories[featureVal]
-    if (categoryVal === undefined) return defaultVal
+    if (categoryVal === undefined) return calculateFeatureStyleProp(feature, defaultVal)
 
     return calculateFeatureStyleProp(feature, categoryVal)
   }
   if (range && feature_key) {
     const featureVal = feature[feature_key]
-    if (featureVal === undefined) return defaultVal
+    if (featureVal === undefined) return calculateFeatureStyleProp(feature, defaultVal)
 
     const { min_in, max_in, min_out, max_out } = range
     const part = (featureVal - min_in) / (max_in - min_in)
