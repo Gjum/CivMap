@@ -54,11 +54,101 @@ All coordinates are centered on the center of a block, except image bounds which
 
 ### Presentation Format
 
-TODO: name, style_base, style_highlight, zoom_styles
+The "presentation" lets you control the style attributes of the features.
+
+- `style_base` is the same for all features in the collection
+- one of the `zoom_styles` is applied to all features according to the current zoom level (see example below)
+- `style_highlight` is only applied to highlighted features (selection, search results, ...)
+
+The overriding order is: `combinedStyle = { ...baseStyle, ...zoomStyle, ...highlightStyle }`
+The result will be passed through this function and then applied to the leaflet element ([code](https://github.com/Gjum/CivMap/blob/master/app/js/utils/presentation.js#L102)).
 
 #### Style Format
 
-TODO allowed keys, prop mapping, prop value replacement
+- `label` (default `$name`)
+- `opacity` (fill and stroke; 0 means the feature is invisible)
+- `fill_opacity`
+- `color` (fill and stroke)
+- `hue` (`[0..360]`; overrides color if set)
+- `stroke_color`
+- `stroke_width`
+- `dash_array`
+- `icon_size`
+- `icon` (URL; a circle by default)
+
+More details on marker icon styles in the [code](https://github.com/Gjum/CivMap/blob/master/app/js/components/leaflet/EditableMarker.jsx#L10)
+
+#### Presentations Example
+
+```js
+{ // ... other collection properties omitted ...
+  "presentations": [
+    // there can be none (=default styles), one, or several presentations
+    // if there's several, the sidebar lets the user select which one to use for this collection
+    {
+      "name": "Rails and Stops", // when there's more than one presentation, this name will show up in the sidebar
+      "style_base": {
+        "color": "#ffffff", // primitives are applied to all features
+        // $-prefixed feature keys resolve to the value of that feature property
+        // | separates a fallback value: style = feature[key] || fallback
+        // this will be fixed to use undefined/NaN check, to allow 0, '', and false as values
+        "label": "$nice_name|(unnamed)",
+        // objects specify how to compute the style from the feature props
+        "stroke_color": {
+          // category selectors are like a switch-case statement
+          // for each feature, its "stroke_color" style depends on the feature's "elevation" property
+          "feature_key": "elevation",
+          "categories": {
+            "underground": "#00ff00",
+            "surface": "#00ffff",
+            // the value can also be another nested selector
+            "elevated": {
+              "feature_key": "elevation_type",
+              "categories": {
+                "skylimit": "#123123",
+                "viaduct": "#345345"
+              },
+              "default": "#234234"
+            }
+          },
+          "default": "#808080"
+        },
+        "stroke_width": {
+          // range selectors linearly map the value of a feature property to a style value, interpolating/extrapolating appropriately
+          // implementation: https://github.com/Gjum/CivMap/blob/master/app/js/utils/presentation.js#L50
+          "feature_key": "num_tracks",
+          "range": {
+            "min_in": 1, "max_in": 5, // in feature units
+            "min_out": 2, "max_out": 10 // in style units (here: px)
+          }
+        }
+      },
+      "zoom_styles": {
+        // searched in ascending order for the largest key that is smaller than or equal to the current zoom
+        "-6": { // zoomed out all the way
+          // each zoom entry is structured exactly the same as style_base
+          "opacity": {
+            // example: only features with "importance":"major" are visible when zoomed out
+            "feature_key": "importance",
+            "categories": {
+              "major": 1
+            },
+            "default": 0
+          }
+        },
+        "0": { // zoomed in at 1 block to 1 pixel
+          "opacity": 1 // now all features are visible
+        }
+      },
+      // style_highlight is structured exactly the same as style_base,
+      // but applied to selected/highlighted features in addition to style_base
+      "style_highlight": {
+        "stroke_color": "#ff0000"
+      }
+    }
+  ]
+}
+```
 
 ### In-Browser Entry Point
 
