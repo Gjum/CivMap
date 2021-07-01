@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import * as RL from 'react-leaflet'
 
-import { intCoords, intCoord, deepLatLngToArr, centered, deepFlip, boundsToRect } from '../../utils/math'
+import { deepFlip, boundsToRect } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
 
@@ -73,7 +73,7 @@ export default class EditableCircle extends React.PureComponent {
       ref={this.onRef.bind(this)}
       onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       {...convertStyle(style)}
-      bounds={!valid ? [[1,2],[3,4]] : centered(deepFlip(rectangle))}
+      bounds={!valid ? [[1,2],[3,4]] : deepFlip(rectangle)}
     />
   }
 }
