@@ -7,6 +7,7 @@ import EditableImage from './EditableImage';
 import EditableLine from './EditableLine'
 import EditableMarker from './EditableMarker'
 import EditablePolygon from './EditablePolygon'
+import EditableRectangle from './EditableRectangle'
 import PassiveLabel from './PassiveLabel'
 import { defaultPresentation, getCurrentPresentation, getZoomStyle, lookupStyle } from '../../utils/presentation'
 
@@ -18,6 +19,7 @@ export function getFeatureComponent(feature, zoom) {
   if (has('map_image')) return EditableImage
   if (has('polygon')) return EditablePolygon
   if (has('line')) return EditableLine
+  if (has('rectangle')) return EditableRectangle
   if (has('x') && has('z')) {
     if (has('radius')) return EditableCircle
     return EditableMarker
@@ -31,7 +33,7 @@ function doesFeatureHaveLabel(featureWithStyles) {
   const label = lookupStyle("label", featureWithStyles, feature.name)
 
   const hasXZ = feature.x !== undefined && feature.z !== undefined
-  return label && (hasXZ || feature.polygon !== undefined)
+  return label && (hasXZ || feature.rectangle !== undefined || feature.polygon !== undefined)
 }
 
 // RL.FeatureGroup has weird expectations about its children...

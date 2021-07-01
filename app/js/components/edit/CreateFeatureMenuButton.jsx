@@ -12,6 +12,7 @@ import ImageIcon from '@material-ui/icons/InsertPhoto'
 import LineIcon from '@material-ui/icons/Timeline'
 import MarkerIcon from '@material-ui/icons/AddLocation'
 import PolygonIcon from '@material-ui/icons/PanoramaHorizontal'
+import RectangleIcon from '@material-ui/icons/AspectRatio'
 
 import { openEditMode, createFeature, updateFeatureInCollection } from '../../store'
 
@@ -60,11 +61,17 @@ export default class CreateFeatureMenuButton extends React.Component {
           <ListItemIcon><LineIcon /></ListItemIcon>
           Create line
         </MenuItem>
+        <MenuItem
+          onClick={() => makeNewAndEdit({ rectangle: null })}
+        >
+          <ListItemIcon><RectangleIcon /></ListItemIcon>
+          Create rectangle
+        </MenuItem>
         <MenuItem disabled
           onClick={() => makeNewAndEdit({ polygon: null })}
         >
           <ListItemIcon><PolygonIcon /></ListItemIcon>
-          Create area
+          Create polygon
         </MenuItem>
         <MenuItem disabled
           onClick={() => makeNewAndEdit({ x: null, z: null, radius: null })}

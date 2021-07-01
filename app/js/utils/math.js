@@ -27,6 +27,12 @@ export function boundsToContainedCircle(bounds) {
   return { x, z, radius }
 }
 
+export function boundsToRect(bounds) {
+  const [e, n] = intCoords(bounds.getNorthEast())
+  const [w, s] = intCoords(bounds.getSouthWest())
+  return [[e, n], [w, s]]
+}
+
 export function rectToEnclosingCircle(rect) {
   const [[w, n], [e, s]] = rect
   const [x, z] = intCoords([(e + w) / 2, (s + n) / 2])
@@ -90,6 +96,7 @@ export function boundsFromPositions(positions) {
 export function rectBoundsFromFeature(feature) {
   const has = (k) => feature[k] !== undefined
   // TODO select largest/according to zoom level
+  if (has('rectangle')) return feature.rectangle
   if (has('map_image')) return boundsFromPositions(feature.map_image.bounds)
   if (has('polygon')) return boundsFromPositions(feature.polygon)
   if (has('line')) return boundsFromPositions(feature.line)

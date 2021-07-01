@@ -59,6 +59,12 @@ export default class PassiveLabel extends React.PureComponent {
     const { feature } = this.props
 
     let { x, z } = feature
+    if (feature.rectangle && x === undefined && z === undefined) {
+      const [[w, n], [e, s]] = feature.rectangle
+      x = (w + e) / 2
+      z = (n + s) / 2
+      console.log('rect center at',{x,z})
+    }
     if (feature.polygon && x === undefined && z === undefined) {
       [x, z] = firstCenter(feature.polygon)
     }
