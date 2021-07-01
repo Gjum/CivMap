@@ -40,6 +40,7 @@ export default class EditableLine extends React.PureComponent {
 
   updatePositions = (e) => {
     this.featureRef.editor.ensureMulti()
+    // for some reason this makes it [[[[]]]] so just get first
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
     // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
@@ -67,15 +68,17 @@ export default class EditableLine extends React.PureComponent {
       ref={this.onRef}
       onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
       {...convertStyle(style)}
-      positions={!deepCheckValidLine(line) ? [] : centered(deepFlip(line))}
+      positions={!checkValidMultiLine(line) ? [] : centered(deepFlip(line))}
     />
   }
 }
 
-function deepCheckValidLine(line) {
-  if (Array.isArray(line)) {
-    return line.length > 0 && line.every(deepCheckValidLine)
-  } else {
-    return Number.isFinite(line)
-  }
+function checkValidMultiLine(line) {
+  return line && line.length && line.every(checkValidLine)
+}
+function checkValidLine(line) {
+  return line && line.length && line.every(checkValidPos)
+}
+function checkValidPos(pos) {
+  return pos && pos.length === 2 && Number.isFinite(pos[0]) && Number.isFinite(pos[1])
 }

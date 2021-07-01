@@ -67,7 +67,7 @@ export default class CreateFeatureMenuButton extends React.Component {
           <ListItemIcon><RectangleIcon /></ListItemIcon>
           Create rectangle
         </MenuItem>
-        <MenuItem disabled
+        <MenuItem
           onClick={() => makeNewAndEdit({ polygon: null })}
         >
           <ListItemIcon><PolygonIcon /></ListItemIcon>

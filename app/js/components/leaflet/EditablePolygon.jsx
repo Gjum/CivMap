@@ -24,12 +24,6 @@ export default class EditablePolygon extends React.PureComponent {
     this.featureRef.enableEdit() // create editor
     this.featureRef.editor.reset()
 
-    const positions = this.props.feature.polygon
-    if (!positions || positions.length <= 0 || positions[positions.length - 1].length <= 0) {
-      this.featureRef.editor.disable() // newShape() is broken while editing
-      this.featureRef.editor.newShape()
-    }
-
     if (!this.featureRef.civMapIsListening) {
       this.featureRef.civMapIsListening = true
       // TODO add holes by clicking on shape
@@ -40,7 +34,7 @@ export default class EditablePolygon extends React.PureComponent {
   }
 
   updatePositions = (e) => {
-    this.featureRef.editor.ensureMulti()
+    this.featureRef.editor.ensureNotFlat()
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
     // TODO ignore updates that only add 1-point segments
     const { feature } = this.props
@@ -61,6 +55,20 @@ export default class EditablePolygon extends React.PureComponent {
     const { id, collectionId, polygon } = feature
     const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
+    if (!checkValidMultiPoly(polygon)) {
+      const tempPoly = this.context.leafMap.editTools.startPolygon()
+      // XXX on react unmount, disable editor and unregister handler
+      tempPoly.on('editable:drawing:clicked', e => {
+        const positions = deepLatLngToArr(tempPoly.getLatLngs())
+        if (checkValidMultiPoly(positions)) {
+          tempPoly.remove()
+          this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, polygon: positions }))
+        }
+      })
+
+      return null
+    }
+
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
 
@@ -71,4 +79,14 @@ export default class EditablePolygon extends React.PureComponent {
       positions={!polygon ? [] : deepFlip(polygon)}
     />
   }
+}
+
+function checkValidMultiPoly(poly) {
+    return poly && poly.length && poly.every(checkValidPoly)
+}
+function checkValidPoly(poly) {
+  return poly && poly.length >= 3 && poly.every(checkValidPos)
+}
+function checkValidPos(pos) {
+    return pos && pos.length === 2 && Number.isFinite(pos[0]) && Number.isFinite(pos[1])
 }
