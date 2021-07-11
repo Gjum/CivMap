@@ -10,10 +10,11 @@ import LeafOverlay from './LeafOverlay'
 
 import { equalViewports, setViewport } from '../../store'
 import { boundsToContainedCircle, circleToBounds, deepFlip, intCoord } from '../../utils/math'
+import { patterns } from '../../utils/presentation'
 
-L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/';
+L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/'
 
-var mcCRS = L.extend({}, L.CRS.Simple, {
+const mcCRS = L.extend({}, L.CRS.Simple, {
   transformation: new L.Transformation(1, 0, 1, 0)
 })
 
@@ -58,6 +59,9 @@ class LeafMap extends React.Component {
     map.invalidateSize()
     if (this.map === map) return
     this.map = map
+    for (const pattern of Object.values(patterns)) {
+      pattern.addTo(map)
+    }
     this.checkAndSetView(this.props.viewport)
   }
 

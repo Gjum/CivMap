@@ -1,3 +1,6 @@
+import 'leaflet.pattern'
+import L from 'leaflet'
+
 /**
  * @typedef {{ default: any, feature_key: String, categories?: {}, range?: { min_in: Number, max_in: Number, min_out: Number, max_out: Number } }} StyleProp
  * @typedef {{any: StyleProp}} Styling
@@ -94,11 +97,20 @@ export function lookupStyle(styleKey, { feature, baseStyle, highlightStyle, zoom
   return defaultVal
 }
 
+// https://github.com/teastman/Leaflet.pattern#usage-examples
+export const patterns = {
+  red_stripes: new L.StripePattern({
+    weight: 1,
+    angle: -45,
+    color: '#ff0000',
+  }),
+}
+
 /**
  * Convert from CivMap-API style to Leaflet style.
  */
 export function convertStyle(styleIn) {
-  let { color, dash_array, fill_opacity, opacity, stroke_color, stroke_width } = styleIn
+  let { color, dash_array, fill_opacity, fill_pattern, opacity, stroke_color, stroke_width } = styleIn
   const styleOut = {
     color: stroke_color || color || '#ff8800',
     dashArray: dash_array,
@@ -106,6 +118,7 @@ export function convertStyle(styleIn) {
     fillOpacity: fill_opacity !== undefined ? fill_opacity : opacity * .3,
     opacity: opacity,
     weight: stroke_width !== undefined ? stroke_width : 3,
+    fillPattern: patterns[fill_pattern],
   }
   return styleOut
 }
