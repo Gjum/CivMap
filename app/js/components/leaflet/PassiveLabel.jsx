@@ -41,11 +41,13 @@ export default class PassiveLabel extends React.PureComponent {
     if (!labelText) return
     labelText = (labelText + '').replace(/\n/g, "<br />")
 
+    const isAreaFeature = feature.polygon || feature.rectangle || feature.map_image
+
     this.icon = L.divIcon({
       className: 'leaflabel',
       html: labelText,
       iconSize: [200, 100],
-      iconAnchor: [100, (feature.polygon || (feature.radius !== undefined)) ? 0 : -10],
+      iconAnchor: [100, (isAreaFeature || feature.radius !== undefined) ? 0 : -10],
     })
   }
 
@@ -59,15 +61,16 @@ export default class PassiveLabel extends React.PureComponent {
     const { feature } = this.props
 
     let { x, z } = feature
-    if (feature.rectangle && x === undefined && z === undefined) {
-      const [[w, n], [e, s]] = feature.rectangle
+    if ((feature.rectangle || feature.map_image) && x === undefined && z === undefined) {
+      const [[w, n], [e, s]] = feature.rectangle || feature.map_image.bounds
       x = (w + e) / 2
       z = (n + s) / 2
-      console.log('rect center at',{x,z})
     }
     if (feature.polygon && x === undefined && z === undefined) {
       [x, z] = firstCenter(feature.polygon)
     }
+
+    if (!Number.isFinite(x) || !Number.isFinite(z)) return null
 
     return <RL.Marker
       position={[z + .5, x + .5]}
