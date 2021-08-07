@@ -100,9 +100,14 @@ export function lookupStyle(styleKey, { feature, baseStyle, highlightStyle, zoom
 // https://github.com/teastman/Leaflet.pattern#usage-examples
 export const patterns = {
   red_stripes: new L.StripePattern({
-    weight: 1,
+    weight: 3,
     angle: -45,
     color: '#ff0000',
+  }),
+  yellow_stripes: new L.StripePattern({
+    weight: 1,
+    angle: 45,
+    color: '#ffff00',
   }),
 }
 
