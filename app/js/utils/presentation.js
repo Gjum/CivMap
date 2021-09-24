@@ -104,6 +104,11 @@ export const patterns = {
     angle: -45,
     color: '#ff0000',
   }),
+  pruple_stripes: new L.StripePattern({
+    weight: 3,
+    angle: -45,
+    color: '#8000ff',
+  }),
   yellow_stripes: new L.StripePattern({
     weight: 1,
     angle: 45,
