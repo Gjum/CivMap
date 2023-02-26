@@ -166,30 +166,19 @@ div {
       "mainlist" 1fr;
 }
 
-/* landscape on medium-size devices */
-@media all and (orientation: landscape) and (min-width: 600px) and (max-width: 719px) {
-  .container.split {
-      grid-template: "mainlist map"
-      / 284px auto;
-  }
-  .container.full-map {
-      grid-template: "map";
-  }
-  .container.full-list {
-      grid-template: "mainlist";
-  }
-
-  .appbar {
-    max-width: 284px;
-    width: auto;
-  }
-}
-
 /* large devices */
 @media all and (min-width: 720px) {
   .container.split {
-      grid-template: "mainlist map"
-      / 360px auto;
+      grid-template: "map mainlist" / auto 360px;
+  }
+
+  .mainlist {
+    margin-top: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+  }
+  .mapContainer {
+    grid-column-end: mainlist;
   }
 
   .appbar {

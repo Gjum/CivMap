@@ -33,6 +33,17 @@ const AppFrame = ({
   const darkTheme = createTheme({
     palette: {
       mode: 'dark',
+      neutral: {
+        main: '#404040',
+        contrastText: '#ffffff',
+      },
+    },
+    components: {
+      MuiButton: {
+        defaultProps: {
+          color: "neutral"
+        }
+      }
     }
   })
 
