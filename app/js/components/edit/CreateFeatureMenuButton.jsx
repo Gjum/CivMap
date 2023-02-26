@@ -2,7 +2,7 @@ import React from 'react'
 import Uuid from 'uuid'
 
 import { IconButton, ListItemIcon, Menu, MenuItem } from '@mui/material'
-import { Circle, Edit, Image, Timeline, AddLocation, Pentagon, Rectangle } from '@mui/icons-material'
+import { CircleRounded, AddRounded, ImageRounded, TimelineRounded, AddLocationRounded, PentagonRounded, RectangleRounded } from '@mui/icons-material'
 
 import { openEditMode, createFeature, updateFeatureInCollection } from '../../store'
 
@@ -32,7 +32,7 @@ export default class CreateFeatureMenuButton extends React.Component {
 
     return <div>
       <IconButton onClick={this.handleOpen}>
-        <Edit />
+        <AddRounded />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -42,39 +42,39 @@ export default class CreateFeatureMenuButton extends React.Component {
         <MenuItem
           onClick={() => makeNewAndEdit({ x: null, z: null })}
         >
-          <ListItemIcon><AddLocation /></ListItemIcon>
+          <ListItemIcon><AddLocationRounded /></ListItemIcon>
           Create marker
         </MenuItem>
         <MenuItem
           onClick={() => makeNewAndEdit({ line: null })}
         >
-          <ListItemIcon><Timeline /></ListItemIcon>
+          <ListItemIcon><TimelineRounded /></ListItemIcon>
           Create line
         </MenuItem>
         <MenuItem
           onClick={() => makeNewAndEdit({ rectangle: null })}
         >
-          <ListItemIcon><Rectangle /></ListItemIcon>
+          <ListItemIcon><RectangleRounded /></ListItemIcon>
           Create rectangle
         </MenuItem>
         <MenuItem
           onClick={() => makeNewAndEdit({ polygon: null })}
         >
-          <ListItemIcon><Pentagon /></ListItemIcon>
+          <ListItemIcon><PentagonRounded /></ListItemIcon>
           Create polygon
         </MenuItem>
-        <MenuItem disabled
+        {/* <MenuItem disabled
           onClick={() => makeNewAndEdit({ x: null, z: null, radius: null })}
         >
-          <ListItemIcon><Circle /></ListItemIcon>
+          <ListItemIcon><CircleRounded /></ListItemIcon>
           Create circle
         </MenuItem>
         <MenuItem disabled
           onClick={() => makeNewAndEdit({ map_image: null })}
         >
-          <ListItemIcon><Image /></ListItemIcon>
+          <ListItemIcon><ImageRounded /></ListItemIcon>
           Create image
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </div>
   }

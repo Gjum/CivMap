@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { IconButton } from '@mui/material'
-import { Close, Edit, Layers, Menu, Search, Share } from '@mui/icons-material'
+import { CloseRounded, EditRounded, LayersRounded, MenuRounded, SearchRounded, ShareRounded } from '@mui/icons-material'
 
 import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
 import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature } from '../store'
@@ -17,12 +17,12 @@ const AppBar = ({
 }) => {
   return <div className='appbar'>
     <IconButton onClick={() => dispatch(setDrawerOpen())}>
-      <Menu />
+      <MenuRounded />
     </IconButton>
 
     {appMode === 'LAYERS' ||
       <IconButton onClick={() => dispatch(openLayers())}>
-        <Layers />
+        <LayersRounded />
       </IconButton>
     }
 
@@ -31,7 +31,7 @@ const AppBar = ({
         // TODO search close/similar to active feature
         dispatch(openSearch())
       }}>
-        <Search />
+        <SearchRounded />
       </IconButton>
     }
 
@@ -47,14 +47,14 @@ const AppBar = ({
         // TODO better location sharing: create marker with name prompt, add query for close-by features, etc.
       }
     }}>
-      <Share />
+      <ShareRounded />
     </IconButton>
 
     {appMode === 'FEATURE' ?
       <IconButton onClick={() => {
         dispatch(openEditMode(feature.id, feature.collectionId))
       }}>
-        <Edit />
+        <EditRounded />
       </IconButton>
       :
       <CreateFeatureMenuButton dispatch={dispatch} />
@@ -66,7 +66,7 @@ const AppBar = ({
 
     {appMode !== 'BROWSE' &&
       <IconButton onClick={() => dispatch(openBrowseMode())}>
-        <Close />
+        <CloseRounded />
       </IconButton>
     }
   </div>
