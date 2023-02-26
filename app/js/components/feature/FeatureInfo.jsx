@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { Button, Stack } from '@mui/material'
-import { DeleteRounded, MapRounded } from '@mui/icons-material'
+import { DeleteRounded, EditRounded, MapRounded } from '@mui/icons-material'
 
 import { circleBoundsFromFeature, rectBoundsFromFeature } from '../../utils/math'
-import { openBrowseMode, removeFeatureInCollection, setViewport, lookupFeature } from '../../store'
+import { openBrowseMode, removeFeatureInCollection, setViewport, lookupFeature, openEditMode } from '../../store'
 
 export function isUrl(value) {
   return /^https?:\/\/[^\/ ]+\.[a-z]{2,}(\/|$)/i.test(value)
@@ -104,6 +104,11 @@ const RealFeatureInfo = ({
       <Button variant='contained' onClick={() => dispatch(setViewport(rectBounds))}>
         <MapRounded />
         Show on map
+      </Button>
+
+      <Button onClick={() => dispatch(openEditMode(feature.id, feature.collectionId))}>
+        <EditRounded />
+        Edit feature
       </Button>
 
       <Button variant='contained' onClick={() => {

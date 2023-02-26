@@ -41,7 +41,8 @@ const AppFrame = ({
     components: {
       MuiButton: {
         defaultProps: {
-          color: "neutral"
+          color: "neutral",
+          variant: "contained"
         }
       }
     }

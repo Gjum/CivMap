@@ -50,15 +50,7 @@ const AppBar = ({
       <ShareRounded />
     </IconButton>
 
-    {appMode === 'FEATURE' ?
-      <IconButton onClick={() => {
-        dispatch(openEditMode(feature.id, feature.collectionId))
-      }}>
-        <EditRounded />
-      </IconButton>
-      :
-      <CreateFeatureMenuButton dispatch={dispatch} />
-    }
+    <CreateFeatureMenuButton dispatch={dispatch} />
 
     <div className='appbar-stretch'>
       {/* CivMap */}

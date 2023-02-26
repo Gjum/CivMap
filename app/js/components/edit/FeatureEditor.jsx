@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Button, Stack, TextField } from '@mui/material'
+import { Button, Stack, TextField, Snackbar } from '@mui/material'
 
-import { CheckRounded, DeleteRounded, HorizontalRuleRounded, PentagonRounded, RestartAltRounded, SwapHorizRounded } from '@mui/icons-material'
+import { CheckRounded, DeleteRounded, HorizontalRuleRounded, PentagonRounded, RestartAltRounded, SwapHorizRounded, LinkRounded } from '@mui/icons-material'
 
 import { exportStringFromFeature } from '../../utils/importExport'
 import JsonEditor from '../edit/JsonEditor'
@@ -15,12 +15,13 @@ export class RealFeatureEditor extends React.Component {
     super(props)
     this.state = {
       originalFeature: props.feature,
+      open: false,
     }
   }
 
   render() {
     const { feature, dispatch } = this.props
-    const { originalFeature } = this.state
+    const { originalFeature, open } = this.state
 
     const dataLink = '#feature=' + exportStringFromFeature(feature)
 
@@ -31,6 +32,7 @@ export class RealFeatureEditor extends React.Component {
           value={String(feature.name || '')}
           onChange={e => dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, name: e.target.value }))}
         />
+
 
         <JsonEditor
           data={feature}
@@ -88,6 +90,18 @@ export class RealFeatureEditor extends React.Component {
             dispatch(updateFeatureInCollection(feature.collectionId, featureNew))
           }}><SwapHorizRounded />Reverse line/area direction</Button>
         }
+        <Snackbar open={open} autoHideDuration={6000} message="Link copied to clipboard!" onClosse={() => {
+          this.setState({...this.state, open: false})
+        }}/>
+        <Button variant="contained" onClick={() => {
+          const url = new URL(window.location.href)
+          url.hash = dataLink
+          navigator.clipboard.writeText(url.toString()).then(() => {
+            this.setState({...this.state, open: true})
+          })
+        }}>
+          <LinkRounded /> Copy feature as link
+        </Button>
       </Stack>
     </div>
   }
