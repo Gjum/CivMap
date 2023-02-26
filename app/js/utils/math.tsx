@@ -1,4 +1,6 @@
-export function intCoords(point: (number|string)[] | {lng: (number|string); lat: (number|string)}) {
+export type Coordinates = [number, number]
+
+export function intCoords(point: (number|string)[] | {lng: (number|string); lat: (number|string)}): Coordinates {
   let x, z
   if (Array.isArray(point)) {
     [x, z] = point
@@ -19,7 +21,13 @@ export function intCoord(c: number|string) {
   return r
 }
 
-export function boundsToContainedCircle(bounds) {
+export interface Circle {
+  x: number
+  z: number
+  radius: number
+}
+
+export function boundsToContainedCircle(bounds): Circle {
   const [x, z] = intCoords(bounds.getCenter())
   const [e, n] = intCoords(bounds.getNorthEast())
   const [w, s] = intCoords(bounds.getSouthWest())
@@ -27,20 +35,20 @@ export function boundsToContainedCircle(bounds) {
   return { x, z, radius }
 }
 
-export function boundsToRect(bounds) {
+export function boundsToRect(bounds): Rectangle {
   const [e, n] = intCoords(bounds.getNorthEast())
   const [w, s] = intCoords(bounds.getSouthWest())
   return [[e, n], [w, s]]
 }
 
-export function rectToEnclosingCircle(rect) {
+export function rectToEnclosingCircle(rect): Circle {
   const [[w, n], [e, s]] = rect
   const [x, z] = intCoords([(e + w) / 2, (s + n) / 2])
   const radius = Math.round(Math.max(Math.abs(e - w), Math.abs(s - n)) / 2)
   return { x, z, radius }
 }
 
-export function circleToBounds({ x, z, radius }) {
+export function circleToBounds({ x, z, radius }): Rectangle {
   return [[x - radius, z - radius], [x + radius, z + radius]]
 }
 
@@ -50,12 +58,16 @@ export function deepLatLngToArr(positions) {
   return intCoords(positions)
 }
 
+export function centered(positions: Coordinates[]): Coordinates[]
+export function centered(positions: Coordinates): Coordinates
 export function centered(positions) {
   if (Array.isArray(positions[0]))
     return positions.map(e => centered(e))
   return [positions[0] + .5, positions[1] + .5]
 }
 
+export function deepFlip(positions: Coordinates[]): Coordinates[]
+export function deepFlip(positions: Coordinates): Coordinates
 export function deepFlip(positions) {
   if (Array.isArray(positions[0]))
     return positions.map(e => deepFlip(e))
@@ -93,7 +105,9 @@ export function boundsFromPositions(positions) {
   }
 }
 
-export function rectBoundsFromFeature(feature) {
+export type Rectangle = [[number, number], [number, number]]
+
+export function rectBoundsFromFeature(feature): Rectangle {
   const has = (k) => feature[k] !== undefined
   // TODO select largest/according to zoom level
   if (has('rectangle')) return feature.rectangle
@@ -109,6 +123,6 @@ export function rectBoundsFromFeature(feature) {
   return [[-9000, -9000], [9000, 9000]]
 }
 
-export function circleBoundsFromFeature(feature) {
+export function circleBoundsFromFeature(feature): Circle {
   return rectToEnclosingCircle(rectBoundsFromFeature(feature))
 }

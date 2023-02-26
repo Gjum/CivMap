@@ -1,11 +1,23 @@
 import 'leaflet.pattern'
 import L from 'leaflet'
 
-/**
- * @typedef {{ default: any, feature_key: String, categories?: {}, range?: { min_in: Number, max_in: Number, min_out: Number, max_out: Number } }} StyleProp
- * @typedef {{any: StyleProp}} Styling
- * @typedef {{name: String, style_base: Styling, style_highlight: Styling, zoom_styles: {Number: Styling}}} Presentation
- */
+export interface StyleProp {
+  default: any
+  feature_key: String
+  categories?: {}
+  range?: { min_in: Number, max_in: Number, min_out: Number, max_out: Number }
+}
+
+export interface Styling {
+  [key: string]: StyleProp
+}
+
+export interface Presentation {
+  name: String
+  style_base: Styling
+  style_highlight: Styling
+  zoom_styles: {Number: Styling}
+}
 
 export function getCurrentPresentation(collection) {
   const { enabled_presentation, presentations = {} } = collection
@@ -61,7 +73,7 @@ export function calculateFeatureStyleProp(feature, styleProp) {
  */
 export function calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle }) {
   const combinedStyle = { ...baseStyle, ...zoomStyle, ...highlightStyle }
-  const style = {}
+  const style: {[key: keyof (typeof combinedStyle)]: any} = {}
   for (let k in combinedStyle) {
     style[k] = calculateFeatureStyleProp(feature, combinedStyle[k])
   }

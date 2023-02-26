@@ -2,12 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as L from 'leaflet'
 import * as RL from 'react-leaflet'
+import { RootState } from '../../store'
 
 const LeafBaseMap = ({
   borderApothem,
   tilesRoot,
   basemapId,
-}) => {
+}: ReturnType<typeof mapStateToProps>) => {
   if (!basemapId) return null
   const tileBounds = [[-borderApothem, -borderApothem], [borderApothem, borderApothem]] as L.LatLngBoundsLiteral
   return <RL.TileLayer
@@ -20,7 +21,7 @@ const LeafBaseMap = ({
   />
 }
 
-const mapStateToProps = ({ mapConfig, mapView }, ownProps) => {
+const mapStateToProps = ({ mapConfig, mapView }: RootState) => {
   const { tilesRoot, borderApothem } = mapConfig
   return { tilesRoot, borderApothem, basemapId: mapView.basemapId }
 }

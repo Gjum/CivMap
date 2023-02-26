@@ -6,7 +6,7 @@ var config = {
     initialState: {
         mapConfig: {
             borderApothem: 16000,
-            tilesRoot: 'http://localhost:8080/',
+            tilesRoot: 'https://raw.githubusercontent.com/CivReignCommunity/Tiles/main/',
             basemaps: {
                 terrain: { name: 'Terrain', id: 'terrain', bgColor: '#000', isDefault: true },
             },

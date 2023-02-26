@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 import * as L from 'leaflet'
 import * as RL from 'react-leaflet'
 import 'leaflet-editable'
@@ -8,8 +8,8 @@ import 'leaflet-editable'
 import LeafBaseMap from './LeafBaseMap'
 import LeafOverlay from './LeafOverlay'
 
-import { equalViewports, setViewport } from '../../store'
-import { boundsToContainedCircle, circleToBounds, deepFlip, intCoord } from '../../utils/math'
+import { equalViewports, RootState, setViewport } from '../../store'
+import { boundsToContainedCircle, Circle, circleToBounds, deepFlip, intCoord } from '../../utils/math'
 import { patterns } from '../../utils/presentation'
 import Coordinates from './Coordinates'
 
@@ -19,11 +19,14 @@ const mcCRS = L.extend({}, L.CRS.Simple, {
   transformation: new L.Transformation(1, 0, 1, 0)
 })
 
-class LeafMap extends React.Component {
+class LeafMap extends React.Component<DispatchProp & ReturnType<typeof mapStateToProps>> {
+  map: L.Map | null
+  waitingForView: Circle
+
   constructor(props) {
     super(props)
 
-    this.state = {coords: [0, 0]}
+    this.map = null
   }
 
   componentWillMount() {
@@ -51,10 +54,9 @@ class LeafMap extends React.Component {
     }
   }
 
-  onRef(ref) {
-    if (!ref) return
-    const map = ref.leafletElement
-    map.invalidateSize()
+  whenCreated(ref: L.Map | null) {
+    const map = ref
+    map?.invalidateSize()
     if (this.map === map) return
     this.map = map
     for (const pattern of Object.values(patterns)) {
@@ -63,24 +65,19 @@ class LeafMap extends React.Component {
     this.checkAndSetView(this.props.viewport)
   }
 
-  onViewChange(e) {
-    const viewport = boundsToContainedCircle(e.target.getBounds())
+  onViewChange(event: L.LeafletEvent) {
+    const viewport = boundsToContainedCircle(event.target.getBounds())
     this.waitingForView = viewport
-    this.props.dispatch(setViewport({ viewport, zoom: e.target.getZoom() }))
+    this.props.dispatch(setViewport({ viewport, zoom: event.target.getZoom() }))
   }
 
   render() {
-    const {
-      mapBgColor,
-    } = this.props
-    const [x, z] = this.state.coords
+    const { mapBgColor } = this.props
 
-    return <div className="mapContainer full"
-      style={{ backgroundColor: mapBgColor }}
-    >
+    return <div className="mapContainer full" style={{ backgroundColor: mapBgColor }}>
       <RL.MapContainer
         className="map"
-        ref={this.onRef.bind(this)}
+        whenCreated={this.whenCreated.bind(this)}
         crs={mcCRS}
         center={[0, 0]}
         zoom={-6}
@@ -88,10 +85,15 @@ class LeafMap extends React.Component {
         minZoom={-6}
         attributionControl={false}
         zoomControl={false}
-        onmoveend={this.onViewChange.bind(this)}
-        onzoomend={this.onViewChange.bind(this)}
         editable
       >
+        <RL.MapConsumer>
+          {(map) => {
+            map.on("moveend", (event) => this.onViewChange(event))
+            map.on("zoomend", (event) => this.onViewChange(event))
+            return null
+          }}
+        </RL.MapConsumer>
         <Coordinates />
         <LeafBaseMap />
         <LeafOverlay />
@@ -100,7 +102,7 @@ class LeafMap extends React.Component {
   }
 }
 
-const mapStateToProps = ({ control, mapConfig, mapView }) => {
+const mapStateToProps = ({ control, mapConfig, mapView }: RootState) => {
   return {
     mapBgColor: (mapConfig.basemaps[mapView.basemapId] || {}).bgColor,
     viewport: mapView.viewport,

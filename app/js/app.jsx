@@ -6,14 +6,11 @@ import { createStore } from 'redux'
 
 import AppFrame from './components/AppFrame'
 import ErrorBoundary from './components/ErrorBoundary'
-import { appLoad, combinedReducers } from './store'
+import { appLoad, store } from './store'
 import { getAppStateFromLocalStorage, saveAppStateToLocalStorage } from './utils/localStorage'
 import { autoImportCollectionsOnStartup, loadAppStateFromUrlData, parseUrlHash, loadCollectionJsonAsync } from './utils/importExport'
 
 export function start(config, rootElement) {
-  const store = createStore(combinedReducers, {},
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
-
   if (config.initialState) {
     store.dispatch(appLoad(prepareInitialState(config.initialState)))
   }

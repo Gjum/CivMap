@@ -46,6 +46,7 @@
     "@mui/icons-material": "^5.11.9",
     "@mui/material": "^5.11.10",
     "@mui/styles": "^5.11.9",
+    "@reduxjs/toolkit": "^1.9.3",
     "leaflet": "^1.4.0",
     "leaflet-editable": "^1.2.0",
     "leaflet.pattern": "^0.1.0",
