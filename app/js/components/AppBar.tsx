@@ -1,20 +1,22 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { IconButton } from '@mui/material'
 import { CloseRounded, EditRounded, LayersRounded, MenuRounded, SearchRounded, ShareRounded } from '@mui/icons-material'
 
 import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
-import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature } from '../store'
+import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature, RootState } from '../store'
 
-const AppBar = ({
-  collection,
-  appMode,
-  feature,
-  searchQuery,
-  viewport,
-  dispatch,
-}) => {
+export default function() {
+  const {
+    collection,
+    appMode,
+    feature,
+    searchQuery,
+    viewport,
+  } = useSelector(mapStateToProps)
+  const dispatch = useDispatch()
+
   return <div className='appbar'>
     <IconButton onClick={() => dispatch(setDrawerOpen())}>
       <MenuRounded />
@@ -64,7 +66,7 @@ const AppBar = ({
   </div>
 }
 
-const mapStateToProps = (state) => {
+function mapStateToProps(state: RootState) {
   const { collections, control, mapView } = state
   const { activeFeatureCollection, activeFeatureId, appMode, searchQuery } = control
   return {
@@ -75,5 +77,3 @@ const mapStateToProps = (state) => {
     viewport: mapView.viewport,
   }
 }
-
-export default connect(mapStateToProps)(AppBar)

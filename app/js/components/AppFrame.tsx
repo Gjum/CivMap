@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 
 import * as BROWSE from './browse'
 import * as EDIT from './edit'
@@ -14,19 +14,19 @@ import DragDrop from './DragDrop'
 import LeafMap from './leaflet/LeafMap'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
+import { RootState } from '../store'
 
-const modes = {
-  BROWSE,
-  EDIT,
-  FEATURE,
-  LAYERS,
-  COLLECTION,
-  SEARCH,
-}
+export default function(props) {
+  const modes = {
+    BROWSE,
+    EDIT,
+    FEATURE,
+    LAYERS,
+    COLLECTION,
+    SEARCH,
+  }
 
-const AppFrame = ({
-  appMode,
-}) => {
+  const appMode = useSelector((state: RootState) => state.control.appMode)
   const { SideContent } = modes[appMode]
 
   const containerModeClass = SideContent ? "split" : "full-map"
@@ -60,11 +60,3 @@ const AppFrame = ({
     </div>
   </ThemeProvider>
 }
-
-const mapStateToProps = ({ control: { appMode } }) => {
-  return {
-    appMode,
-  }
-}
-
-export default connect(mapStateToProps)(AppFrame)

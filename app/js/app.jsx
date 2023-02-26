@@ -2,7 +2,6 @@ import throttle from 'lodash/throttle'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 
 import AppFrame from './components/AppFrame'
 import ErrorBoundary from './components/ErrorBoundary'

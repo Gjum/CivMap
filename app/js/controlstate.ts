@@ -68,7 +68,7 @@ export type Action =
   { type: "OPEN_FEATURE_DETAIL"; featureId: FeatureId; collectionId: CollectionId } |
   { type: "OPEN_LAYERS" } |
   { type: "OPEN_COLLECTION"; collectionId: CollectionId } |
-  { type: "OPEN_SEARCH"; query: string } |
+  { type: "OPEN_SEARCH"; query: string | null } |
   { type: "SET_DRAWER_CLOSED" } |
   { type: "SET_DRAWER_OPEN" }
 
@@ -84,7 +84,7 @@ export const openLayers = (): Action => ({ type: 'OPEN_LAYERS' })
 
 export const openCollectionEdit = (collectionId: CollectionId): Action => ({ type: 'OPEN_COLLECTION', collectionId })
 
-export const openSearch = (query: string): Action => ({ type: 'OPEN_SEARCH', query })
+export const openSearch = (query: string | null = null): Action => ({ type: 'OPEN_SEARCH', query })
 
 
 export const setDrawerClosed = (): Action => ({ type: 'SET_DRAWER_CLOSED' })
