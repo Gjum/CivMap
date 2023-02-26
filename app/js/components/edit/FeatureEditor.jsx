@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Button, TextField } from '@mui/material'
+import { Button, Stack, TextField } from '@mui/material'
 
-import { Check, Delete, HorizontalRule, Pentagon, RestartAlt, SwapHoriz } from '@mui/icons-material'
+import { CheckRounded, DeleteRounded, HorizontalRuleRounded, PentagonRounded, RestartAltRounded, SwapHorizRounded } from '@mui/icons-material'
 
 import { exportStringFromFeature } from '../../utils/importExport'
 import JsonEditor from '../edit/JsonEditor'
@@ -25,13 +25,27 @@ export class RealFeatureEditor extends React.Component {
     const dataLink = '#feature=' + exportStringFromFeature(feature)
 
     return <div>
-      <div style={{ margin: '16px' }}>
+      <Stack spacing={2} margin={1}>
+        <TextField autoFocus fullWidth
+          label="Name"
+          value={String(feature.name || '')}
+          onChange={e => dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, name: e.target.value }))}
+        />
+
+        <JsonEditor
+          data={feature}
+          onChange={(newFeature) => {
+            // TODO validate feature
+            dispatch(updateFeatureInCollection(feature.collectionId, newFeature, feature.id))
+            dispatch(openEditMode(newFeature.id, feature.collectionId))
+          }}
+        />
 
         <Button variant='contained' onClick={() => {
           dispatch(updateFeatureInCollection(feature.collectionId, originalFeature, feature.id))
           dispatch(openEditMode(originalFeature.id, originalFeature.collectionId))
         }}>
-          <RestartAlt />
+          <RestartAltRounded />
           Reset
         </Button>
 
@@ -39,14 +53,14 @@ export class RealFeatureEditor extends React.Component {
           dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
           dispatch(openBrowseMode()) // TODO show similar features in search results instead
         }}>
-          <Delete />
+          <DeleteRounded />
           Delete
         </Button>
 
         <Button variant='contained' onClick={() => {
           dispatch(openFeatureDetail(feature.id, feature.collectionId))
         }}>
-          <Check />
+          <CheckRounded />
           Save
         </Button>
 
@@ -56,13 +70,13 @@ export class RealFeatureEditor extends React.Component {
               const f = { ...feature, line: feature.polygon }
               delete f.polygon
               dispatch(updateFeatureInCollection(f.collectionId, f))
-            }}><HorizontalRule />Convert to line</Button>
+            }}><HorizontalRuleRounded />Convert to line</Button>
             : feature.line !== undefined ?
               <Button variant='contained' onClick={() => {
                 const f = { ...feature, polygon: feature.line }
                 delete f.line
                 dispatch(updateFeatureInCollection(f.collectionId, f))
-              }}><Pentagon />Convert to area</Button>
+              }}><PentagonRounded />Convert to area</Button>
               : null
         }
         {/* TODO button to add new subshape */}
@@ -72,28 +86,9 @@ export class RealFeatureEditor extends React.Component {
             if (feature.polygon) featureNew.polygon = reversePolyPositions(feature.polygon)
             if (feature.line) featureNew.line = reversePolyPositions(feature.line)
             dispatch(updateFeatureInCollection(feature.collectionId, featureNew))
-          }}><SwapHoriz />Reverse line/area direction</Button>
+          }}><SwapHorizRounded />Reverse line/area direction</Button>
         }
-
-        <TextField autoFocus fullWidth
-          label="Name"
-          value={String(feature.name || '')}
-          onChange={e => dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, name: e.target.value }))}
-          style={{ margin: '16px 0px' }}
-        />
-
-        <a style={{ margin: '16px 0px' }} href={dataLink}>Export data as link</a>
-
-        <JsonEditor
-          style={{ margin: '16px 0px' }}
-          data={feature}
-          onChange={(newFeature) => {
-            // TODO validate feature
-            dispatch(updateFeatureInCollection(feature.collectionId, newFeature, feature.id))
-            dispatch(openEditMode(newFeature.id, feature.collectionId))
-          }}
-        />
-      </div>
+      </Stack>
     </div>
   }
 }
