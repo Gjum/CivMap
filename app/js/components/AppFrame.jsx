@@ -12,6 +12,8 @@ import AppBar from './AppBar'
 import AppDrawer from './drawer/AppDrawer'
 import DragDrop from './DragDrop'
 import LeafMap from './leaflet/LeafMap'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { CssBaseline } from '@mui/material'
 
 const modes = {
   BROWSE,
@@ -28,16 +30,23 @@ const AppFrame = ({
   const { SideContent } = modes[appMode]
 
   const containerModeClass = SideContent ? "split" : "full-map"
+  const darkTheme = createTheme({
+    palette: {
+      mode: 'dark',
+    }
+  })
 
-  return <div className='full'>
-    <AppDrawer />
-    <AppBar />
-    <div className={"container " + containerModeClass}>
-      <LeafMap />
-      {SideContent && <div className="mainlist"><SideContent /></div>}
+  return <ThemeProvider theme={darkTheme}>
+    <CssBaseline />
+    <div className='full'>
+      <AppDrawer />
+      <AppBar />
+      <div className={"container " + containerModeClass}>
+        <LeafMap />
+        {SideContent && <div className="mainlist"><SideContent /></div>}
+      </div>
     </div>
-    <DragDrop />
-  </div>
+  </ThemeProvider>
 }
 
 const mapStateToProps = ({ control: { appMode } }) => {

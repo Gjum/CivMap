@@ -11,6 +11,7 @@ import LeafOverlay from './LeafOverlay'
 import { equalViewports, setViewport } from '../../store'
 import { boundsToContainedCircle, circleToBounds, deepFlip, intCoord } from '../../utils/math'
 import { patterns } from '../../utils/presentation'
+import Coordinates from './Coordinates'
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/'
 
@@ -19,8 +20,10 @@ const mcCRS = L.extend({}, L.CRS.Simple, {
 })
 
 class LeafMap extends React.Component {
-  static childContextTypes = {
-    leafMap: PropTypes.object,
+  constructor(props) {
+    super(props)
+
+    this.state = {coords: [0, 0]}
   }
 
   getChildContext() {
@@ -71,26 +74,16 @@ class LeafMap extends React.Component {
     this.props.dispatch(setViewport({ viewport, zoom: e.target.getZoom() }))
   }
 
-  onCoordsRef(ref) {
-    if (!ref) return
-    this.coordsRef = ref
-  }
-
-  onMouseMove(e) {
-    if (!this.coordsRef) return
-    const { lat: z, lng: x } = e.latlng
-    this.coordsRef.innerText = `X ${intCoord(x)} ${intCoord(z)} Z`
-  }
-
   render() {
     const {
       mapBgColor,
     } = this.props
+    const [x, z] = this.state.coords
 
     return <div className="mapContainer full"
       style={{ backgroundColor: mapBgColor }}
     >
-      <RL.Map
+      <RL.MapContainer
         className="map"
         ref={this.onRef.bind(this)}
         crs={mcCRS}
@@ -102,16 +95,12 @@ class LeafMap extends React.Component {
         zoomControl={false}
         onmoveend={this.onViewChange.bind(this)}
         onzoomend={this.onViewChange.bind(this)}
-        onmousemove={this.onMouseMove.bind(this)}
         editable
       >
-        <div
-          className='leafmap-coords'
-          ref={this.onCoordsRef.bind(this)}
-        >X 0 0 Z</div>
+        <Coordinates />
         <LeafBaseMap />
         <LeafOverlay />
-      </RL.Map>
+      </RL.MapContainer>
     </div>
   }
 }

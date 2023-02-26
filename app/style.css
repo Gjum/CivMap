@@ -51,8 +51,9 @@ div {
   right: 0;
   padding: .5em 1em;
   font-size: 12px;
-  color: black;
-  background-color: white;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(30px);
   box-shadow: 0px 0px 4px -1px #00000070;
 }
 
@@ -118,7 +119,8 @@ div {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(30px);
 }
 
 /* .appbar > button {

@@ -38,10 +38,6 @@ function createIcon({ feature, style }) {
 }
 
 export default class EditableMarker extends React.PureComponent {
-  static contextTypes = {
-    leafMap: PropTypes.object,
-  }
-
   componentWillUpdate(nextProps, nextState) {
     for (const propKey of ['feature', 'baseStyle', 'highlightStyle', 'zoomStyle']) {
       if (nextProps[propKey] !== this.props[propKey]) {
@@ -86,37 +82,41 @@ export default class EditableMarker extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
-    const { id, collectionId, x, z } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
+    return <RL.MapConsumer>
+      {(map) => {
+        const { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
+        const { id, collectionId, x, z } = feature
+        const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
-    if (x === null || z === null) {
-      const tempMarker = this.context.leafMap.editTools.startMarker()
-      // XXX on react unmount, disable editor and unregister handler
-      tempMarker.on('editable:drawing:clicked', e => {
-        const [x, z] = intCoords(tempMarker.getLatLng())
-        tempMarker.remove()
-        this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, x, z }))
-      })
+        if (x === null || z === null) {
+          const tempMarker = map.editTools.startMarker()
+          // XXX on react unmount, disable editor and unregister handler
+          tempMarker.on('editable:drawing:clicked', e => {
+            const [x, z] = intCoords(tempMarker.getLatLng())
+            tempMarker.remove()
+            this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, x, z }))
+          })
 
-      return null
-    }
+          return null
+        }
 
-    // let leaflet internals finish updating before we interact with it
-    setTimeout(this.resetEditor, 0)
+        // let leaflet internals finish updating before we interact with it
+        setTimeout(this.resetEditor, 0)
 
-    if (!this.icon) this.icon = createIcon({ feature, style })
+        if (!this.icon) this.icon = createIcon({ feature, style })
 
-    if (this.icon) return <RL.Marker
-      ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
-      position={[z + .5, x + .5]}
-      icon={this.icon}
-    />
-    return <RL.Marker
-      ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
-      position={[z + .5, x + .5]}
-    />
+        if (this.icon) return <RL.Marker
+          ref={this.onRef.bind(this)}
+          onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+          position={[z + .5, x + .5]}
+          icon={this.icon}
+        />
+        return <RL.Marker
+          ref={this.onRef.bind(this)}
+          onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+          position={[z + .5, x + .5]}
+        />
+      }}
+    </RL.MapConsumer>
   }
 }

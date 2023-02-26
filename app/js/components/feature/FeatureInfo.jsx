@@ -1,13 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from '@material-ui/core/Button'
-import IconButton from '@material-ui/core/IconButton'
-
-import DeleteIcon from '@material-ui/icons/Delete'
-import EditIcon from '@material-ui/icons/Edit'
-import FilterIcon from '@material-ui/icons/FilterList'
-import ShowOnMapIcon from '@material-ui/icons/Explore'
+import { Button, IconButton } from '@mui/material'
+import { Delete, Edit, Filter, Map } from '@mui/icons-material'
 
 import { circleBoundsFromFeature, rectBoundsFromFeature } from '../../utils/math'
 import { openBrowseMode, removeFeatureInCollection, setViewport, lookupFeature } from '../../store'
@@ -107,7 +102,7 @@ const RealFeatureInfo = ({
 
     <div style={{ margin: '16px' }}>
       <Button variant='contained' onClick={() => dispatch(setViewport(rectBounds))}>
-        <ShowOnMapIcon />
+        <Map />
         Show on map
       </Button>
 
@@ -115,7 +110,7 @@ const RealFeatureInfo = ({
         dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
         dispatch(openBrowseMode()) // TODO show similar features in search results instead
       }}>
-        <DeleteIcon />
+        <Delete />
         Delete
       </Button>
     </div>

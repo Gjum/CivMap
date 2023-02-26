@@ -1,14 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from '@material-ui/core/Button'
-import IconButton from '@material-ui/core/IconButton'
-import TextField from '@material-ui/core/TextField'
-
-import CheckIcon from '@material-ui/icons/Check'
-import DeleteIcon from '@material-ui/icons/Delete'
-import DownloadIcon from '@material-ui/icons/CloudDownload'
-import ResetIcon from '@material-ui/icons/Undo'
+import { Button, IconButton, TextField } from '@mui/material'
+import { Check, Delete, Download, RestartAlt } from '@mui/icons-material'
 
 import { exportCollection } from '../../utils/importExport'
 import JsonEditor from '../edit/JsonEditor'
@@ -35,7 +29,7 @@ class RealCollectionEditor extends React.PureComponent {
         <Button variant='contained' onClick={() => {
           dispatch(updateCollection(originalCollection))
         }}>
-          <ResetIcon />
+          <RestartAlt />
           Reset
         </Button>
 
@@ -43,14 +37,14 @@ class RealCollectionEditor extends React.PureComponent {
           dispatch(removeCollection(collection.id))
           dispatch(openLayers())
         }}>
-          <DeleteIcon />
+          <Delete />
           Delete
         </Button>
 
         <Button variant='contained' onClick={() => {
           dispatch(openLayers())
         }}>
-          <CheckIcon />
+          <Check />
           Save
         </Button>
 
@@ -77,7 +71,7 @@ class RealCollectionEditor extends React.PureComponent {
 
           document.body.removeChild(element)
         }}>
-          <DownloadIcon />
+          <Download />
           Download
         </Button>
 

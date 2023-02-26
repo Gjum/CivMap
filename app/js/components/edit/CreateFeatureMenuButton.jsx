@@ -1,18 +1,8 @@
 import React from 'react'
 import Uuid from 'uuid'
 
-import IconButton from '@material-ui/core/IconButton'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
-
-import CircleIcon from '@material-ui/icons/AddCircle'
-import EditIcon from '@material-ui/icons/Edit'
-import ImageIcon from '@material-ui/icons/InsertPhoto'
-import LineIcon from '@material-ui/icons/Timeline'
-import MarkerIcon from '@material-ui/icons/AddLocation'
-import PolygonIcon from '@material-ui/icons/PanoramaHorizontal'
-import RectangleIcon from '@material-ui/icons/AspectRatio'
+import { IconButton, ListItemIcon, Menu, MenuItem } from '@mui/material'
+import { Circle, Edit, Image, Timeline, AddLocation, Pentagon, Rectangle } from '@mui/icons-material'
 
 import { openEditMode, createFeature, updateFeatureInCollection } from '../../store'
 
@@ -42,7 +32,7 @@ export default class CreateFeatureMenuButton extends React.Component {
 
     return <div>
       <IconButton onClick={this.handleOpen}>
-        <EditIcon />
+        <Edit />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -52,37 +42,37 @@ export default class CreateFeatureMenuButton extends React.Component {
         <MenuItem
           onClick={() => makeNewAndEdit({ x: null, z: null })}
         >
-          <ListItemIcon><MarkerIcon /></ListItemIcon>
+          <ListItemIcon><AddLocation /></ListItemIcon>
           Create marker
         </MenuItem>
         <MenuItem
           onClick={() => makeNewAndEdit({ line: null })}
         >
-          <ListItemIcon><LineIcon /></ListItemIcon>
+          <ListItemIcon><Timeline /></ListItemIcon>
           Create line
         </MenuItem>
         <MenuItem
           onClick={() => makeNewAndEdit({ rectangle: null })}
         >
-          <ListItemIcon><RectangleIcon /></ListItemIcon>
+          <ListItemIcon><Rectangle /></ListItemIcon>
           Create rectangle
         </MenuItem>
         <MenuItem
           onClick={() => makeNewAndEdit({ polygon: null })}
         >
-          <ListItemIcon><PolygonIcon /></ListItemIcon>
+          <ListItemIcon><Pentagon /></ListItemIcon>
           Create polygon
         </MenuItem>
         <MenuItem disabled
           onClick={() => makeNewAndEdit({ x: null, z: null, radius: null })}
         >
-          <ListItemIcon><CircleIcon /></ListItemIcon>
+          <ListItemIcon><Circle /></ListItemIcon>
           Create circle
         </MenuItem>
         <MenuItem disabled
           onClick={() => makeNewAndEdit({ map_image: null })}
         >
-          <ListItemIcon><ImageIcon /></ListItemIcon>
+          <ListItemIcon><Image /></ListItemIcon>
           Create image
         </MenuItem>
       </Menu>

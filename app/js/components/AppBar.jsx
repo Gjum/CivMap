@@ -1,14 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import IconButton from '@material-ui/core/IconButton'
-
-import CloseIcon from '@material-ui/icons/Close'
-import EditIcon from '@material-ui/icons/Edit'
-import LayersIcon from '@material-ui/icons/Layers'
-import MenuIcon from '@material-ui/icons/Menu'
-import SearchIcon from '@material-ui/icons/Search'
-import ShareLinkIcon from '@material-ui/icons/Link'
+import { IconButton } from '@mui/material'
+import { Close, Edit, Layers, Menu, Search, Share } from '@mui/icons-material'
 
 import CreateFeatureMenuButton from './edit/CreateFeatureMenuButton'
 import { openBrowseMode, openEditMode, openLayers, openSearch, setDrawerOpen, lookupFeature } from '../store'
@@ -23,12 +17,12 @@ const AppBar = ({
 }) => {
   return <div className='appbar'>
     <IconButton onClick={() => dispatch(setDrawerOpen())}>
-      <MenuIcon />
+      <Menu />
     </IconButton>
 
     {appMode === 'LAYERS' ||
       <IconButton onClick={() => dispatch(openLayers())}>
-        <LayersIcon />
+        <Layers />
       </IconButton>
     }
 
@@ -37,7 +31,7 @@ const AppBar = ({
         // TODO search close/similar to active feature
         dispatch(openSearch())
       }}>
-        <SearchIcon />
+        <Search />
       </IconButton>
     }
 
@@ -53,14 +47,14 @@ const AppBar = ({
         // TODO better location sharing: create marker with name prompt, add query for close-by features, etc.
       }
     }}>
-      <ShareLinkIcon />
+      <Share />
     </IconButton>
 
     {appMode === 'FEATURE' ?
       <IconButton onClick={() => {
         dispatch(openEditMode(feature.id, feature.collectionId))
       }}>
-        <EditIcon />
+        <Edit />
       </IconButton>
       :
       <CreateFeatureMenuButton dispatch={dispatch} />
@@ -72,7 +66,7 @@ const AppBar = ({
 
     {appMode !== 'BROWSE' &&
       <IconButton onClick={() => dispatch(openBrowseMode())}>
-        <CloseIcon />
+        <Close />
       </IconButton>
     }
   </div>

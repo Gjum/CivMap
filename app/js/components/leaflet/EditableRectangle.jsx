@@ -7,10 +7,6 @@ import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
 
 export default class EditableCircle extends React.PureComponent {
-  static contextTypes = {
-    leafMap: PropTypes.object,
-  }
-
   resetEditor = () => {
     if (!this.featureRef) {
       console.error('trying to set rectangle editing without featureRef')
@@ -47,34 +43,38 @@ export default class EditableCircle extends React.PureComponent {
   }
 
   render() {
-    let { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
+    return <RL.MapConsumer>
+      {(map) => {
+        let { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
 
-    const { id, collectionId, rectangle } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
+        const { id, collectionId, rectangle } = feature
+        const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
-    const valid = validRectangle(rectangle)
+        const valid = validRectangle(rectangle)
 
-    if (!valid) {
-      const tempRect = this.context.leafMap.editTools.startRectangle()
-      // XXX on react unmount, disable editor and unregister handler
-      tempRect.on('editable:drawing:commit', e => {
-        const rectangle = boundsToRect(tempRect.getBounds())
-        tempRect.remove()
-        this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, rectangle }))
-      })
+        if (!valid) {
+          const tempRect = map.editTools.startRectangle()
+          // XXX on react unmount, disable editor and unregister handler
+          tempRect.on('editable:drawing:commit', e => {
+            const rectangle = boundsToRect(tempRect.getBounds())
+            tempRect.remove()
+            this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, rectangle }))
+          })
 
-      return null
-    }
+          return null
+        }
 
-    // let leaflet internals finish updating before we interact with it
-    setTimeout(this.resetEditor, 0)
+        // let leaflet internals finish updating before we interact with it
+        setTimeout(this.resetEditor, 0)
 
-    return <RL.Rectangle
-      ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
-      {...convertStyle(style)}
-      bounds={!valid ? [[1,2],[3,4]] : deepFlip(rectangle)}
-    />
+        return <RL.Rectangle
+          ref={this.onRef.bind(this)}
+          onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+          {...convertStyle(style)}
+          bounds={!valid ? [[1,2],[3,4]] : deepFlip(rectangle)}
+        />
+      }}
+    </RL.MapConsumer>
   }
 }
 

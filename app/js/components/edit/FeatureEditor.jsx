@@ -1,15 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
+import { Button, TextField } from '@mui/material'
 
-import CheckIcon from '@material-ui/icons/Check'
-import DeleteIcon from '@material-ui/icons/Delete'
-import LineIcon from '@material-ui/icons/Timeline'
-import PolygonIcon from '@material-ui/icons/PanoramaHorizontal'
-import ResetIcon from '@material-ui/icons/Undo'
-import SwapIcon from '@material-ui/icons/SwapCalls'
+import { Check, Delete, HorizontalRule, Pentagon, RestartAlt, SwapHoriz } from '@mui/icons-material'
 
 import { exportStringFromFeature } from '../../utils/importExport'
 import JsonEditor from '../edit/JsonEditor'
@@ -37,7 +31,7 @@ export class RealFeatureEditor extends React.Component {
           dispatch(updateFeatureInCollection(feature.collectionId, originalFeature, feature.id))
           dispatch(openEditMode(originalFeature.id, originalFeature.collectionId))
         }}>
-          <ResetIcon />
+          <RestartAlt />
           Reset
         </Button>
 
@@ -45,14 +39,14 @@ export class RealFeatureEditor extends React.Component {
           dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
           dispatch(openBrowseMode()) // TODO show similar features in search results instead
         }}>
-          <DeleteIcon />
+          <Delete />
           Delete
         </Button>
 
         <Button variant='contained' onClick={() => {
           dispatch(openFeatureDetail(feature.id, feature.collectionId))
         }}>
-          <CheckIcon />
+          <Check />
           Save
         </Button>
 
@@ -62,13 +56,13 @@ export class RealFeatureEditor extends React.Component {
               const f = { ...feature, line: feature.polygon }
               delete f.polygon
               dispatch(updateFeatureInCollection(f.collectionId, f))
-            }}><LineIcon />Convert to line</Button>
+            }}><HorizontalRule />Convert to line</Button>
             : feature.line !== undefined ?
               <Button variant='contained' onClick={() => {
                 const f = { ...feature, polygon: feature.line }
                 delete f.line
                 dispatch(updateFeatureInCollection(f.collectionId, f))
-              }}><PolygonIcon />Convert to area</Button>
+              }}><Pentagon />Convert to area</Button>
               : null
         }
         {/* TODO button to add new subshape */}
@@ -78,7 +72,7 @@ export class RealFeatureEditor extends React.Component {
             if (feature.polygon) featureNew.polygon = reversePolyPositions(feature.polygon)
             if (feature.line) featureNew.line = reversePolyPositions(feature.line)
             dispatch(updateFeatureInCollection(feature.collectionId, featureNew))
-          }}><SwapIcon />Reverse line/area direction</Button>
+          }}><SwapHoriz />Reverse line/area direction</Button>
         }
 
         <TextField autoFocus fullWidth

@@ -7,10 +7,6 @@ import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
 
 export default class EditablePolygon extends React.PureComponent {
-  static contextTypes = {
-    leafMap: PropTypes.object,
-  }
-
   resetEditor = () => {
     if (!this.featureRef) {
       console.error('trying to set polygon editing without featureRef')
@@ -51,33 +47,37 @@ export default class EditablePolygon extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
-    const { id, collectionId, polygon } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
+    return <RL.MapConsumer>
+      {(map) => {
+        const { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
+        const { id, collectionId, polygon } = feature
+        const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
 
-    if (!checkValidMultiPoly(polygon)) {
-      const tempPoly = this.context.leafMap.editTools.startPolygon()
-      // XXX on react unmount, disable editor and unregister handler
-      tempPoly.on('editable:drawing:clicked', e => {
-        const positions = deepLatLngToArr(tempPoly.getLatLngs())
-        if (checkValidMultiPoly(positions)) {
-          tempPoly.remove()
-          this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, polygon: positions }))
+        if (!checkValidMultiPoly(polygon)) {
+          const tempPoly = map.editTools.startPolygon()
+          // XXX on react unmount, disable editor and unregister handler
+          tempPoly.on('editable:drawing:clicked', e => {
+            const positions = deepLatLngToArr(tempPoly.getLatLngs())
+            if (checkValidMultiPoly(positions)) {
+              tempPoly.remove()
+              this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, polygon: positions }))
+            }
+          })
+
+          return null
         }
-      })
 
-      return null
-    }
+        // let leaflet internals finish updating before we interact with it
+        setTimeout(this.resetEditor, 0)
 
-    // let leaflet internals finish updating before we interact with it
-    setTimeout(this.resetEditor, 0)
-
-    return <RL.Polygon
-      ref={this.onRef}
-      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
-      {...convertStyle(style)}
-      positions={!polygon ? [] : deepFlip(polygon)}
-    />
+        return <RL.Polygon
+          ref={this.onRef}
+          onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+          {...convertStyle(style)}
+          positions={!polygon ? [] : deepFlip(polygon)}
+        />
+      }}
+    </RL.MapConsumer>
   }
 }
 

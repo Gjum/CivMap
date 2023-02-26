@@ -1,16 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from '@material-ui/core/Button'
-import IconButton from '@material-ui/core/IconButton'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
-import ListItemText from '@material-ui/core/ListItemText'
-import TextField from '@material-ui/core/TextField'
-
-import CloseIcon from '@material-ui/icons/Close'
-import ShowOnMapIcon from '@material-ui/icons/Explore'
+import { Button, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, TextField } from '@mui/material'
+import { Close, Explore } from '@mui/icons-material'
 
 import { rectBoundsFromFeature } from '../../utils/math'
 import { highlightFeature, openFeatureDetail, openSearch, setViewport } from '../../store'
@@ -112,7 +104,7 @@ class SearchControl extends React.PureComponent {
                 dispatch(highlightFeature(feature.id, feature.collectionId))
                 dispatch(setViewport(rectBoundsFromFeature(feature)))
               }}>
-                <ShowOnMapIcon />
+                <Explore />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>

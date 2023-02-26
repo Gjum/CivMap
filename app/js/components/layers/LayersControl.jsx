@@ -1,18 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Collapse from '@material-ui/core/Collapse'
-import IconButton from '@material-ui/core/IconButton'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
-import ListItemText from '@material-ui/core/ListItemText'
-import ListSubheader from '@material-ui/core/ListSubheader'
-
-import MoreIcon from '@material-ui/icons/MoreVert'
-import InvisibleIcon from '@material-ui/icons/VisibilityOff'
-import VisibleIcon from '@material-ui/icons/Visibility'
+import { Collapse, IconButton, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material'
+import { MoreVert, VisibilityOff, Visibility } from '@mui/icons-material'
 
 import { disablePresentationInCollection, enablePresentationInCollection, openCollectionEdit } from '../../store'
 
@@ -29,14 +19,14 @@ const Layer = ({ nested, dispatch, collection, presentation, enabled_presentatio
     if (isEnabled) dispatch(disablePresentationInCollection(collection.id, presentation.name))
     else dispatch(enablePresentationInCollection(collection.id, nested ? presentation.name : true))
   }}>
-    <ListItemIcon>{isEnabled ? <VisibleIcon /> : <InvisibleIcon />}</ListItemIcon>
+    <ListItemIcon>{isEnabled ? <Visibility /> : <VisibilityOff />}</ListItemIcon>
     <ListItemText primary={presentation.name} />
     <ListItemSecondaryAction>
       <IconButton onClick={() =>
         // TODO dispatch(openPresentationEdit(presentation.name))
         dispatch(openCollectionEdit(collection.id))
       }>
-        <MoreIcon />
+        <MoreVert />
       </IconButton>
     </ListItemSecondaryAction>
   </ListItem>

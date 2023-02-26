@@ -7,10 +7,6 @@ import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
 
 export default class EditableCircle extends React.PureComponent {
-  static contextTypes = {
-    leafMap: PropTypes.object,
-  }
-
   resetEditor = () => {
     const editor = this.featureRef.enableEdit()
     editor.reset() // TODO only reset when radius/center changed
@@ -51,34 +47,38 @@ export default class EditableCircle extends React.PureComponent {
   }
 
   render() {
-    let { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
-    editable = false // TODO fix radius marker projection
-
-    const { id, collectionId, x, z, radius } = feature
-    const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
-
-    if (!radius) {
-      const tempCircle = this.context.leafMap.editTools.startCircle()
-      // XXX on react unmount, disable editor and unregister handler
-      tempCircle.on('editable:vertex:dragend', e => {
-        const [zNew, xNew] = intCoords(tempCircle.getLatLng())
-        const radiusNew = Math.round(tempCircle.getRadius())
-        tempCircle.remove()
-        this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, xNew, zNew, radiusNew }))
-      })
-
-      return null
-    }
-
-    // let leaflet internals finish updating before we interact with it
-    setTimeout(this.resetEditor, 0)
-
-    return <RL.Circle
-      ref={this.onRef.bind(this)}
-      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
-      {...convertStyle(style)}
-      center={[z + .5, x + .5]}
-      radius={radius}
-    />
+    return <RL.MapConsumer>
+      {(map) => {
+        let { dispatch, editable, feature, baseStyle, highlightStyle, zoomStyle } = this.props
+        editable = false // TODO fix radius marker projection
+    
+        const { id, collectionId, x, z, radius } = feature
+        const style = calculateFeatureStyle({ feature, baseStyle, highlightStyle, zoomStyle })
+    
+        if (!radius) {
+          const tempCircle = map.editTools.startCircle()
+          // XXX on react unmount, disable editor and unregister handler
+          tempCircle.on('editable:vertex:dragend', e => {
+            const [zNew, xNew] = intCoords(tempCircle.getLatLng())
+            const radiusNew = Math.round(tempCircle.getRadius())
+            tempCircle.remove()
+            this.props.dispatch(updateFeatureInCollection(this.props.feature.collectionId, { ...this.props.feature, xNew, zNew, radiusNew }))
+          })
+    
+          return null
+        }
+    
+        // let leaflet internals finish updating before we interact with it
+        setTimeout(this.resetEditor, 0)
+    
+        return <RL.Circle
+          ref={this.onRef.bind(this)}
+          onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+          {...convertStyle(style)}
+          center={[z + .5, x + .5]}
+          radius={radius}
+        />
+      }}
+    </RL.MapConsumer>
   }
 }

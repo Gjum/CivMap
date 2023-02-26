@@ -1,6 +1,6 @@
 import React from 'react'
 
-import TextField from '@material-ui/core/TextField'
+import { TextField } from '@mui/material'
 
 export default class JsonEditor extends React.PureComponent {
   constructor(props) {
@@ -14,7 +14,7 @@ export default class JsonEditor extends React.PureComponent {
   render() {
     const { data, onChange } = this.props
     return <TextField fullWidth multiline
-      rowsMax={9999}
+      maxRows={9999}
       style={this.props.style}
       label="JSON"
       value={this.state.parseErrorText ? undefined : JSON.stringify(data)}

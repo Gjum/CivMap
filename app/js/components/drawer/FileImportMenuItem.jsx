@@ -1,19 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemText from '@material-ui/core/ListItemText'
-import TextField from '@material-ui/core/TextField'
-
-import CloseIcon from '@material-ui/icons/Close'
-import FileUploadIcon from '@material-ui/icons/VerticalAlignTop'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItem, ListItemIcon, ListItemText, TextField } from '@mui/material'
+import { Close, FileUpload } from '@mui/icons-material'
 
 import { getFileProcessor, processVoxelWaypointsText } from '../../utils/importFile'
 import { setDrawerClosed } from '../../store'
@@ -46,7 +35,7 @@ export class ImportDialog extends React.Component {
         <TextField
           autoFocus
           fullWidth margin="dense"
-          multiline rows={2} rowsMax={10}
+          multiline rows={2} maxRows={10}
           label="Paste your Waypoints/Snitches/JSON here"
           value={this.state.importText}
           onChange={e => this.setState({ importText: e.target.value })}
@@ -54,7 +43,7 @@ export class ImportDialog extends React.Component {
       </DialogContent>
       <DialogActions>
         <Button onClick={() => this.props.onClose()}>
-          <CloseIcon />
+          <Close />
           Close
         </Button>
         <Button
@@ -62,7 +51,7 @@ export class ImportDialog extends React.Component {
           disabled={!this.state.importText}
           onClick={() => this.props.onImport(this.state.importText)}
         >
-          <FileUploadIcon />
+          <FileUpload />
           Import
         </Button>
       </DialogActions>
@@ -116,7 +105,7 @@ class FileImportMenuItem extends React.Component {
         style={{ display: "none" }}
         onChange={this.handleFileSelect}
       />
-      <ListItemIcon><FileUploadIcon /></ListItemIcon>
+      <ListItemIcon><FileUpload /></ListItemIcon>
       {this.state.dialogOpen && <ImportDialog
         onClose={() => this.setState({ dialogOpen: false })}
         onImport={(importText) => {

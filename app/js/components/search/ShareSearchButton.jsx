@@ -1,9 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import IconButton from '@material-ui/core/IconButton'
-
-import ShareIcon from '@material-ui/icons/Share'
+import { IconButton } from '@mui/material'
+import { Share } from '@mui/icons-material'
 
 const ShareSearchButton = ({
   dispatch,
@@ -15,7 +14,7 @@ const ShareSearchButton = ({
       // TODO better search sharing
     }}
   >
-    <ShareIcon />
+    <Share />
   </IconButton>
 }
 
