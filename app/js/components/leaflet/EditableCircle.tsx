@@ -5,42 +5,46 @@ import * as RL from 'react-leaflet'
 import { intCoords, intCoord } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
+import { EditableProps } from './EditableThing'
+import { Circle, CircleEditor, LeafletEvent } from 'leaflet'
 
-export default class EditableCircle extends React.PureComponent {
+export default class EditableCircle extends React.PureComponent<EditableProps> {
+  featureRef: L.Circle | null
+
+  constructor(props) {
+    super(props)
+
+    this.featureRef = null
+  }
+
   resetEditor = () => {
-    const editor = this.featureRef.enableEdit()
-    editor.reset() // TODO only reset when radius/center changed
-
     if (!this.featureRef) {
       console.error('trying to set circle editing without featureRef')
       return
     }
+    
     if (!this.props.editable) {
       this.featureRef.disableEdit()
       return
     }
 
-    this.featureRef.enableEdit() // create editor
-    this.featureRef.editor.reset()
-
-    if (!this.featureRef.civMapIsListening) {
-      this.featureRef.civMapIsListening = true
-      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
-      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
-    }
+    const editor = this.featureRef.enableEdit() as CircleEditor
+    editor.reset() // TODO only reset when radius/center changed
   }
 
-  updatePositions = (e) => {
+  updatePositions = (e: LeafletEvent) => {
     const { feature } = this.props
     const [x, z] = intCoords(this.featureRef.getLatLng())
     const radius = Math.round(this.featureRef.getRadius())
     this.props.dispatch(updateFeatureInCollection({ ...feature, x, z, radius }))
   }
 
-  onRef(ref) {
-    if (!ref || !ref.leafletElement) return
-
-    this.featureRef = ref.leafletElement
+  onRef(ref: Circle | null) {
+    this.featureRef = ref
+    if (ref) {
+      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
+      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
+    }
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
@@ -73,7 +77,13 @@ export default class EditableCircle extends React.PureComponent {
     
         return <RL.Circle
           ref={this.onRef.bind(this)}
-          onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+          eventHandlers={{
+            click: () => {
+              if (!editable) {
+                dispatch(openFeatureDetail(id, collectionId))
+              }
+            }
+          }}
           {...convertStyle(style)}
           center={[z + .5, x + .5]}
           radius={radius}

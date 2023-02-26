@@ -26,11 +26,6 @@ class LeafMap extends React.Component {
     this.state = {coords: [0, 0]}
   }
 
-  getChildContext() {
-    // TODO this might not fire early enough because we use this.map and not this.state.map
-    return { leafMap: this.map }
-  }
-
   componentWillMount() {
     window.onresize = e => {
       // e.target.innerHeight

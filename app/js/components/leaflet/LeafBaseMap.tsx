@@ -9,7 +9,7 @@ const LeafBaseMap = ({
   basemapId,
 }) => {
   if (!basemapId) return null
-  const tileBounds = [[-borderApothem, -borderApothem], [borderApothem, borderApothem]]
+  const tileBounds = [[-borderApothem, -borderApothem], [borderApothem, borderApothem]] as L.LatLngBoundsLiteral
   return <RL.TileLayer
     url={tilesRoot + basemapId + '/z{z}/{x},{y}.png'}
     errorTileUrl={'data:image/gifbase64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
@@ -17,7 +17,6 @@ const LeafBaseMap = ({
     bounds={tileBounds}
     minZoom={-6}
     maxNativeZoom={0}
-    continuousWorld={true}
   />
 }
 

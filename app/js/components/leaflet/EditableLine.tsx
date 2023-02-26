@@ -4,8 +4,16 @@ import * as RL from 'react-leaflet'
 import { centered, deepFlip, deepLatLngToArr } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
+import { EditableProps } from './EditableThing'
+import { LeafletEvent, Polyline, PolylineEditor } from 'leaflet'
 
-export default class EditableLine extends React.PureComponent {
+export default class EditableLine extends React.PureComponent<EditableProps> {
+  featureRef: L.Polyline | null
+
+  constructor(props) {
+    super(props)
+  }
+
   resetEditor = () => {
     if (!this.featureRef) {
       console.error('trying to set polyline editing without featureRef')
@@ -16,30 +24,23 @@ export default class EditableLine extends React.PureComponent {
       return
     }
 
-    this.featureRef.enableEdit() // create editor
-    this.featureRef.editor.reset()
+    const editor = this.featureRef.enableEdit() as PolylineEditor // create editor
+    editor.reset()
 
     const positions = this.props.feature.line
     if (!positions || positions.length <= 0 || positions[positions.length - 1].length <= 0) {
-      this.featureRef.editor.disable() // newShape() is broken while editing
-      this.featureRef.editor.newShape()
+      editor.disable() // newShape() is broken while editing
+      editor.newShape()
     }
     else {
-      this.featureRef.editor.disable() // continueForward() is broken while editing
-      this.featureRef.editor.continueForward()
-      this.featureRef.editor.enable() // re-add corner markers
-    }
-
-    if (!this.featureRef.civMapIsListening) {
-      this.featureRef.civMapIsListening = true
-      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
-      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
-      this.featureRef.on('editable:vertex:deleted', this.updatePositions)
+      editor.disable() // continueForward() is broken while editing
+      editor.continueForward()
+      editor.enable() // re-add corner markers
     }
   }
 
-  updatePositions = (e) => {
-    this.featureRef.editor.ensureMulti()
+  updatePositions = (e: LeafletEvent) => {
+    // this.featureRef.editor.ensureMulti()
     // for some reason this makes it [[[[]]]] so just get first
     const positions = deepLatLngToArr(this.featureRef.getLatLngs())
     // TODO ignore updates that only add 1-point segments
@@ -47,10 +48,13 @@ export default class EditableLine extends React.PureComponent {
     this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, line: positions }))
   }
 
-  onRef = (ref) => {
-    if (!ref || !ref.leafletElement) return
-
-    this.featureRef = ref.leafletElement
+  onRef = (ref: Polyline | null) => {
+    this.featureRef = ref
+    if (ref) {
+      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
+      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
+      this.featureRef.on('editable:vertex:deleted', this.updatePositions)
+    }
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
@@ -66,7 +70,13 @@ export default class EditableLine extends React.PureComponent {
 
     return <RL.Polyline
       ref={this.onRef}
-      onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+      eventHandlers={{
+        click: () => {
+          if (!editable) {
+            dispatch(openFeatureDetail(id, collectionId))
+          }
+        }
+      }}
       {...convertStyle(style)}
       positions={!checkValidMultiLine(line) ? [] : centered(deepFlip(line))}
     />

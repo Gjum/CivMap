@@ -5,8 +5,18 @@ import * as RL from 'react-leaflet'
 import { deepFlip, boundsToRect } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
+import { EditableProps } from './EditableThing'
+import { LeafletEvent, Rectangle, RectangleEditor } from 'leaflet'
 
-export default class EditableCircle extends React.PureComponent {
+export default class EditableRectangle extends React.PureComponent<EditableProps> {
+  featureRef: Rectangle | null
+
+  constructor(props) {
+    super(props)
+
+    this.featureRef = null
+  }
+
   resetEditor = () => {
     if (!this.featureRef) {
       console.error('trying to set rectangle editing without featureRef')
@@ -17,26 +27,22 @@ export default class EditableCircle extends React.PureComponent {
       return
     }
 
-    const editor = this.featureRef.enableEdit()
+    const editor = this.featureRef.enableEdit() as RectangleEditor
     editor.reset() // TODO only reset when radius/center changed
-
-    if (!this.featureRef.civMapIsListening) {
-      this.featureRef.civMapIsListening = true
-      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
-      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
-    }
   }
 
-  updatePositions = (e) => {
+  updatePositions = (e: LeafletEvent) => {
     const { feature } = this.props
     const rectangle = boundsToRect(this.featureRef.getBounds())
     this.props.dispatch(updateFeatureInCollection(feature.collectionId, { ...feature, rectangle }))
   }
 
-  onRef(ref) {
-    if (!ref || !ref.leafletElement) return
-
-    this.featureRef = ref.leafletElement
+  onRef(ref: Rectangle | null) {
+    this.featureRef = ref
+    if (ref) {
+      this.featureRef.on('editable:drawing:clicked', this.updatePositions)
+      this.featureRef.on('editable:vertex:dragend', this.updatePositions)
+    }
 
     // let leaflet internals finish updating before we interact with it
     setTimeout(this.resetEditor, 0)
@@ -69,7 +75,13 @@ export default class EditableCircle extends React.PureComponent {
 
         return <RL.Rectangle
           ref={this.onRef.bind(this)}
-          onclick={() => editable || dispatch(openFeatureDetail(id, collectionId))}
+          eventHandlers={{
+            click: () => {
+              if (!editable) {
+                dispatch(openFeatureDetail(id, collectionId))
+              }
+            }
+          }}
           {...convertStyle(style)}
           bounds={!valid ? [[1,2],[3,4]] : deepFlip(rectangle)}
         />

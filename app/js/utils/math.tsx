@@ -1,4 +1,4 @@
-export function intCoords(point) {
+export function intCoords(point: (number|string)[] | {lng: (number|string); lat: (number|string)}) {
   let x, z
   if (Array.isArray(point)) {
     [x, z] = point
@@ -13,8 +13,8 @@ export function intCoords(point) {
   return [rx, rz]
 }
 
-export function intCoord(c) {
-  let r = parseInt(c)
+export function intCoord(c: number|string) {
+  let r = parseInt(c.toString())
   if (r !== c && c < 0) r -= 1
   return r
 }
