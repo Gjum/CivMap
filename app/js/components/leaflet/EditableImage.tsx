@@ -3,7 +3,7 @@ import * as RL from 'react-leaflet'
 
 import { deepFlip } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
-import { openFeatureDetail } from '../../store'
+import { openFeature } from '../../store'
 import { EditableProps } from './EditableThing'
 
 export default class EditableImage extends React.PureComponent<EditableProps> {
@@ -16,7 +16,7 @@ export default class EditableImage extends React.PureComponent<EditableProps> {
       eventHandlers={{
         click: () => {
           if (!editable) {
-            dispatch(openFeatureDetail(id, collectionId))
+            dispatch(openFeature(id, collectionId))
           }
         }
       }}

@@ -1,15 +1,28 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 
 import { Button, IconButton, TextField } from '@mui/material'
 import { Check, Delete, Download, RestartAlt } from '@mui/icons-material'
 
-import { exportCollection } from '../../utils/importExport'
-import JsonEditor from '../edit/JsonEditor'
-import { openLayers, removeCollection, updateCollection } from '../../store'
+import { exportCollection } from '../../../utils/importExport'
+import JsonEditor from '../feature-edit/JsonEditor'
+import { openTabs, removeCollection, RootState, updateCollection } from '../../../store'
+import { Collection, CollectionId } from '../../../collectionstate'
 
-class RealCollectionEditor extends React.PureComponent {
-  constructor(props) {
+interface OwnProps {
+  collectionID: CollectionId
+}
+
+type Props = OwnProps & {
+  collection: Collection
+}
+
+interface State {
+  originalCollection: Collection
+}
+
+class RealCollectionEditor extends React.PureComponent<DispatchProp & Props, State> {
+  constructor(props: DispatchProp & Props) {
     super(props)
     this.state = {
       originalCollection: props.collection,
@@ -35,14 +48,14 @@ class RealCollectionEditor extends React.PureComponent {
 
         <Button variant='contained' onClick={() => {
           dispatch(removeCollection(collection.id))
-          dispatch(openLayers())
+          dispatch(openTabs())
         }}>
           <Delete />
           Delete
         </Button>
 
         <Button variant='contained' onClick={() => {
-          dispatch(openLayers())
+          dispatch(openTabs())
         }}>
           <Check />
           Save
@@ -89,9 +102,9 @@ class RealCollectionEditor extends React.PureComponent {
   }
 }
 
-const mapStateToProps = ({ collections, control }) => {
+const mapStateToProps = ({ collections }: RootState, props: OwnProps) => {
   return {
-    collection: collections[control.activeCollectionId],
+    collection: collections[props.collectionID],
   }
 }
 

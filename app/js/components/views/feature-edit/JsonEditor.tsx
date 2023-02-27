@@ -2,7 +2,17 @@ import React from 'react'
 
 import { TextField } from '@mui/material'
 
-export default class JsonEditor extends React.PureComponent {
+interface Props {
+  data: any
+  onChange: any
+  style?: React.CSSProperties
+}
+
+interface State {
+  parseErrorText: string | undefined
+}
+
+export default class JsonEditor extends React.PureComponent<Props, State> {
   constructor(props) {
     super(props)
 

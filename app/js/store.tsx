@@ -5,12 +5,12 @@ import { inspect } from 'util'
 
 import { currentVersion } from './utils/convertFromOld';
 import { control, ControlState } from './controlstate'
-import { Collections, collections } from './collectionstate';
+import { Collections, collections, Feature } from './collectionstate';
 import { MapConfig, mapConfig } from './mapconfigstate';
 import { MapView, mapView } from './mapviewstate';
 
 export { createCollection, importCollection, removeFeatureInCollection, removeCollection, updateCollection, updateFeatureInCollection, disablePresentationInCollection, enablePresentationInCollection } from "./collectionstate"
-export { highlightFeature, openBrowseMode, openEditMode, openFeatureDetail, openLayers, openCollectionEdit, openSearch, setDrawerClosed, setDrawerOpen } from "./controlstate"
+export { openSearch, changeMainTab, openFeature, editFeature, editCollection, openTabs } from "./controlstate"
 export { setActiveBasemap, setViewport, equalViewports } from "./mapviewstate"
 
 export const combinedReducers = combineReducers({
@@ -38,7 +38,7 @@ export interface AppLoad {
 
 export const appLoad = (state: RootState): AppLoad => ({ type: 'APP_LOAD', state })
 
-export function lookupFeature(state: RootState, featureId, collectionId) {
+export function lookupFeature(state: RootState, featureId, collectionId): Feature {
   const collection = state.collections[collectionId]
   if (collection) {
     const feature = collection.features[featureId]

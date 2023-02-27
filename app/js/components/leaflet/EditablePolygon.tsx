@@ -4,7 +4,7 @@ import * as RL from 'react-leaflet'
 
 import { centered, deepFlip, deepLatLngToArr } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
-import { openFeatureDetail, updateFeatureInCollection } from '../../store'
+import { openFeature, updateFeatureInCollection } from '../../store'
 import { EditableProps } from './EditableThing'
 import { PolygonEditor } from 'leaflet'
 
@@ -80,7 +80,7 @@ export default class EditablePolygon extends React.PureComponent<EditableProps> 
           eventHandlers={{
             click: () => {
               if (!editable) {
-                dispatch(openFeatureDetail(id, collectionId))
+                dispatch(openFeature(id, collectionId))
               }
             }
           }}

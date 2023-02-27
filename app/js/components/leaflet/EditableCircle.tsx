@@ -4,7 +4,7 @@ import * as RL from 'react-leaflet'
 
 import { intCoords, intCoord } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
-import { openFeatureDetail, updateFeatureInCollection } from '../../store'
+import { openFeature, updateFeatureInCollection } from '../../store'
 import { EditableProps } from './EditableThing'
 import { Circle, CircleEditor, LeafletEvent } from 'leaflet'
 
@@ -36,7 +36,7 @@ export default class EditableCircle extends React.PureComponent<EditableProps> {
     const { feature } = this.props
     const [x, z] = intCoords(this.featureRef.getLatLng())
     const radius = Math.round(this.featureRef.getRadius())
-    this.props.dispatch(updateFeatureInCollection({ ...feature, x, z, radius }))
+    // this.props.dispatch(updateFeatureInCollection({ ...feature, x, z, radius }))
   }
 
   onRef(ref: Circle | null) {
@@ -80,7 +80,7 @@ export default class EditableCircle extends React.PureComponent<EditableProps> {
           eventHandlers={{
             click: () => {
               if (!editable) {
-                dispatch(openFeatureDetail(id, collectionId))
+                dispatch(openFeature(id, collectionId))
               }
             }
           }}

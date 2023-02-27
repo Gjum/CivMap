@@ -12,6 +12,7 @@ import { equalViewports, RootState, setViewport } from '../../store'
 import { boundsToContainedCircle, Circle, circleToBounds, deepFlip, intCoord } from '../../utils/math'
 import { patterns } from '../../utils/presentation'
 import Coordinates from './Coordinates'
+import AddFab from './AddFab'
 
 L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/images/'
 
@@ -94,6 +95,7 @@ class LeafMap extends React.Component<DispatchProp & ReturnType<typeof mapStateT
             return null
           }}
         </RL.MapConsumer>
+        <AddFab />
         <Coordinates />
         <LeafBaseMap />
         <LeafOverlay />
@@ -102,11 +104,10 @@ class LeafMap extends React.Component<DispatchProp & ReturnType<typeof mapStateT
   }
 }
 
-const mapStateToProps = ({ control, mapConfig, mapView }: RootState) => {
+const mapStateToProps = ({ mapConfig, mapView }: RootState) => {
   return {
     mapBgColor: (mapConfig.basemaps[mapView.basemapId] || {}).bgColor,
     viewport: mapView.viewport,
-    _appMode: control.appMode, // dummy, only to trigger a re-render
   }
 }
 

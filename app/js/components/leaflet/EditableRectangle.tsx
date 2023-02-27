@@ -4,7 +4,7 @@ import * as RL from 'react-leaflet'
 
 import { deepFlip, boundsToRect } from '../../utils/math'
 import { calculateFeatureStyle, convertStyle } from '../../utils/presentation'
-import { openFeatureDetail, updateFeatureInCollection } from '../../store'
+import { openFeature, updateFeatureInCollection } from '../../store'
 import { EditableProps } from './EditableThing'
 import { LeafletEvent, Rectangle, RectangleEditor } from 'leaflet'
 
@@ -78,7 +78,7 @@ export default class EditableRectangle extends React.PureComponent<EditableProps
           eventHandlers={{
             click: () => {
               if (!editable) {
-                dispatch(openFeatureDetail(id, collectionId))
+                dispatch(openFeature(id, collectionId))
               }
             }
           }}

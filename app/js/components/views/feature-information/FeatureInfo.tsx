@@ -1,11 +1,21 @@
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { Dispatch } from 'react'
+import { connect, DispatchProp } from 'react-redux'
 
 import { Button, Stack } from '@mui/material'
 import { DeleteRounded, EditRounded, MapRounded } from '@mui/icons-material'
 
-import { circleBoundsFromFeature, rectBoundsFromFeature } from '../../utils/math'
-import { openBrowseMode, removeFeatureInCollection, setViewport, lookupFeature, openEditMode } from '../../store'
+import { circleBoundsFromFeature, rectBoundsFromFeature } from '../../../utils/math'
+import { openTabs, removeFeatureInCollection, setViewport, lookupFeature, editFeature, RootState } from '../../../store'
+import { CollectionId, Feature, FeatureId } from '../../../collectionstate'
+
+interface OwnProps {
+  featureID: FeatureId
+  featureCollection: CollectionId
+}
+
+type Props = OwnProps & {
+  feature: Feature
+}
 
 export function isUrl(value) {
   return /^https?:\/\/[^\/ ]+\.[a-z]{2,}(\/|$)/i.test(value)
@@ -27,7 +37,7 @@ function linkify(val) {
   return elements.slice(1)
 }
 
-const FeatureProps = ({ feature }) => {
+const FeatureProps = ({ feature }: { feature: Feature }) => {
   let image = null
   let title = null
   let otherProps = []
@@ -82,14 +92,14 @@ const FeatureProps = ({ feature }) => {
 const RealFeatureInfo = ({
   feature,
   dispatch,
-}) => {
+}: Props & DispatchProp) => {
   if (!feature) {
     // TODO find clean solution
     // show "Loading" if we're still waiting on collections to load
     return <div style={{ margin: '16px' }}>
       <h2>There might have been an error.</h2>
       <p>Sorry about that.</p>
-      <Button variant='contained' onClick={() => dispatch(openBrowseMode())}>
+      <Button variant='contained' onClick={() => dispatch(openTabs())}>
         Close
       </Button>
     </div>
@@ -106,14 +116,14 @@ const RealFeatureInfo = ({
         Show on map
       </Button>
 
-      <Button onClick={() => dispatch(openEditMode(feature.id, feature.collectionId))}>
+      <Button onClick={() => dispatch(editFeature(feature.id, feature.collectionId))}>
         <EditRounded />
         Edit feature
       </Button>
 
       <Button variant='contained' onClick={() => {
         dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
-        dispatch(openBrowseMode()) // TODO show similar features in search results instead
+        dispatch(openTabs()) // TODO show similar features in search results instead
       }}>
         <DeleteRounded />
         Delete
@@ -122,10 +132,10 @@ const RealFeatureInfo = ({
   </div>
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState, props: OwnProps) => {
   const { control } = state
   return {
-    feature: lookupFeature(state, control.activeFeatureId, control.activeFeatureCollection),
+    feature: lookupFeature(state, props.featureID, props.featureCollection),
   }
 }
 

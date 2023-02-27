@@ -1,7 +1,7 @@
 import { convertFeatureFrom200, convertCollectionFromAny } from './convertFromOld'
 import { rectBoundsFromFeature } from './math'
 import { getJSON } from './net'
-import { enablePresentationInCollection, importCollection, openFeatureDetail, openSearch, setActiveBasemap, setViewport, updateFeatureInCollection, lookupFeature } from '../store'
+import { enablePresentationInCollection, importCollection, openFeature, openSearch, setActiveBasemap, setViewport, updateFeatureInCollection, lookupFeature } from '../store'
 
 /**
  * @typedef {{basemap?: String, viewport?: Object, collectionUrl?: String, featureId?: String, feature?: Object, collection?: Object, searchQuery?: String}} UrlData
@@ -114,7 +114,7 @@ export function loadAppStateFromUrlData(urlData, store) {
     if (urlData.featureId) {
       const feature = lookupFeature(store.getState(), urlData.featureId, (urlCollectionData || {}).id)
       if (feature) {
-        store.dispatch(openFeatureDetail(feature.id, feature.collectionId))
+        store.dispatch(openFeature(feature.id, feature.collectionId))
         if (!urlData.viewport) {
           const viewport = rectBoundsFromFeature(feature)
           store.dispatch(setViewport(viewport))

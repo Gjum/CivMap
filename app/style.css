@@ -142,6 +142,14 @@ div {
   margin-top: 48px;
 }
 
+.mainlist {
+  display: flex;
+  flex-direction: column;
+}
+.mainlist .content {
+  flex-grow: 1;
+}
+
 .mapContainer {
   grid-area: map;
 }
@@ -175,10 +183,20 @@ div {
   .mainlist {
     margin-top: 0px;
     background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(30px) saturate(150%);
   }
   .mapContainer {
     grid-column-end: mainlist;
+  }
+  #add-fab-noside {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+  }
+  #add-fab-side {
+    position: absolute;
+    bottom: 16px;
+    right: 376px;
   }
 
   .appbar {

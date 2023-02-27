@@ -3,8 +3,9 @@ import { connect } from 'react-redux'
 
 import { Collapse, IconButton, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material'
 import { MoreVert, VisibilityOff, Visibility } from '@mui/icons-material'
+import { disablePresentationInCollection, editCollection, enablePresentationInCollection } from '../../../../store'
 
-import { disablePresentationInCollection, enablePresentationInCollection, openCollectionEdit } from '../../store'
+// import { disablePresentationInCollection, enablePresentationInCollection, openCollectionEdit } from '../../store'
 
 // TODO better visually distinguish multi-layer collections from single-layer collections
 
@@ -24,7 +25,7 @@ const Layer = ({ nested, dispatch, collection, presentation, enabled_presentatio
     <ListItemSecondaryAction>
       <IconButton onClick={() =>
         // TODO dispatch(openPresentationEdit(presentation.name))
-        dispatch(openCollectionEdit(collection.id))
+        dispatch(editCollection(collection.id))
       }>
         <MoreVert />
       </IconButton>

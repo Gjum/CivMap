@@ -5,7 +5,7 @@ import * as RL from 'react-leaflet'
 
 import { intCoords } from '../../utils/math'
 import { calculateFeatureStyle } from '../../utils/presentation'
-import { openFeatureDetail, updateFeatureInCollection } from '../../store'
+import { openFeature, updateFeatureInCollection } from '../../store'
 import { EditableProps } from './EditableThing'
 
 function createIcon({ feature, style }) {
@@ -117,7 +117,7 @@ export default class EditableMarker extends React.PureComponent<EditableProps> {
           eventHandlers={{
             click: () => {
               if (!editable) {
-                dispatch(openFeatureDetail(id, collectionId))
+                dispatch(openFeature(id, collectionId))
               }
             }
           }}
@@ -129,7 +129,7 @@ export default class EditableMarker extends React.PureComponent<EditableProps> {
           eventHandlers={{
             click: () => {
               if (!editable) {
-                dispatch(openFeatureDetail(id, collectionId))
+                dispatch(openFeature(id, collectionId))
               }
             }
           }}

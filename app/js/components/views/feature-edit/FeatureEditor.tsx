@@ -1,26 +1,41 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 
 import { Button, Stack, TextField, Snackbar } from '@mui/material'
 
 import { CheckRounded, DeleteRounded, HorizontalRuleRounded, PentagonRounded, RestartAltRounded, SwapHorizRounded, LinkRounded } from '@mui/icons-material'
 
-import { exportStringFromFeature } from '../../utils/importExport'
-import JsonEditor from '../edit/JsonEditor'
-import { reversePolyPositions } from '../../utils/math'
-import { lookupFeature, openBrowseMode, openEditMode, openFeatureDetail, removeFeatureInCollection, updateFeatureInCollection } from '../../store'
+import { exportStringFromFeature } from '../../../utils/importExport'
+import JsonEditor from './JsonEditor'
+import { reversePolyPositions } from '../../../utils/math'
+import { lookupFeature, openTabs, editFeature, openFeature, removeFeatureInCollection, updateFeatureInCollection, RootState } from '../../../store'
+import { CollectionId, Feature, FeatureId } from '../../../collectionstate'
 
-export class RealFeatureEditor extends React.Component {
-  constructor(props) {
+interface Props {
+  featureID: FeatureId
+  featureCollection: CollectionId
+  state: RootState
+}
+
+interface State {
+  originalFeature: Feature
+  open: boolean
+}
+
+export class RealFeatureEditor extends React.Component<DispatchProp & Props, State> {
+  constructor(props: DispatchProp & Props) {
     super(props)
+
+    const { featureID, featureCollection, state } = this.props
     this.state = {
-      originalFeature: props.feature,
+      originalFeature: lookupFeature(state, featureID, featureCollection),
       open: false,
     }
   }
 
   render() {
-    const { feature, dispatch } = this.props
+    const { featureID, featureCollection, state, dispatch } = this.props
+    const feature = lookupFeature(state, featureID, featureCollection)
     const { originalFeature, open } = this.state
 
     const dataLink = '#feature=' + exportStringFromFeature(feature)
@@ -39,13 +54,13 @@ export class RealFeatureEditor extends React.Component {
           onChange={(newFeature) => {
             // TODO validate feature
             dispatch(updateFeatureInCollection(feature.collectionId, newFeature, feature.id))
-            dispatch(openEditMode(newFeature.id, feature.collectionId))
+            dispatch(editFeature(newFeature.id, feature.collectionId))
           }}
         />
 
         <Button variant='contained' onClick={() => {
           dispatch(updateFeatureInCollection(feature.collectionId, originalFeature, feature.id))
-          dispatch(openEditMode(originalFeature.id, originalFeature.collectionId))
+          dispatch(editFeature(originalFeature.id, originalFeature.collectionId))
         }}>
           <RestartAltRounded />
           Reset
@@ -53,14 +68,14 @@ export class RealFeatureEditor extends React.Component {
 
         <Button variant='contained' onClick={() => {
           dispatch(removeFeatureInCollection(feature.collectionId, feature.id))
-          dispatch(openBrowseMode()) // TODO show similar features in search results instead
+          dispatch(openTabs()) // TODO show similar features in search results instead
         }}>
           <DeleteRounded />
           Delete
         </Button>
 
         <Button variant='contained' onClick={() => {
-          dispatch(openFeatureDetail(feature.id, feature.collectionId))
+          dispatch(openFeature(feature.id, feature.collectionId))
         }}>
           <CheckRounded />
           Save
@@ -69,13 +84,13 @@ export class RealFeatureEditor extends React.Component {
         {
           feature.polygon !== undefined ?
             <Button variant='contained' onClick={() => {
-              const f = { ...feature, line: feature.polygon }
+              const f = { ...feature, line: feature.polygon } as Feature
               delete f.polygon
               dispatch(updateFeatureInCollection(f.collectionId, f))
             }}><HorizontalRuleRounded />Convert to line</Button>
             : feature.line !== undefined ?
               <Button variant='contained' onClick={() => {
-                const f = { ...feature, polygon: feature.line }
+                const f = { ...feature, polygon: feature.line } as Feature
                 delete f.line
                 dispatch(updateFeatureInCollection(f.collectionId, f))
               }}><PentagonRounded />Convert to area</Button>
@@ -90,7 +105,7 @@ export class RealFeatureEditor extends React.Component {
             dispatch(updateFeatureInCollection(feature.collectionId, featureNew))
           }}><SwapHorizRounded />Reverse line/area direction</Button>
         }
-        <Snackbar open={open} autoHideDuration={6000} message="Link copied to clipboard!" onClosse={() => {
+        <Snackbar open={open} autoHideDuration={6000} message="Link copied to clipboard!" onClose={() => {
           this.setState({...this.state, open: false})
         }}/>
         <Button variant="contained" onClick={() => {
@@ -108,11 +123,6 @@ export class RealFeatureEditor extends React.Component {
 }
 
 
-const mapStateToProps = (state) => {
-  const { control } = state
-  return {
-    feature: lookupFeature(state, control.activeFeatureId, control.activeFeatureCollection),
-  }
-}
+const mapStateToProps = (state: RootState) => ({state})
 
 export default connect(mapStateToProps)(RealFeatureEditor)

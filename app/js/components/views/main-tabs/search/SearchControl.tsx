@@ -1,11 +1,17 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 
-import { Button, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, TextField } from '@mui/material'
-import { Close, Explore } from '@mui/icons-material'
+import { IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, TextField } from '@mui/material'
+import { ExploreRounded } from '@mui/icons-material'
 
-import { rectBoundsFromFeature } from '../../utils/math'
-import { highlightFeature, openFeatureDetail, openSearch, setViewport } from '../../store'
+import { rectBoundsFromFeature } from '../../../../utils/math'
+import { openSearch, setViewport, openFeature, RootState } from '../../../../store'
+import { Collections } from '../../../../collectionstate'
+
+interface Props {
+  collections: Collections
+  searchQuery: string
+}
 
 function fuzzyMatch(query, str) {
   let hay = str, i = 0, n = -1, l
@@ -37,7 +43,7 @@ function matchScore(query, words, str) {
   return 99
 }
 
-function search(query, collections) {
+function search(query: string, collections: Collections) {
   query = String(query).toLowerCase()
   if (!query || query.length <= 1) return []
   const words = query.split(' ')
@@ -57,7 +63,7 @@ function search(query, collections) {
   return searchResults.map(r => r[1])
 }
 
-class SearchControl extends React.PureComponent {
+class SearchControl extends React.PureComponent<DispatchProp & Props> {
   state = {
     parseErrorText: undefined,
   }
@@ -91,7 +97,7 @@ class SearchControl extends React.PureComponent {
         {topResults.map((feature, i) => {
           return <ListItem button key={feature.id}
             onClick={() => {
-              dispatch(openFeatureDetail(feature.id, feature.collectionId))
+              dispatch(openFeature(feature.id, feature.collectionId))
               dispatch(setViewport(rectBoundsFromFeature(feature)))
             }}
           >
@@ -101,10 +107,10 @@ class SearchControl extends React.PureComponent {
             />
             <ListItemSecondaryAction>
               <IconButton onClick={() => {
-                dispatch(highlightFeature(feature.id, feature.collectionId))
+                dispatch(openFeature(feature.id, feature.collectionId))
                 dispatch(setViewport(rectBoundsFromFeature(feature)))
               }}>
-                <Explore />
+                <ExploreRounded />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>
@@ -114,7 +120,7 @@ class SearchControl extends React.PureComponent {
   }
 }
 
-const mapStateToProps = ({ control: { searchQuery }, collections }) => {
+const mapStateToProps = ({ control: { searchQuery }, collections }: RootState) => {
   return {
     collections,
     searchQuery,
