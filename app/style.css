@@ -139,7 +139,12 @@ div {
 .mainlist {
   grid-area: mainlist;
   overflow-y: auto;
-  margin-top: 48px;
+}
+
+#add-fab-noside, #add-fab-side {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
 }
 
 .mainlist {

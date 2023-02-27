@@ -64,7 +64,6 @@ export default function (props) {
   return <ThemeProvider theme={darkTheme}>
     <CssBaseline />
     <div className='full'>
-      <AppBar />
       <div className={"container " + containerModeClass}>
         <LeafMap />
         {SideContent &&
