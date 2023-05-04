@@ -129,7 +129,14 @@ export function loadAppStateFromUrlData(urlData, store) {
   }
 }
 
+/** @type Set<string> */
+const alreadyImported = new Set();
+
 export function loadCollectionJsonAsync(url, dispatch, cb, enabled_presentation) {
+  if (alreadyImported.has(url)) {
+    return;
+  }
+  alreadyImported.add(url);
   getJSON(url,
     data => {
       loadCollectionJson(data, dispatch, url, enabled_presentation)
@@ -146,11 +153,24 @@ export function loadCollectionJson(data, dispatch, source, enabled_presentation)
   const collection = convertCollectionFromAny({
     info: {},
     features: [],
+    external: [],
     presentations: [],
     id: source, // fallback
     ...data,
     source, // override whatever is inside data
   })
+
+  if (Array.isArray(collection.external)) {
+    for (const externalJsonUrl of collection.external) {
+      loadCollectionJsonAsync(
+          externalJsonUrl,
+          dispatch,
+          null,
+          // Inherit the presentation setting
+          enabled_presentation
+      );
+    }
+  }
 
   if (enabled_presentation === undefined) {
     if (!collection.enabled_presentation && collection.presentations[0]) {
