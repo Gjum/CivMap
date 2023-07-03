@@ -7,9 +7,16 @@ import { intCoords } from '../../utils/math'
 import { calculateFeatureStyle } from '../../utils/presentation'
 import { openFeatureDetail, updateFeatureInCollection } from '../../store'
 
+const cssColorRE = /^[- a-z0-9#().,/%]+$/i
+
 function createIcon({ feature, style }) {
-  let { color, fill_opacity = 1, icon, icon_size, opacity, stroke_color, stroke_width = 1 } = style
+  let { color, fill_opacity = 1, icon, icon_size, stroke_color, stroke_width = 1 } = style
   icon = icon || feature.icon
+
+  icon_size = parseFloat(icon_size)
+  stroke_width = parseFloat(stroke_width)
+  if (!cssColorRE.test(color)) color = undefined
+  if (!cssColorRE.test(stroke_color)) stroke_color = undefined
 
   if ((icon + '').startsWith('http') || (icon + '').startsWith('/')) {
     if (!icon_size) icon_size = 32
@@ -19,7 +26,7 @@ function createIcon({ feature, style }) {
       // iconAnchor: [icon_anchor_x, icon_anchor_y], // TODO from style, only if both are set
     })
   } else {
-    if (!stroke_color) stroke_color = style.color
+    if (!stroke_color) stroke_color = color
     if (!stroke_color) stroke_color = '#000000'
     if (!color) color = '#aaaaaa'
     if (!icon_size) icon_size = 14
