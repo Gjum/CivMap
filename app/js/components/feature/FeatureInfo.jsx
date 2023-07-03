@@ -20,11 +20,15 @@ function linkify(val) {
   if (isUrl(val)) return <a href={val} target='_blank'>{val}</a>
 
   const elements = []
-  val = '' + val // make string
-  val.split(' ').forEach((word, i) => {
+  val = String(val).replace(/\n/g,' \n ')
+  val.split(/ +/).forEach((word, i) => {
     elements.push(' ')
-    if (/^\/?[ru]\/[^ \/]+$/.test(word)) {
+    if (/^\/?[ru]\/[^\s\/]+$/.test(word)) {
       elements.push(<a key={i} href={`https://reddit.com/${word}`} target='_blank' rel='noopener'>{word}</a>)
+    } else if (isUrl(val)) {
+      elements.push(<a href={word} target='_blank'>{word}</a>)
+    } else if (word === '\n') {
+      elements.push(<br />)
     } else {
       elements.push(word)
     }
