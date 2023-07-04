@@ -20,6 +20,7 @@ export default class ErrorBoundary extends React.Component {
       return <div className='error-display'>
         <h1>Something went wrong.</h1>
         <p>Try reloading the page.</p>
+        <p>If it still doesn't work, try clearing your cookies for this site.</p>
         <pre style={{
           padding: '1em',
           backgroundColor: '#eeeeee',
